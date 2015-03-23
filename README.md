@@ -18,4 +18,5 @@
 - Connected particles:
 - Circular motion:
 - Simple harmonic motion:
-- Relative motion:
+- Relative velocity:
+- Collisions:
