@@ -6,6 +6,7 @@ var clearID;
 var offGround;
 var fps = 60;
 var scale;
+var currentObject = 0;
 
 $(document).ready(function(){
 	
@@ -22,6 +23,34 @@ $(document).ready(function(){
 	
 });
 
+function swapObjects(){
+	
+	var first = document.getElementById("first");
+	var second = document.getElementById("second");
+	
+	if(first.style.display != "none"){
+		
+		first.style.display = "none";
+		second.style.display = "block";
+		
+	}else{
+		
+		first.style.display = "block";
+		second.style.display = "none";
+		
+	}
+}
+
+function movingObject(){
+	this.u = 0;
+	this.s = 0;
+	this.a = 0;
+}
+
+function run(){
+	
+}
+/*
 function addNew(){
 	
 	var value = document.getElementById("name").value;
@@ -41,3 +70,4 @@ function addNew(){
     option.text = value;
     x.add(option);
 }
+*/
