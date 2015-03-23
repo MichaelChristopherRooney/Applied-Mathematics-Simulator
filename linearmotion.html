@@ -1,0 +1,30 @@
+<html>
+
+<meta charset="UTF-8"> 
+
+	<script src="js/raphael.js"></script>
+	<script src="js/jquery-1.11.2.js"></script>
+	<script src="js/linearmotion.js"></script>
+	
+	<body>
+	
+		<div style="width:160px;">
+		
+			<select id="dropdown">
+				<option>None</option>
+			</select>
+			<div style="height:5px;"></div>
+			
+			<input id="name" class="" name="name" type="text" placeholder="Name of object" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>
+			
+			<button onclick="addNew()" type="button">Add new object</button>
+			<div style="height:5px;"></div>
+			
+		</div>
+		
+		<div id="graphics_panel" style="position:fixed; left:160px;width:610px;"></div>
+		
+	</body>
+	
+</html>

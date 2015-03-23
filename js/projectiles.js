@@ -1,4 +1,4 @@
-var height = 600;
+var size = 600;
 var circle;
 var paper;
 var proj;
@@ -10,13 +10,13 @@ var scale;
 $(document).ready(function(){
 	
 	// Creates canvas 320 × 200 at 10, 50
-	paper = Raphael(160, 0, height, height);
+	paper = Raphael(160, 0, size, size);
 	
-	var backgroundRectangle = paper.rect(0, 0, height, height);
+	var backgroundRectangle = paper.rect(0, 0, size, size);
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
 	
-	circle = paper.circle(0, height, 10);
+	circle = paper.circle(0, size, 10);
 	circle.attr("fill", "#f00");
 	circle.attr("stroke", "#fff");
 	
@@ -38,25 +38,6 @@ function Projectile(u, projectileAngle){
 		this.slopeAngle = -1;
 }
 
-function getHeight() {
-	
-  var height = 0;
-  
-  if( typeof( window.innerWidth ) == 'number' ) {
-    //Non-IE
-    height = window.innerHeight;
-  } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-    //IE 6+ in 'standards compliant mode'
-    height = document.documentElement.clientHeight;
-  } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-    //IE 4 compatible
-    height = document.body.clientHeight;
-  }
-  
-  return height
-  
-}
-
 function getNextPosition(){
 	
 	if(proj.time < proj.tof){
@@ -68,7 +49,7 @@ function getNextPosition(){
 		proj.time = proj.time + (1/fps);
 	
 		circle.attr("cx", proj.sx * scale);
-		circle.attr("cy", height - (proj.sy * scale));
+		circle.attr("cy", size - (proj.sy * scale));
 	
 	}else{
 		
@@ -78,7 +59,7 @@ function getNextPosition(){
 		proj.sx = (proj.ux * proj.tof);
 	
 		circle.attr("cx", proj.sx * scale);
-		circle.attr("cy", height - (proj.sy * scale));
+		circle.attr("cy", size - (proj.sy * scale));
 		
 		clearInterval(clearID);
 	}
@@ -101,7 +82,7 @@ function getNextPositionOffGround(){
 		proj.time = proj.time + (1/fps);
 	
 		circle.attr("cx", proj.sx * scale);
-		circle.attr("cy", height - ((proj.startHeight + proj.sy) * scale));
+		circle.attr("cy", size - ((proj.startHeight + proj.sy) * scale));
 		
 	}else{
 		
@@ -111,7 +92,7 @@ function getNextPositionOffGround(){
 		proj.sx = (proj.ux * proj.tof);
 	
 		circle.attr("cx", proj.sx * scale);
-		circle.attr("cy", height);
+		circle.attr("cy", size);
 		
 		clearInterval(clearID);
 	}
@@ -171,12 +152,12 @@ function getOffGroundValues(){
 function getScale(){
 	
 	if(proj.range > proj.height && proj.range > proj.startHeight){
-		scale = height / proj.range;
+		scale = size / proj.range;
 	}else{
 		if(proj.height > proj.startHeight){
-			scale = height / proj.height;
+			scale = size / proj.height;
 		}else{
-			scale = height / (proj.startHeight + proj.height);
+			scale = size / (proj.startHeight + proj.height);
 		}
 	}
 }
@@ -234,7 +215,8 @@ function verifyInput(){
 function clearInput(){
 	document.getElementById("u").value = "";
 	document.getElementById("angle").value = "";
-	document.getElementById("time").value = "";
 	document.getElementById("isSloped").checked = false;
 	document.getElementById("slopeAngle").value = "";
+	document.getElementById("offGround").checked = false;
+	document.getElementById("startHeight").value = "";
 }
