@@ -2,58 +2,58 @@
 
 <meta charset="UTF-8"> 
 
-	<script src="js/raphael.js"></script>
-	<script src="js/jquery-1.11.2.js"></script>
-	<script src="js/projectiles.js"></script>
+<script src="js/raphael.js"></script>
+<script src="js/jquery-1.11.2.js"></script>
+<script src="js/projectiles.js"></script>
 	
-	<body>
+<body>
 	
-		<div style="width:160px;">
+	<div style="width:160px;">
 			
 			
-			<input id="u" class="" name="u" type="text" placeholder="Initial speed u (m/s)" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
+		<input id="u" class="" name="u" type="text" placeholder="Initial speed u (m/s)" autocomplete="off"/> </br>
+		<div style="height:5px;"></div>
 			
-			<input id="angle" class="" name="angle" type="text" placeholder="Projectile angle α" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
+		<input id="angle" class="" name="angle" type="text" placeholder="Projectile angle α" autocomplete="off"/> </br>
+		<div style="height:5px;"></div>
 			
-			<label>Sloped?</label> 
-			<input id = "isSloped" type="checkbox" autocomplete="off"></br>
-			<div style="height:5px;"></div>
+		<label>Sloped?</label> 
+		<input id = "isSloped" type="checkbox" autocomplete="off"></br>
+		<div style="height:5px;"></div>
 			
-			<input id="slopeAngle" class="" name="slopeAngle" type="text" placeholder="Slope angle ω" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
+		<input id="slopeAngle" class="" name="slopeAngle" type="text" placeholder="Slope angle ω" autocomplete="off"/> </br>
+		<div style="height:5px;"></div>
 			
-			<label>Off ground?</label> 
-			<input id = "offGround" type="checkbox" autocomplete="off"></br>
-			<div style="height:5px;"></div>
+		<label>Off ground?</label> 
+		<input id = "offGround" type="checkbox" autocomplete="off"></br>
+		<div style="height:5px;"></div>
 			
-			<input id="startHeight" class="" name="startHeight" type="text" placeholder="Starting height" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
+		<input id="startHeight" class="" name="startHeight" type="text" placeholder="Starting height" autocomplete="off"/> </br>
+		<div style="height:5px;"></div>
 			
-			<button onclick="runSimulation()" type="button">Run simulation</button> </br>
-			<div style="height:5px;"></div>
+		<button onclick="run()" type="button">Run simulation</button> </br>
+		<div style="height:5px;"></div>
 			
-			<button onclick="clearInput()" type="button">Clear input</button>
-			<div style="height:5px;"></div>
+		<button onclick="clearInput()" type="button">Clear input</button>
+		<div style="height:5px;"></div>
 			
-		</div>
+	</div>
 		
-		<div id="graphics_panel" style="position:fixed; left:160px;width:610px;"></div>
+	<div id="graphics_panel" style="position:fixed; left:160px;width:610px;"></div>
 		
-		<div id ="info_pane" style="position:fixed;left:770px;width:200px;top:0px;">
-			<div id="ux">ux:</div>
-			<div id="uy">uy:</div>
-			<div id="vx">vx:</div>
-			<div id="vy">vy:</div>
-			<div id="sx">sx:</div>
-			<div id="sy">sy:</div>
-			<div id="range">Range:</div>
-			<div id="height">Height:</div>
-			<div id="tof">TOF:</div>
-			<div id="scale">Scale:</div>
-		</div>
+	<div id ="info_pane" style="position:fixed;left:770px;width:200px;top:0px;">
+		<div id="ux">ux:</div>
+		<div id="uy">uy:</div>
+		<div id="vx">vx:</div>
+		<div id="vy">vy:</div>
+		<div id="sx">sx:</div>
+		<div id="sy">sy:</div>
+		<div id="range">Range:</div>
+		<div id="height">Height:</div>
+		<div id="tof">TOF:</div>
+		<div id="scale">Scale:</div>
+	</div>
 		
-	</body>
+</body>
 	
 </html>
