@@ -114,10 +114,10 @@ function verifyInput(){
 	value = parseInt(document.getElementById("s").value);
 
 	if(isNaN(value) || value == ""){
-		alertMessage += "\tInitial position angle must be a number\n";
+		alertMessage += "\tInitial position must be a number\n";
 	}
 
-	/* if the enable second check box is checked  */
+	/* if the "enable second" check box is checked  */
 	if(document.getElementById("enableSecond").checked == true){
 
 		var value = parseInt(document.getElementById("u1").value);
@@ -137,7 +137,7 @@ function verifyInput(){
 
 		if(isNaN(value) || value == ""){
 			alertMessage +=
-			"\tInitial position angle must be a number\n";
+			"\tInitial position must be a number\n";
 		}
 
 	}
@@ -151,6 +151,8 @@ function verifyInput(){
 
 function clearInput(){
 
+	document.getElementById("dropdown").selectedIndex = 0;
+	
 	document.getElementById("u").value = "";
 	document.getElementById("a").value = "";
 	document.getElementById("s").value = "";

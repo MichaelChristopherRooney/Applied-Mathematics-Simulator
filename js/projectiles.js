@@ -21,20 +21,24 @@ $(document).ready(function(){
 	
 });
 
+/*
+see appendix for detailed explanations of
+values and formulae used in projectiles
+*/
 function Projectile(u, projectileAngle){
 		this.ux = u * Math.cos(projectileAngle * (Math.PI / 180));
 		this.uy = u * Math.sin(projectileAngle * (Math.PI / 180));
-		this.vx = 0;
+		this.vx = this.ux;
 		this.vy = 0;
 		this.pa = projectileAngle;
-		this.tof = (2 * this.uy) / 9.8 // time of flight
-		this.sx = 0; // distance in x plane
-		this.sy = 0; // distance in y plane
+		this.tof = (2 * this.uy) / 9.8;
+		this.sx = 0;
+		this.sy = 0; 
 		this.time = 0;
 		this.range = this.ux * this.tof;
 		this.height = 
 			(this.uy * (this.tof / 2) 
-			+ (0.5 * -9.8 * (this.tof / 2) 
+			+ (-4.9 * (this.tof / 2) 
 			* (this.tof / 2)));
 		this.startHeight = -1;
 		this.slopeAngle = -1;
@@ -47,11 +51,10 @@ function simulateStep(){
 	
 	if(proj.time < proj.tof){
 		
-		proj.vx = proj.ux;
 		proj.vy = proj.uy + (-9.8 * proj.time);
 		proj.sx = (proj.ux * proj.time);
 		proj.sy = (proj.uy * proj.time) 
-			+ (0.5 * -9.8 * proj.time * proj.time);
+			+ (-4.9 * proj.time * proj.time);
 		proj.time = proj.time + (1/fps);
 	
 		circle.attr("cx", proj.sx * scale);
@@ -59,7 +62,6 @@ function simulateStep(){
 	
 	}else{
 		
-		proj.vx = proj.ux;
 		proj.vy = proj.uy + (-9.8 * proj.tof);
 		proj.sy = 0;
 		proj.sx = (proj.ux * proj.tof);
@@ -68,6 +70,7 @@ function simulateStep(){
 		circle.attr("cy", size - (proj.sy * scale));
 		
 		clearInterval(clearID);
+		
 	}
 	
 	document.getElementById("vx").innerHTML = "vx: " + proj.vx.toFixed(3);
@@ -85,11 +88,10 @@ function simulateStepOffGround(){
 	
 	if(proj.time < proj.tof){
 		
-		proj.vx = proj.ux;
 		proj.vy = proj.uy + (-9.8 * proj.time);
 		proj.sx = (proj.ux * proj.time);
 		proj.sy = (proj.uy * proj.time) 
-			+ (0.5 * -9.8 * proj.time * proj.time);
+			+ (-4.9 * proj.time * proj.time);
 		proj.time = proj.time + (1/fps);
 	
 		circle.attr("cx", proj.sx * scale);
@@ -106,6 +108,7 @@ function simulateStepOffGround(){
 		circle.attr("cy", size);
 		
 		clearInterval(clearID);
+		
 	}
 	
 	document.getElementById("vx").innerHTML = "vx: " + proj.vx.toFixed(3);
@@ -166,12 +169,13 @@ off the ground
 */
 function getOffGroundValues(){
 	
-	proj.tof = (-proj.uy - Math.sqrt((proj.uy * proj.uy) 
-		- (4*0.5*-9.8*proj.startHeight))) / -9.8;
+	proj.tof = (-proj.uy 
+		- Math.sqrt((proj.uy * proj.uy) - (-19.6 * proj.startHeight)))
+		/ -9.8;
 	proj.range = proj.ux * proj.tof;
 	var tempTOF = (2 * proj.uy) / 9.8
 	proj.height = (proj.uy * (tempTOF / 2) 
-		+ (0.5 * -9.8 * (tempTOF / 2) * (tempTOF / 2)));
+		+ (-4.9 * (tempTOF / 2) * (tempTOF / 2)));
 	
 }
 	
@@ -187,6 +191,7 @@ function getScale(){
 			scale = size / (proj.startHeight + proj.height);
 		}
 	}
+	
 }
 
 function verifyInput(){
@@ -206,7 +211,7 @@ function verifyInput(){
 		"Projectile angle must be a number and be > 0 and <= 90\n";
 	}
 	
-	/* if the sloped check box is checked */
+	/* if the "sloped" check box is checked */
 	if(document.getElementById("isSloped").checked == true){
 		
 		var angleTotal = value;
@@ -226,12 +231,13 @@ function verifyInput(){
 		
 	}
 	
-	/* if the off ground check box is checked */
+	/* if the "off ground" check box is checked */
 	if(document.getElementById("offGround").checked == true){
 		
 		value = parseInt(document.getElementById("startHeight").value);
 		if(isNaN(value) || value == "" || value <= 0){
-			alertMessage += "Starting height must be a number and be > 0\n";
+			alertMessage += 
+			"Starting height must be a number and be > 0\n";
 		}
 
 	}
