@@ -31,7 +31,7 @@ function swapObjects(){
 	var first = document.getElementById("first");
 	var second = document.getElementById("second");
 
-	if(first.style.display != "none"){
+	if(first.style.display != "none" && secondEnabled){
 
 		first.style.display = "none";
 		second.style.display = "block";
@@ -81,7 +81,7 @@ function parseInput(){
 		parseInt(document.getElementById("s"))
 	);
 
-	if(enableSecond == true){
+	if(secondEnabled == true){
 		secondObject = movingObject(
 			parseInt(document.getElementById("u1")),
 			parseInt(document.getElementById("a1")),
@@ -119,7 +119,7 @@ function verifyInput(){
 	}
 
 	/* if the "enable second" check box is checked  */
-	if(enableSecond == true){
+	if(secondEnabled){
 
 		var value = parseInt(document.getElementById("u1").value);
 
@@ -162,12 +162,22 @@ function enableSecond(){
 		option.text = "Second object";
 		x.add(option);
 		
+		var x = document.getElementById("terminateObjectSelect");
+		var option = document.createElement("option");
+		option.text = "Second object";
+		x.add(option);
+		
 	}else{
 		
 		secondEnabled = false;
 		document.getElementById("enableSecond").innerHTML = "Enable second";
+		
 		var x = document.getElementById("dropdown");
 		x.remove(1);
+		
+		var x = document.getElementById("terminateObjectSelect");
+		x.remove(1);
+		
 		swapObjects();
 		
 	}
@@ -178,11 +188,18 @@ function enableSecond(){
 function clearInput(){
 
 	if(secondEnabled){
+		
 		document.getElementById("dropdown").selectedIndex = 0;
 		document.getElementById("dropdown").remove(1);
+		
+		var x = document.getElementById("terminateObjectSelect");
+		x.remove(1);
+		
 		secondEnabled = false;
 		document.getElementById("enableSecond").innerHTML = "Enable second";
+		
 		swapObjects();
+		
 	}
 	
 	document.getElementById("u").value = "";
