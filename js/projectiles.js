@@ -1,5 +1,6 @@
 var size = 600;
 var circle;
+var line;
 var paper;
 var proj;
 var clearID;
@@ -18,6 +19,7 @@ $(document).ready(function(){
 	circle = paper.circle(0, size, 10);
 	circle.attr("fill", "#f00");
 	circle.attr("stroke", "#fff");
+	
 	
 });
 
@@ -101,7 +103,7 @@ function simulateStepOffGround(){
 		
 		proj.vx = proj.ux;
 		proj.vy = proj.uy + (-9.8 * proj.tof);
-		proj.sy = -proj.startHeight
+		proj.sy = -proj.startHeight;
 		proj.sx = (proj.ux * proj.tof);
 	
 		circle.attr("cx", proj.sx * scale);
@@ -118,6 +120,63 @@ function simulateStepOffGround(){
 	
 }
 
+function simulateStepSloped(){
+	
+	if(proj.time < proj.tof){
+		
+		proj.vx = proj.ux + 
+			(-9.8 
+			* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
+			* proj.time
+		);
+		proj.vy = proj.uy + 
+			(-9.8 
+			* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
+			* proj.time
+		);
+		proj.sx = (proj.ux * proj.time) 
+			+ (-4.9 
+			* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
+			* proj.time * proj.time
+		);
+		proj.sy = (proj.uy * proj.time) 
+			+ (-4.9 
+			* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
+			* proj.time * proj.time
+		);
+		proj.time = proj.time + (1/fps);
+	
+		circle.attr("cx", proj.sx * scale);
+		circle.attr("cy", size - (proj.sy * scale));
+		
+	}else{
+		
+		proj.vx = proj.ux + 
+			(-9.8 
+			* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
+			* proj.tof
+		);
+		proj.vy = proj.uy + 
+			(-9.8 
+			* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
+			* proj.tof
+		);
+		proj.sy = 0;
+		proj.sx = proj.range;
+	
+		circle.attr("cx", proj.sx * scale);
+		circle.attr("cy", size - (proj.sy * scale));
+		
+		clearInterval(clearID);
+		
+	}
+	
+	document.getElementById("vx").innerHTML = "vx: " + proj.vx.toFixed(3);
+	document.getElementById("vy").innerHTML = "vy: " + proj.vy.toFixed(3);
+	document.getElementById("sx").innerHTML = "sx: " + proj.sx.toFixed(3);
+	document.getElementById("sy").innerHTML = "sy: " + proj.sy.toFixed(3);
+	
+}
 /*
 called when the "Run simulation" button is pressed
 */
@@ -126,6 +185,11 @@ function run(){
 	if(verifyInput() == false){
 		return;
 	}
+	
+	if(line){
+		line.remove();
+	}
+
 	
 	proj = new Projectile(parseInt(
 		document.getElementById("u").value),
@@ -136,6 +200,19 @@ function run(){
 		proj.startHeight = 
 			parseInt(document.getElementById("startHeight").value);
 		getOffGroundValues();
+		//line = paper.path("M0 600" + "L90 90");
+	}else if(document.getElementById("isSloped").checked){
+		proj.slopeAngle =
+			parseInt(document.getElementById("slopeAngle").value);
+		getSlopedValues();
+		line = paper.path("M0 600" + "L"
+			+ size
+			+ " "
+			+ (size - 
+			(size * Math.tan(proj.slopeAngle * (Math.PI / 180)))
+			)
+		);
+		Math.tan
 	}
 	
 	getScale();
@@ -157,6 +234,8 @@ function run(){
 	
 	if(proj.startHeight != -1){
 		clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
+	}else if(proj.slopeAngle != -1){
+		clearID = setInterval(simulateStepSloped, (1/fps) * 1000);
 	}else{
 		clearID = setInterval(simulateStep, (1/fps) * 1000);
 	}
@@ -176,6 +255,24 @@ function getOffGroundValues(){
 	var tempTOF = (2 * proj.uy) / 9.8
 	proj.height = (proj.uy * (tempTOF / 2) 
 		+ (-4.9 * (tempTOF / 2) * (tempTOF / 2)));
+	
+}
+
+function getSlopedValues(){
+	
+	proj.tof = (2 * proj.uy) 
+		/ (9.8 * Math.cos(proj.slopeAngle * (Math.PI / 180)));
+	proj.range = (proj.ux * proj.tof) 
+		+ (-4.9 
+		* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
+		* proj.tof * proj.tof
+	);
+	proj.height = (proj.uy * (proj.tof / 2)) 
+		+ (-4.9 
+		* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
+		* (proj.tof / 2) * (proj.tof / 2)
+	);
+
 	
 }
 	

@@ -118,7 +118,7 @@ function verifyInput(){
 		alertMessage += "\tInitial position must be a number\n";
 	}
 
-	/* if the "enable second" check box is checked  */
+	/* if the "enable second" button was pressed */
 	if(secondEnabled){
 
 		var value = parseInt(document.getElementById("u1").value);
@@ -175,7 +175,8 @@ function enableSecond(){
 	if(!secondEnabled){
 		
 		secondEnabled = true;
-		document.getElementById("enableSecond").innerHTML = "Disable second";
+		document.getElementById("enableSecond").innerHTML 
+			= "Disable second";
 		
 		var x = document.getElementById("dropdown");
 		var option = document.createElement("option");
@@ -190,7 +191,8 @@ function enableSecond(){
 	}else{
 		
 		secondEnabled = false;
-		document.getElementById("enableSecond").innerHTML = "Enable second";
+		document.getElementById("enableSecond").innerHTML
+			= "Enable second";
 		
 		var x = document.getElementById("dropdown");
 		x.remove(1);
@@ -216,7 +218,8 @@ function clearInput(){
 		x.remove(1);
 		
 		secondEnabled = false;
-		document.getElementById("enableSecond").innerHTML = "Enable second";
+		document.getElementById("enableSecond").innerHTML
+			= "Enable second";
 		
 		swapObjects();
 		
