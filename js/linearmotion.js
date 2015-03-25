@@ -150,6 +150,26 @@ function verifyInput(){
 
 }
 
+function terminateChange(){
+	
+	var x = document.getElementById("terminateSelect").selectedIndex;
+	
+	var first = document.getElementById("objectTerminate");
+	var second = document.getElementById("timeTerminate");
+
+	if(x == 2){
+
+		first.style.display = "none";
+		second.style.display = "block";
+
+	}else{
+
+		first.style.display = "block";
+		second.style.display = "none";
+
+	}
+	
+}
 function enableSecond(){
 	
 	if(!secondEnabled){
@@ -209,5 +229,13 @@ function clearInput(){
 	document.getElementById("u1").value = "";
 	document.getElementById("a1").value = "";
 	document.getElementById("s1").value = "";
+	
+	document.getElementById("terminateSelect").selectedIndex = 0;
+	document.getElementById("objectTerminate").style.display = "block";
+	document.getElementById("timeTerminate").style.display = "none";
+	
+	document.getElementById("terminateObjectValue").value = "";
+	document.getElementById("terminateTimeValue").value = "";
+	
 
 }

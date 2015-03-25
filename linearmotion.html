@@ -53,10 +53,10 @@
 			<div style="height:5px;"></div>
 			
 			<!-- TERMINATION SELECT -->
-			<select id="terminateSelect" autocomplete="off">
-				<option>Time</option>
+			<select id="terminateSelect" onchange="terminateChange()"autocomplete="off">
 				<option>Velocity</option>
 				<option>Displacement</option>
+				<option>Time</option>
 			</select>
 			<div style="height:5px;"></div>
 			
@@ -74,7 +74,7 @@
 				<div>is</div>
 				<div style="height:5px;"></div>
 			
-				<input id="terminateObjectValue" type="text" placeholder="Finish time" autocomplete="off"/> </br>
+				<input id="terminateObjectValue" type="text" placeholder="Terminate value" autocomplete="off"/> </br>
 				<div style="height:5px;"></div>
 					
 			</div>
@@ -85,7 +85,7 @@
 				<div>is</div>
 				<div style="height:5px;"></div>
 			
-				<input id="terminateTimeValue" type="text" placeholder="Finish time" autocomplete="off"/> </br>
+				<input id="terminateTimeValue" type="text" placeholder="Terminate value" autocomplete="off"/> </br>
 				<div style="height:5px;"></div>
 				
 			</div>
