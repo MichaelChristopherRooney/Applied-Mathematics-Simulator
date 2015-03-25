@@ -7,6 +7,7 @@ var clearID;
 var offGround;
 var fps = 60;
 var scale;
+var pointList = [];
 
 $(document).ready(function(){
 	
@@ -61,6 +62,13 @@ function simulateStep(){
 	
 		circle.attr("cx", proj.sx * scale);
 		circle.attr("cy", size - (proj.sy * scale));
+		
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", proj.sx * scale);
+		tCircle.attr("cy", size - (proj.sy * scale));
+		tCircle.attr("fill", "#000");
+		//tCircle.attr("stroke", "#fff");
+		pointList.push(tCircle);
 	
 	}else{
 		
@@ -70,6 +78,13 @@ function simulateStep(){
 	
 		circle.attr("cx", proj.sx * scale);
 		circle.attr("cy", size - (proj.sy * scale));
+		
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", proj.sx * scale);
+		tCircle.attr("cy", size - (proj.sy * scale));
+		tCircle.attr("fill", "#000");
+		//tCircle.attr("stroke", "#fff");
+		pointList.push(tCircle);
 		
 		clearInterval(clearID);
 		
@@ -99,6 +114,13 @@ function simulateStepOffGround(){
 		circle.attr("cx", proj.sx * scale);
 		circle.attr("cy", size - ((proj.startHeight + proj.sy) * scale));
 		
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", proj.sx * scale);
+		tCircle.attr("cy", size - ((proj.startHeight + proj.sy) * scale));
+		tCircle.attr("fill", "#000");
+		//tCircle.attr("stroke", "#fff");
+		pointList.push(tCircle);
+		
 	}else{
 		
 		proj.vx = proj.ux;
@@ -108,6 +130,13 @@ function simulateStepOffGround(){
 	
 		circle.attr("cx", proj.sx * scale);
 		circle.attr("cy", size);
+		
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", proj.sx * scale);
+		tCircle.attr("cy", size);
+		tCircle.attr("fill", "#000");
+		//tCircle.attr("stroke", "#fff");
+		pointList.push(tCircle);
 		
 		clearInterval(clearID);
 		
@@ -149,6 +178,13 @@ function simulateStepSloped(){
 		circle.attr("cx", proj.sx * scale);
 		circle.attr("cy", size - (proj.sy * scale));
 		
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", proj.sx * scale);
+		tCircle.attr("cy", size - (proj.sy * scale));
+		tCircle.attr("fill", "#000");
+		//tCircle.attr("stroke", "#fff");
+		pointList.push(tCircle);
+		
 	}else{
 		
 		proj.vx = proj.ux + 
@@ -166,6 +202,13 @@ function simulateStepSloped(){
 	
 		circle.attr("cx", proj.sx * scale);
 		circle.attr("cy", size - (proj.sy * scale));
+		
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", proj.sx * scale);
+		tCircle.attr("cy", size - (proj.sy * scale));
+		tCircle.attr("fill", "#000");
+		//tCircle.attr("stroke", "#fff");
+		pointList.push(tCircle);
 		
 		clearInterval(clearID);
 		
@@ -186,8 +229,24 @@ function run(){
 		return;
 	}
 	
+	if(proj){
+		proj = null;
+	}
+	
+	if(clearID){
+		clearInterval(clearID);
+		clearID = null;
+	}
+	
 	if(line){
 		line.remove();
+	}
+	
+	if(pointList){
+		for(var i = 0; i < pointList.length; i++){
+			pointList[i].remove();
+		}
+		pointList = [];
 	}
 
 	
@@ -197,14 +256,28 @@ function run(){
 	);
 	
 	if(document.getElementById("offGround").checked){
+		
 		proj.startHeight = 
 			parseInt(document.getElementById("startHeight").value);
+			
 		getOffGroundValues();
-		//line = paper.path("M0 600" + "L90 90");
+		getScale();
+		
+		line = paper.path("M0 " 
+			+ (size - (proj.startHeight * scale)) + " " + "L"
+			+ size
+			+ " "
+			+ (size - (proj.startHeight * scale))
+		);
+		
 	}else if(document.getElementById("isSloped").checked){
+		
 		proj.slopeAngle =
 			parseInt(document.getElementById("slopeAngle").value);
+			
 		getSlopedValues();
+		getScale();
+		
 		line = paper.path("M0 600" + "L"
 			+ size
 			+ " "
@@ -212,10 +285,10 @@ function run(){
 			(size * Math.tan(proj.slopeAngle * (Math.PI / 180)))
 			)
 		);
-		Math.tan
+		
 	}
 	
-	getScale();
+	
 	
 	document.getElementById("ux").innerHTML = "ux: " + proj.ux.toFixed(3);
 	document.getElementById("uy").innerHTML = "uy: " + proj.uy.toFixed(3);
