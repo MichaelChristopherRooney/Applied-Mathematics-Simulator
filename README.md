@@ -6,17 +6,21 @@
 - Uses raphael.js for drawing and jquery-1.11.2.js
 
 #Implemented features:
-- Projectiles
+- Projectiles:
 	- Normal
 	- Starting off ground
+	- Display real time info
+
 		
 #Planned features:
 - Vectors:
 - Projectiles:
 	- Incline plane
+	- Options to display additional graphical info
 - Linear motion:
 - Connected particles:
 - Circular motion:
 - Simple harmonic motion:
+	- Display speed vs displacement in a graph beside main graphics panel
 - Relative velocity:
 - Collisions:

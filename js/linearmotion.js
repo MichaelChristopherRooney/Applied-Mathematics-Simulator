@@ -6,6 +6,7 @@ var fps = 60;
 var scale;
 var firstObject;
 var secondObject;
+var secondEnabled = false;
 
 $(document).ready(function(){
 
@@ -80,7 +81,7 @@ function parseInput(){
 		parseInt(document.getElementById("s"))
 	);
 
-	if(document.getElementById("enableSecond").checked == true){
+	if(enableSecond == true){
 		secondObject = movingObject(
 			parseInt(document.getElementById("u1")),
 			parseInt(document.getElementById("a1")),
@@ -118,7 +119,7 @@ function verifyInput(){
 	}
 
 	/* if the "enable second" check box is checked  */
-	if(document.getElementById("enableSecond").checked == true){
+	if(enableSecond == true){
 
 		var value = parseInt(document.getElementById("u1").value);
 
@@ -149,15 +150,45 @@ function verifyInput(){
 
 }
 
+function enableSecond(){
+	
+	if(!secondEnabled){
+		
+		secondEnabled = true;
+		document.getElementById("enableSecond").innerHTML = "Disable second";
+		
+		var x = document.getElementById("dropdown");
+		var option = document.createElement("option");
+		option.text = "Second object";
+		x.add(option);
+		
+	}else{
+		
+		secondEnabled = false;
+		document.getElementById("enableSecond").innerHTML = "Enable second";
+		var x = document.getElementById("dropdown");
+		x.remove(1);
+		swapObjects();
+		
+	}
+	
+
+}
+
 function clearInput(){
 
-	document.getElementById("dropdown").selectedIndex = 0;
+	if(secondEnabled){
+		document.getElementById("dropdown").selectedIndex = 0;
+		document.getElementById("dropdown").remove(1);
+		secondEnabled = false;
+		document.getElementById("enableSecond").innerHTML = "Enable second";
+		swapObjects();
+	}
 	
 	document.getElementById("u").value = "";
 	document.getElementById("a").value = "";
 	document.getElementById("s").value = "";
 
-	document.getElementById("enableSecond").checked = false;
 	document.getElementById("u1").value = "";
 	document.getElementById("a1").value = "";
 	document.getElementById("s1").value = "";
