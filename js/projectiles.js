@@ -286,6 +286,8 @@ function run(){
 			)
 		);
 		
+	}else{
+		getScale();
 	}
 	
 	
