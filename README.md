@@ -9,14 +9,11 @@
 - Projectiles:
 	- Normal
 	- Starting off ground
+	- Incline plane
 	- Display real time info
-
-		
+	
 #Planned features:
 - Vectors:
-- Projectiles:
-	- Incline plane
-	- Options to display additional graphical info
 - Linear motion:
 - Connected particles:
 - Circular motion:
