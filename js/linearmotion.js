@@ -4,9 +4,8 @@ var paper;
 var clearID;
 var fps = 60;
 var scale;
-var firstObject;
-var secondObject;
 var secondEnabled = false;
+var state;
 
 $(document).ready(function(){
 
@@ -44,10 +43,21 @@ function swapObjects(){
 	}
 }
 
-function movingObject(u, a, s){
-	this.u = u;
-	this.a = a;
-	this.s = s;
+/*
+this holds the state at the moment the run button is pressed
+*/
+function stateObject(){
+	this.u1 = 0;
+	this.a1 = 0;
+	this.s1 = 0;
+	this.u2 = 0;
+	this.a2 = 0;
+	this.s2 = 0;
+	this.secondEnabled = false;
+	this.terminateSelect = 0;
+	this.terminateObjectSelect = 0;
+	this.terminateObjectValue = 0;
+	this.timeToTerminate = 0;
 }
 
 /*
@@ -55,14 +65,120 @@ when the "Run simulation" button is pressed
 */
 function run(){
 
+	parseInput();
+	console.log("Input parsed");
+	
 	if(!verifyInput()){
 		return;
 	}
-
-	parseInput();
+	console.log("Input verified");
+	
+	if(!determineTerminate()){
+		return;
+	}
 
 	clearID = setInterval(simulateStep(), (1/fps) * 1000);
 
+}
+
+/*
+determines if the program will terminate given the input
+*/
+function determineTerminate(){
+	
+	console.log("Selected object: " + state.terminateSelect);
+
+	
+	if(state.terminateSelect == 0){ // velocity
+		return determineTerminateVelocity();
+	}else if(state.terminateSelect == 1){ // displacement
+		return determineTerminateDisplacement();
+	}else if(state.terminateSelect == 2){ // time
+		return true;
+	}else if(state.terminateSelect == 3){ // objects equal
+		return determineTerminateEqual();
+	}
+}
+
+/*
+determine if the selected object will ever reach the terminating velocity value
+*/
+function determineTerminateVelocity(){
+	
+	console.log("Determining if velocity will reach given value");
+	
+	var u, a, s;
+	
+	if(state.terminateObjectSelect == 0){
+		u = state.u1;
+		a = state.a1;
+		s = state.s1;
+	}else{
+		u = state.u2;
+		a = state.a2;
+		s = state.s2;
+	}
+	
+	console.log("u: " + u + ", a: " + a + ", s: " + s);
+	
+	// using equation "v = u + at" to get t
+	var t = (state.terminateObjectValue - u) / a;
+	
+	console.log("t: " + t);
+	
+	if(t < 0){
+		alert("Selected object will never reach given velocity");
+		return false;
+	}
+	
+	state.timeToTerminate = t;
+	
+	return true;
+}
+
+function determineTerminateDisplacement(){
+	
+	console.log("Determining if displacement will reach given value");
+	
+	var u, a, s;
+	
+	if(state.terminateObjectSelect == 0){
+		u = state.u1;
+		a = state.a1;
+		s = state.s1;
+	}else{
+		u = state.u2;
+		a = state.a2;
+		s = state.s2;
+	}
+	
+	console.log("u: " + u + ", a: " + a + ", s: " + s);
+	
+	// check that part under the square root will not be negative
+	var t = (2 * u * u) + (8 * a * state.terminateObjectValue);
+	
+	if(t < 0){
+		alert("Selected object will never reach given displacement");
+		return false;
+	}
+	
+	// using equation "s = ut + (0.5 * a * t * t)" to get t
+	t = ((-2 * u) 
+		+ Math.sqrt((4 * u * u) + (8 * a * state.terminateObjectValue))
+		) / (2 * a);
+	/*	
+	TO DO: 
+	Could possibly be an issue if with using +- in the quadratic formula?
+	*/
+	
+	state.timeToTerminate = t;
+	
+	return true;
+}
+
+function determineTerminateEqual(){
+	
+	return true;
 }
 
 /*
@@ -75,19 +191,24 @@ function simulateStep(){
 
 function parseInput(){
 
-	firstObject = movingObject(
-		parseInt(document.getElementById("u")),
-		parseInt(document.getElementById("a")),
-		parseInt(document.getElementById("s"))
-	);
-
-	if(secondEnabled == true){
-		secondObject = movingObject(
-			parseInt(document.getElementById("u1")),
-			parseInt(document.getElementById("a1")),
-			parseInt(document.getElementById("s1"))
-		);
+	if(state){
+		state = null;
 	}
+	
+	state = new stateObject();
+	
+	state.u1 = parseInt(document.getElementById("u1").value);
+	state.a1 = parseInt(document.getElementById("a1").value);
+	state.s1 = parseInt(document.getElementById("s1").value);
+	state.u2 = parseInt(document.getElementById("u2").value);
+	state.a2 = parseInt(document.getElementById("a2").value);
+	state.s2 = parseInt(document.getElementById("s2").value);
+	state.secondEnabled = secondEnabled;
+	state.terminateSelect 
+		= document.getElementById("terminateSelect").selectedIndex;
+	state.terminateObjectSelect 
+		= document.getElementById("terminateObjectSelect").selectedIndex;
+	state.terminateObjectValue = parseInt(document.getElementById("terminateObjectValue").value);
 
 }
 
@@ -99,54 +220,50 @@ function verifyInput(){
 
 	var alertMessage = "";
 
-	var value = parseInt(document.getElementById("u").value);
-
-	if(isNaN(value) || value == ""){
+	if(isNaN(state.u1) || (state.u1 != 0 && state.u1 == "")){
 		alertMessage +=
 		"First object:\n\tInitial speed must be a number\n";
 	}
 
-	value = parseInt(document.getElementById("a").value);
-
-	if(isNaN(value) || value == ""){
+	if(isNaN(state.a1) || (state.a1 != 0 && state.a1 == "")){
 		alertMessage += "\tAcceleration must be a number\n";
 	}
 
-	value = parseInt(document.getElementById("s").value);
-
-	if(isNaN(value) || value == ""){
+	
+	if(isNaN(state.s1) || (state.s1 != 0 && state.s1 == "")){
 		alertMessage += "\tInitial position must be a number\n";
 	}
 
+	
 	/* if the "enable second" button was pressed */
-	if(secondEnabled){
+	if(state.secondEnabled){
 
-		var value = parseInt(document.getElementById("u1").value);
-
-		if(isNaN(value) || value == ""){
+		if(isNaN(state.u2) || (state.u2 != 0 && state.u2 == "")){
 			alertMessage +=
 			"\nSecond object:\n\tInitial speed must be a number\n";
 		}
 
-		value = parseInt(document.getElementById("a1").value);
-
-		if(isNaN(value) || value == ""){
+		if(isNaN(state.a2) || (state.a2 != 0 && state.a2 == "")){
 			alertMessage += "\tAcceleration must be a number\n";
 		}
 
-		value = parseInt(document.getElementById("s1").value)
-
-		if(isNaN(value) || value == ""){
+		if(isNaN(state.s2) || (state.s2 != 0 && state.s2 == "")){
 			alertMessage +=
 			"\tInitial position must be a number\n";
 		}
 
 	}
+	
+	/*
+	TO DO: Verify termination condition input
+	*/
 
 	if(alertMessage != ""){
 		alert(alertMessage);
 		return false;
 	}
+	
+	return true;
 
 }
 

@@ -17,7 +17,7 @@ $(document).ready(function(){
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
 	
-	circle = paper.circle(0, size, 10);
+	circle = paper.circle(-10, -10, 10);
 	circle.attr("fill", "#f00");
 	circle.attr("stroke", "#fff");
 	
@@ -47,6 +47,25 @@ function Projectile(u, projectileAngle){
 		this.slopeAngle = -1;
 }
 
+function stopSimulation(){
+	
+	if(clearID){
+		
+		clearInterval(clearID);
+		
+		circle.attr("cx", -10);
+		circle.attr("cy", -10);
+		
+		if(pointList){
+			for(var i = 0; i < pointList.length; i++){
+				pointList[i].remove();
+			}
+			pointList = [];
+		}
+
+	}
+	
+}
 /*
 gets values for the next step in the simulation
 */
