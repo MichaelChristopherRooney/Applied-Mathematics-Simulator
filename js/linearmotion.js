@@ -56,7 +56,8 @@ function stateObject(){
 	this.secondEnabled = false;
 	this.terminateSelect = 0;
 	this.terminateObjectSelect = 0;
-	this.terminateObjectValue = 0;
+	this.terminateEqualSelect = 0;
+	this.terminateValue = 0;
 	this.timeToTerminate = 0;
 }
 
@@ -94,7 +95,7 @@ function determineTerminate(){
 	}else if(state.terminateSelect == 1){ // displacement
 		return determineTerminateDisplacement();
 	}else if(state.terminateSelect == 2){ // time
-		return true;
+		return true; // time always increasing, will always terminate
 	}else if(state.terminateSelect == 3){ // objects equal
 		return determineTerminateEqual();
 	}
@@ -122,7 +123,7 @@ function determineTerminateVelocity(){
 	console.log("u: " + u + ", a: " + a + ", s: " + s);
 	
 	// using equation "v = u + at" to get t
-	var t = (state.terminateObjectValue - u) / a;
+	var t = (state.terminateValue - u) / a;
 	
 	console.log("t: " + t);
 	
@@ -155,7 +156,7 @@ function determineTerminateDisplacement(){
 	console.log("u: " + u + ", a: " + a + ", s: " + s);
 	
 	// check that part under the square root will not be negative
-	var t = (2 * u * u) + (8 * a * state.terminateObjectValue);
+	var t = (2 * u * u) + (8 * a * state.terminateValue);
 	
 	if(t < 0){
 		alert("Selected object will never reach given displacement");
@@ -164,7 +165,7 @@ function determineTerminateDisplacement(){
 	
 	// using equation "s = ut + (0.5 * a * t * t)" to get t
 	t = ((-2 * u) 
-		+ Math.sqrt((4 * u * u) + (8 * a * state.terminateObjectValue))
+		+ Math.sqrt((4 * u * u) + (8 * a * state.terminateValue))
 		) / (2 * a);
 	/*	
 	TO DO: 
@@ -176,9 +177,21 @@ function determineTerminateDisplacement(){
 	return true;
 }
 
+/*
+determine if the two objects will ever be equal in the selected attribute
+*/
 function determineTerminateEqual(){
 	
+	console.log("Determining if the two objects will be equal in a given attribute");
+	
+	if(state.terminateEqualSelect == 0){
+		console.log("Velocity chosen");
+	}else{
+		console.log("Displacement chosen");
+	}
+	
 	return true;
+	
 }
 
 /*
@@ -208,8 +221,8 @@ function parseInput(){
 		= document.getElementById("terminateSelect").selectedIndex;
 	state.terminateObjectSelect 
 		= document.getElementById("terminateObjectSelect").selectedIndex;
-	state.terminateObjectValue = parseInt(document.getElementById("terminateObjectValue").value);
-
+	state.terminateValue = parseInt(document.getElementById("terminateValue").value);
+	state.terminateEqualSelect = document.getElementById("terminateEqualSelect").selectedIndex;
 }
 
 /*
@@ -220,18 +233,21 @@ function verifyInput(){
 
 	var alertMessage = "";
 
+	/* verify values of the first object */
 	if(isNaN(state.u1) || (state.u1 != 0 && state.u1 == "")){
 		alertMessage +=
-		"First object:\n\tInitial speed must be a number\n";
+		"First object: Initial speed must be a number\n";
 	}
 
 	if(isNaN(state.a1) || (state.a1 != 0 && state.a1 == "")){
-		alertMessage += "\tAcceleration must be a number\n";
+		alertMessage += 
+		"First object: Acceleration must be a number\n";
 	}
 
 	
 	if(isNaN(state.s1) || (state.s1 != 0 && state.s1 == "")){
-		alertMessage += "\tInitial position must be a number\n";
+		alertMessage += 
+		"First object: Initial position must be a number\n";
 	}
 
 	
@@ -240,23 +256,49 @@ function verifyInput(){
 
 		if(isNaN(state.u2) || (state.u2 != 0 && state.u2 == "")){
 			alertMessage +=
-			"\nSecond object:\n\tInitial speed must be a number\n";
+			"Second object: Initial speed must be a number\n";
 		}
 
 		if(isNaN(state.a2) || (state.a2 != 0 && state.a2 == "")){
-			alertMessage += "\tAcceleration must be a number\n";
+			alertMessage += 
+			"Second object: Acceleration must be a number\n";
 		}
 
 		if(isNaN(state.s2) || (state.s2 != 0 && state.s2 == "")){
 			alertMessage +=
-			"\tInitial position must be a number\n";
+			"Second object: Initial position must be a number\n";
 		}
 
 	}
 	
-	/*
-	TO DO: Verify termination condition input
-	*/
+	/* verify input based on the selected termination condition */
+	if(state.terminateSelect == 0 || state.terminateSelect == 1){
+		
+		if(isNaN(state.terminateValue) || (state.terminateValue != 0 && state.terminateValue == "")){
+			alertMessage +=
+			"Terminate condition: Value must be a number"
+		}
+		
+	}else if(state.terminateSelect == 2){
+		
+		if(isNaN(state.terminateValue) || state.terminateValue < 0 || (state.terminateValue != 0 && state.terminateValue == "")){
+			alertMessage +=
+			"Terminate condition: Time must be a number and non-negative";
+		}
+		
+	}else if(state.terminateSelect == 3){
+		
+		if(!state.secondEnabled){
+			alertMessage += 
+			"Terminate condition: Second object used for termination but not enabled\n"
+		}
+		
+		if(isNaN(state.terminateValue) || state.terminateValue < 0 || (state.terminateValue != 0 && state.terminateValue == "")){
+			alertMessage +=
+			"Terminate condition: Value must be a number\n"
+		}
+		
+	}
 
 	if(alertMessage != ""){
 		alert(alertMessage);
@@ -273,18 +315,22 @@ function terminateChange(){
 	
 	var first = document.getElementById("objectTerminate");
 	var second = document.getElementById("timeTerminate");
+	var third = document.getElementById("equalTerminate");
 
-	if(x == 2){
-
-		first.style.display = "none";
-		second.style.display = "block";
-
-	}else{
-
+	if(x == 0 || x == 1){
 		first.style.display = "block";
 		second.style.display = "none";
-
+		third.style.display = "none";
+	}else if(x == 2){
+		first.style.display = "none";
+		second.style.display = "block";
+		third.style.display = "none";
+	}else if(x == 3){
+		first.style.display = "none";
+		second.style.display = "none";
+		third.style.display = "block";
 	}
+
 	
 }
 function enableSecond(){
@@ -342,20 +388,22 @@ function clearInput(){
 		
 	}
 	
-	document.getElementById("u").value = "";
-	document.getElementById("a").value = "";
-	document.getElementById("s").value = "";
-
 	document.getElementById("u1").value = "";
 	document.getElementById("a1").value = "";
 	document.getElementById("s1").value = "";
+
+	document.getElementById("u2").value = "";
+	document.getElementById("a2").value = "";
+	document.getElementById("s2").value = "";
 	
-	document.getElementById("terminateSelect").selectedIndex = 0;
 	document.getElementById("objectTerminate").style.display = "block";
 	document.getElementById("timeTerminate").style.display = "none";
+	document.getElementById("equalTerminate").style.display = "none";
 	
-	document.getElementById("terminateObjectValue").value = "";
-	document.getElementById("terminateTimeValue").value = "";
+	document.getElementById("terminateSelect").selectedIndex = 0;
+	document.getElementById("terminateEqualSelect").selectedIndex = 0;
+	
+	document.getElementById("terminateValue").value = "";
 	
 
 }

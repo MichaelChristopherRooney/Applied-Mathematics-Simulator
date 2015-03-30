@@ -45,6 +45,7 @@
 		</div>
 		
 		<hr style = "float:left; width:85%;">
+		</br>
 		
 		<!-- TERMINATION FIELDS -->
 		<div id = "terminate">
@@ -74,10 +75,7 @@
 				
 				<div>is</div>
 				<div style="height:5px;"></div>
-			
-				<input id="terminateObjectValue" type="text" placeholder="Terminate value" style = "float:left;width:90%;" autocomplete="off"/> </br>
-				<div style="height:5px;"></div>
-					
+
 			</div>
 			
 			<!-- time elapsed has been chosen as termination value -->
@@ -85,17 +83,35 @@
 			
 				<div>is</div>
 				<div style="height:5px;"></div>
-			
-				<input id="terminateTimeValue" type="text" placeholder="Terminate value" style = "float:left;width:90%;" autocomplete="off"/> </br>
-				<div style="height:5px;"></div>
 				
 			</div>
+			
+			<!-- equal attribute has been chosen as termination value -->
+			<div id = "equalTerminate" style="display:none;">
+			
+				<div>in</div>
+				<div style="height:5px;"></div>
+				
+				<select id="terminateEqualSelect" autocomplete="off">
+					<option>Velocity</option>
+					<option>Displacement</option>
+				</select>
+				<div style="height:5px;"></div>
+				
+				<div>to</div>
+				<div style="height:5px;"></div>
+
+			</div>
+			
+			<input id="terminateValue" type="text" placeholder="Terminate value" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>
 			
 		</select>
 		
 		</div>
 			
 		<hr style = "float:left; width:85%;">
+		</br>
 		
 		<!-- RUN BUTTON -->
 		<button onclick="run()" type="button">Run simulation</button>
