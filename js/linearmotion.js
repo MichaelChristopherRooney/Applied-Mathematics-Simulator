@@ -67,6 +67,7 @@ function stateObject(){
 	this.offset = 0;
 	this.time = 0;
 	this.endPosition = 0;
+	this.startPosition1 = 0;
 }
 
 /*
@@ -90,16 +91,16 @@ function run(){
 
 	getScale();
 		
-	document.getElementById("iu1").innerHTML = "u1: " + state.u1.toFixed(3);
-	document.getElementById("ia1").innerHTML = "a1: " + state.a1.toFixed(3);
-	document.getElementById("is1").innerHTML = "s1: " + state.s1.toFixed(3);
-	document.getElementById("v1").innerHTML = "v1: " + state.u1.toFixed(3);
+	document.getElementById("iu1").innerHTML = "Initial speed u1: " + state.u1.toFixed(3);
+	document.getElementById("ia1").innerHTML = "Initial acceleration a1: " + state.a1.toFixed(3);
+	document.getElementById("is1").innerHTML = "Initial position s1: " + state.s1.toFixed(3);
+	document.getElementById("v1").innerHTML = "Current velocity v1: " + state.u1.toFixed(3);
+	document.getElementById("cs1").innerHTML = "Current position s1: " + state.s1.toFixed(3);
 	document.getElementById("ct").innerHTML = "Current time: " + state.time.toFixed(3);
 	document.getElementById("sf").innerHTML = "Final position " + state.endPosition.toFixed(3);
 	document.getElementById("td").innerHTML = "Total distance: " + state.totalDistance.toFixed(3);
 	document.getElementById("tt").innerHTML = "Total time: " + state.timeToTerminate.toFixed(3);
 	document.getElementById("scale").innerHTML = "Scale: " + state.scale.toFixed(3);
-	
 
 	
 	clearID = setInterval(simulateStep, (1/fps) * 1000);
@@ -343,9 +344,9 @@ function simulateStep(){
 		
 	}
 	
-	document.getElementById("v1").innerHTML = "v1: " + state.v1.toFixed(3);
+	document.getElementById("v1").innerHTML = "Current velocity v1: " + state.v1.toFixed(3);
+	document.getElementById("cs1").innerHTML = "Current position s1: " + (state.s1 + state.startPosition1).toFixed(3);
 	document.getElementById("ct").innerHTML = "Current time: " + state.time.toFixed(3);
-	document.getElementById("circle").innerHTML = "Circle x: " + (state.s1 * state.scale).toFixed(3);
 	
 	circle.attr("cx", state.s1 * state.scale);
 	circle.attr("cy", 200);
@@ -379,6 +380,7 @@ function parseInput(){
 		= document.getElementById("terminateObjectSelect").selectedIndex;
 	state.terminateValue = parseInt(document.getElementById("terminateValue").value);
 	state.terminateEqualSelect = document.getElementById("terminateEqualSelect").selectedIndex;
+	state.startPosition1 = state.s1;
 }
 
 /*
