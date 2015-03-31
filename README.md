@@ -14,6 +14,7 @@
 - Linear motion:
 	- Accelerate to a given speed
 	- Decelerate to zero
+	- Display real time info
 	
 #Planned features:
 - Vectors:
