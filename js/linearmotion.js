@@ -3,7 +3,6 @@ var circle;
 var paper;
 var clearID;
 var fps = 60;
-var scale;
 var secondEnabled = false;
 var state;
 
@@ -15,7 +14,7 @@ $(document).ready(function(){
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
 
-	circle = paper.circle(0, size, 10);
+	circle = paper.circle(-10, -10, 10);
 	circle.attr("fill", "#f00");
 	circle.attr("stroke", "#fff");
 
@@ -53,12 +52,21 @@ function stateObject(){
 	this.u2 = 0;
 	this.a2 = 0;
 	this.s2 = 0;
+	this.v1 = 0;
+	this.v2 = 0;
 	this.secondEnabled = false;
 	this.terminateSelect = 0;
 	this.terminateObjectSelect = 0;
 	this.terminateEqualSelect = 0;
 	this.terminateValue = 0;
 	this.timeToTerminate = 0;
+	this.t1 = 0;
+	this.t2 = 0;
+	this.totalDistance = 0;
+	this.scale = 0;
+	this.offset = 0;
+	this.time = 0;
+	this.endPosition = 0;
 }
 
 /*
@@ -77,9 +85,48 @@ function run(){
 	if(!determineTerminate()){
 		return;
 	}
+	
+	determineValues();
 
-	clearID = setInterval(simulateStep(), (1/fps) * 1000);
+	getScale();
+		
+	document.getElementById("iu1").innerHTML = "u1: " + state.u1.toFixed(3);
+	document.getElementById("ia1").innerHTML = "a1: " + state.a1.toFixed(3);
+	document.getElementById("is1").innerHTML = "s1: " + state.s1.toFixed(3);
+	document.getElementById("v1").innerHTML = "v1: " + state.u1.toFixed(3);
+	document.getElementById("ct").innerHTML = "Current time: " + state.time.toFixed(3);
+	document.getElementById("sf").innerHTML = "Final position " + state.endPosition.toFixed(3);
+	document.getElementById("td").innerHTML = "Total distance: " + state.totalDistance.toFixed(3);
+	document.getElementById("tt").innerHTML = "Total time: " + state.timeToTerminate.toFixed(3);
+	document.getElementById("scale").innerHTML = "Scale: " + state.scale.toFixed(3);
+	
 
+	
+	clearID = setInterval(simulateStep, (1/fps) * 1000);
+
+}
+
+
+function determineValues(){
+	
+	if(state.secondEnabled){
+		determineValuesTwo();
+	}else{
+		determineValuesSingle();
+	}
+}
+
+function determineValuesSingle(){
+	
+	state.totalDistance =
+		(state.u1 * state.timeToTerminate)
+		+ (0.5 * state.a1 
+		* state.timeToTerminate * state.timeToTerminate);
+		
+	state.endPosition = state.totalDistance + state.s1;
+	
+	console.log("Will travel a distance of: " + state.totalDistance);
+	
 }
 
 /*
@@ -87,17 +134,27 @@ determines if the program will terminate given the input
 */
 function determineTerminate(){
 	
-	console.log("Selected object: " + state.terminateSelect);
-
-	
 	if(state.terminateSelect == 0){ // velocity
+	
+		console.log("Velocity is termination criteria");
 		return determineTerminateVelocity();
+		
 	}else if(state.terminateSelect == 1){ // displacement
+	
+		console.log("Displacement is termination criteria");
 		return determineTerminateDisplacement();
+		
 	}else if(state.terminateSelect == 2){ // time
+	
+		state.timeToTerminate = state.terminateValue
+		console.log("Will terminate after: " + state.timeToTerminate);
 		return true; // time always increasing, will always terminate
+		
 	}else if(state.terminateSelect == 3){ // objects equal
+		
+		console.log("Equal attribute is termination criteria");
 		return determineTerminateEqual();
+		
 	}
 }
 
@@ -156,7 +213,7 @@ function determineTerminateDisplacement(){
 	console.log("u: " + u + ", a: " + a + ", s: " + s);
 	
 	// check that part under the square root will not be negative
-	var t = (2 * u * u) + (8 * a * state.terminateValue);
+	var t = (4 * u * u) + (8 * a * state.terminateValue);
 	
 	if(t < 0){
 		alert("Selected object will never reach given displacement");
@@ -182,13 +239,84 @@ determine if the two objects will ever be equal in the selected attribute
 */
 function determineTerminateEqual(){
 	
-	console.log("Determining if the two objects will be equal in a given attribute");
+	console.log(
+	"Determining if the two objects will be equal in a given attribute"
+	);
 	
-	if(state.terminateEqualSelect == 0){
+	if(state.terminateEqualSelect == 0){ // velocity
+		
 		console.log("Velocity chosen");
-	}else{
+		
+		state.t1 = (state.terminateValue - state.u1) / state.a1;
+		state.t2 = (state.terminateValue - state.u2) / state.a2;
+		
+		if(state.t1 < 0){
+			
+			alert(
+			"Object one will not reach given velocity\n");
+			return false;
+			
+		}else if(state.t2 < 0){
+			
+			alert("Object two will not reach given velocity\n");
+			return false;
+			
+		}else if(state.t1 != state.t2){ //possible fp error here
+		
+			alert(
+				"Objects will never be at the same velocity"
+				+ "at the same time\n"
+			);
+			return false;
+			
+		}
+		
+	}else{ // displacement
+		
 		console.log("Displacement chosen");
+		
+		console.log("u: " + u + ", a: " + a + ", s: " + s);
+	
+		// using equation "s = ut + (0.5 * a * t * t)" to get t
+		state.t1 = ((-2 * state.u1) 
+			+ Math.sqrt(
+				(4 * state.u1 * state.u1) 
+				+ (8 * state.a1 * state.terminateValue)
+			)) / (2 * state.a1);
+			
+		state.t2 = ((-2 * state.u2) 
+			+ Math.sqrt(
+				(4 * state.u2 * state.u2) 
+				+ (8 * state.a2 * state.terminateValue)
+			)) / (2 * state.a2);
+			
+		if(state.t1 < 0 || isNaN(state.t1)){
+			
+			alert("Object one will never reach given displacement");
+			return false
+			
+		}else if(state.t2 < 0 || isNaN(state.t2)){
+			
+			alert("Object two will never reach given displacement");
+			return false
+			
+		}else if(state.t1 != state.t2){
+			
+			alert(
+				"Objects will never be at the same displacement"
+				+ "at the same time\n"
+			);
+			return false;
+			
+		}
+		/*	
+		TO DO: 
+		Could possibly be an issue if with using +- in the quadratic formula?
+		*/
+		
 	}
+	
+	state.timeToTerminate = state.t1;
 	
 	return true;
 	
@@ -199,8 +327,36 @@ gets values for the next step in the simulation
 */
 function simulateStep(){
 
+	if(state.time > state.timeToTerminate){
+		console.log("Simulation done");
+		clearInterval(clearID);
+		state.time = state.timeToTerminate;
+	}
+	
+	state.v1 = state.u1 + (state.a1 * state.time);
+	state.s1 = (state.u1 * state.time)
+		+ (0.5 * state.a1 * state.time * state.time);
+	
+	//console.log(state.s1);
+		
+	if(state.secondEnabled){
+		
+	}
+	
+	document.getElementById("v1").innerHTML = "v1: " + state.v1.toFixed(3);
+	document.getElementById("ct").innerHTML = "Current time: " + state.time.toFixed(3);
+	document.getElementById("circle").innerHTML = "Circle x: " + (state.s1 * state.scale).toFixed(3);
+	
+	circle.attr("cx", state.s1 * state.scale);
+	circle.attr("cy", 200);
+	
+	state.time += (1 / fps);
+	
 }
 
+function getScale(){
+	state.scale = size / state.totalDistance;
+}
 
 function parseInput(){
 
@@ -333,6 +489,7 @@ function terminateChange(){
 
 	
 }
+
 function enableSecond(){
 	
 	if(!secondEnabled){
@@ -365,8 +522,7 @@ function enableSecond(){
 		
 		swapObjects();
 		
-	}
-	
+	}	
 
 }
 
