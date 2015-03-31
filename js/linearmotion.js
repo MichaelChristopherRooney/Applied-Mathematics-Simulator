@@ -165,7 +165,7 @@ function getSlowValues(){
 	state.startS = state.s1;
 	
 	var tX = graphSize / state.endTime;
-	var tY = graphSize / state.v1
+	var tY = graphSize / state.u1
 	
 	if(tX < tY){
 		state.graphScale = tX;
