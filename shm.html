@@ -1,0 +1,46 @@
+<html>
+
+<meta charset="UTF-8"> 
+
+<script src="js/raphael.js"></script>
+<script src="js/jquery-1.11.2.js"></script>
+<script src="js/projectiles.js"></script>
+	
+<body>
+	
+	<div style="width:160px;">
+			
+		<!-- CONSTANT A FIELD -->
+		<input id="constanta" class="" name="constanta" type="text" placeholder="Constant A" style = "float:left;width:90%;" autocomplete="off"/> </br>
+		<div style="height:5px;"></div>
+		
+		<!-- CONSTANT OMEGA FIELD -->
+		<input id="constantomega" class="" name="constantomega" type="text" placeholder="Constant ω" style = "float:left;width:90%;" autocomplete="off"/> </br>
+		<div style="height:5px;"></div>
+		
+		
+		<!-- RUN BUTTON -->
+		<button onclick="run()" type="button">Run simulation</button> </br>
+		<div style="height:5px;"></div>
+			
+		<!-- CLEAR BUTTON -->
+		<button onclick="clearInput()" type="button">Clear input</button>
+		<div style="height:5px;"></div>
+		
+		<!-- STOP BUTTON -->
+		<button onclick="stopSimulation()" type="button">Stop simulation</button>
+		<div style="height:5px;"></div>
+			
+	</div>
+		
+	<!-- space for the graphics panel -->
+	<div id="graphics_panel" style="position:fixed; left:160px;width:610px;"></div>
+		
+	<!-- real time info relevant to the simulation -->
+	<div id ="info_pane" style="position:fixed;left:770px;width:200px;top:0px;">
+
+	</div>
+		
+</body>
+	
+</html>

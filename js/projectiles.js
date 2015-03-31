@@ -306,7 +306,7 @@ function run(){
 	document.getElementById("height").innerHTML = 
 		"Max height: " + proj.maxHeight.toFixed(3);
 	document.getElementById("scale").innerHTML = 
-		"Scale: 1 metre:" + scale.toFixed(3) + " pixels";
+		"Scale: 1 metre = " + scale.toFixed(3) + " pixels";
 	
 	if(proj.startHeight != -1){
 		clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
