@@ -91,6 +91,127 @@ function run(){
 
 }
 
+function runSlow(){
+	
+	if(!parseInputSlow()){
+		return false;
+	}
+	
+	getSlowValues();
+	setInfo();
+	
+	state.priorV = state.u1;
+	state.priorX = state.s1;
+	state.priorT = 0;
+	
+	var graphString = 
+		"M" + (0) + " " + (graphSize - (state.u1 * state.graphScale)) 
+		+ "L" +  (graphSize) + " " + (graphSize - (state.u1 * state.graphScale));
+	baseLine = graph.path(graphString);
+	
+	clearID = setInterval(simulateStepSlow, (1/fps) * 1000);
+	
+}
+
+function parseInputSlow(){
+	
+	/* parse all relevant input */
+	state.u1 = parseFloat(document.getElementById("slow-u1").value);
+	state.a1 = parseFloat(document.getElementById("slow-a1").value);
+	
+	/* now verify the input */
+	var alertMessage = "";
+	
+	if(isNaN(state.u1) || state.u1 <= 0 || (state.u1 == "" && state.u1 != 0)){
+		alertMessage += "Initial velocity must be a number > 0\n";
+	}
+	
+	if(isNaN(state.a1) || state.a1 >= 0 || (state.a1 == "" && state.a1 != 0)){
+		alertMessage += "Acceleration must be a number < 0\n";
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+	
+	return true;
+	
+}
+
+function getSlowValues(){
+	
+	/*
+	v = u + at
+	get t when v = 0
+	*/
+	state.endTime = (-state.u1) / state.a1;
+	
+	/* this error should never be entered, but just in case */
+	if(state.endTime < 0){
+		alert(
+		"Zero velocity will never be reached with given values\n"
+		);
+		return false;
+	}
+	
+	/* s = u*t + 0.5*a*t*t */
+	state.s1 = (state.u1 * state.endTime)
+		+ (0.5 * state.a1 * state.endTime * state.endTime);
+		
+	state.scale = size / state.s1;
+	
+	state.startV = state.u1;
+	state.startS = state.s1;
+	
+	var tX = graphSize / state.endTime;
+	var tY = graphSize / state.v1
+	
+	if(tX < tY){
+		state.graphScale = tX;
+	}else{
+		state.graphScale = tY;
+	}
+	
+}
+
+function simulateStepSlow(){
+	
+	if(state.currentTime > state.endTime){
+		console.log("Simulation done");
+		clearInterval(clearID);
+		state.currentTime = state.endTime;
+	}
+	
+	state.v1 = state.u1 + (state.a1 * state.currentTime);
+	state.s1 = (state.u1 * state.currentTime)
+		+ (0.5 * state.a1 * state.currentTime * state.currentTime);
+	
+	circle1.attr("cx", state.s1 * state.scale);
+	circle1.attr("cy", 200);
+	
+	document.getElementById("cv1").innerHTML = "Current velocity: " + state.v1.toFixed(3);
+	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
+	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
+	
+	state.currentTime += (1 / fps);
+	
+	if(graphLine){
+		graphLine.remove();
+		graphLine = false;
+	}
+	
+	var graphString = 
+		"M" + (0) + " " + (graphSize - (state.startV * state.graphScale)) 
+		+ "L" +  (state.currentTime * state.graphScale) + " " + (graphSize - (state.v1 * state.graphScale));
+	graphLine = graph.path(graphString);
+	
+	state.priorV = state.v1;
+	state.priorX = state.s1;
+	state.priorT = state.currentTime;
+	
+}
+
 function runReach(){
 	
 	if(!parseInputReach()){
@@ -131,7 +252,7 @@ function parseInputReach(){
 		alertMessage += "Acceleration must be a number ≥ 0\n";
 	}
 	
-	if(isNaN(state.u1) || state.u1 < 0 || state.v1 <= state.u1 || (state.u1 == "" && state.u1 != 0)){
+	if(isNaN(state.v1) || state.v1 < 0 || state.v1 <= state.u1 || (state.v1 == "" && state.v1 != 0)){
 		alertMessage += "Final velocity must be a number ≥ 0 and be > than initial velocity\n";
 	}
 	
@@ -177,21 +298,6 @@ function getReachValues(){
 	
 }
 
-function setInfo(){
-	
-	document.getElementById("iu1").innerHTML = "Initial speed: " + state.u1.toFixed(3);
-	document.getElementById("ia1").innerHTML = "Initial accleration: " + state.a1.toFixed(3);
-	document.getElementById("is1").innerHTML = "Initial position: " + state.s1.toFixed(3);
-	document.getElementById("cv1").innerHTML = "Current velocity: " + state.v1.toFixed(3);
-	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
-	
-	document.getElementById("time").innerHTML = "Time: " + state.currentTime.toFixed(3);
-	document.getElementById("scale").innerHTML = "Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
-	
-	document.getElementById("graphText").innerHTML = "Velocity vs time";
-	
-}
-
 function simulateStepReach(){
 	
 	if(state.currentTime > state.endTime){
@@ -227,9 +333,36 @@ function simulateStepReach(){
 	state.priorX = state.s1;
 	state.priorT = state.currentTime;
 	
+}
+
+function setInfo(){
+	
+	document.getElementById("iu1").innerHTML = 
+		"Initial speed: " + state.u1.toFixed(3);
+	document.getElementById("ia1").innerHTML = 
+		"Initial accleration: " + state.a1.toFixed(3);
+	document.getElementById("is1").innerHTML = 
+		"Initial position: " + state.s1.toFixed(3);
+	document.getElementById("cv1").innerHTML = 
+		"Current velocity: " + state.v1.toFixed(3);
+	document.getElementById("cs1").innerHTML = 
+		"Current position: " + state.s1.toFixed(3);
+	
+	document.getElementById("time").innerHTML = 
+		"Time: " + state.currentTime.toFixed(3);
+	document.getElementById("scale").innerHTML = 
+		"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+	
+	if(state.type == "reachSpeed" || state.type == "slowToZero"){
+		document.getElementById("graphText").innerHTML = 
+			"Velocity vs time";
+	}else if(state.type == "catchup"){
+		
+	}
 	
 	
 }
+
 
 function typeChange(){
 	
