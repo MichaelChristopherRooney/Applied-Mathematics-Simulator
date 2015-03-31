@@ -11,10 +11,14 @@
 	- Starting off ground
 	- Incline plane
 	- Display real time info
+- Linear motion:
+	- Accelerate to a given speed
+	- Decelerate to zero
 	
 #Planned features:
 - Vectors:
 - Linear motion:
+	- One object catches up to another
 - Connected particles:
 - Circular motion:
 - Simple harmonic motion:
