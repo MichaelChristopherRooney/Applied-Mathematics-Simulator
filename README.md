@@ -14,15 +14,16 @@
 - Linear motion:
 	- Accelerate to a given speed
 	- Decelerate to zero
+	- One object catches up to another
 	- Display real time info
 	
 #Planned features:
-- Vectors:
-- Linear motion:
-	- One object catches up to another
 - Connected particles:
-- Circular motion:
-- Simple harmonic motion:
+- Circular motion and Simple harmonic motion:
+	- Horizontal circle
+	- Vertical circle
+	- Pendulum
 	- Display speed vs displacement in a graph beside main graphics panel
 - Relative velocity:
+	- Crossing river
 - Collisions:

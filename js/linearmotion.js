@@ -9,6 +9,7 @@ var graph;
 var clearID;
 var fps = 60;
 var state;
+var pointList = [];
 
 $(document).ready(function(){
 
@@ -53,6 +54,7 @@ function stateObject(){
 	this.priorX = 0;
 	this.priorT = 0;
 	this.startS = 0;
+	this.ticks = 0;
 }
 
 /*
@@ -71,6 +73,13 @@ function run(){
 	
 	if(baseLine){
 		baseLine.remove();
+	}
+	
+	if(pointList){
+		for(var i = 0; i < pointList.length; i++){
+			pointList[i].remove();
+		}
+		pointList = [];
 	}
 	
 	state = new stateObject();
@@ -200,8 +209,27 @@ function simulateStepCatchup(){
 		
 		circle2.attr("cx", state.s2 * state.scale);
 		circle2.attr("cy", 300);
+		
+		if(state.ticks % 10 == 0){
+			var tCircle = paper.circle(0, 0, 2);
+			tCircle.attr("cx", state.s2 * state.scale);
+			tCircle.attr("cy", 300);
+			tCircle.attr("fill", "#000");
+			pointList.push(tCircle);
+		}
+		
 	}
 	
+	if(state.ticks % 10 == 0){
+		tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", state.s1 * state.scale);
+		tCircle.attr("cy", 200);
+		tCircle.attr("fill", "#000");
+		pointList.push(tCircle);
+	}
+	
+	
+	pointList.push(tCircle);
 	circle1.attr("cx", state.s1 * state.scale);
 	circle1.attr("cy", 200);
 
@@ -211,7 +239,7 @@ function simulateStepCatchup(){
 	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
 	
 	state.currentTime += (1 / fps);
-
+	state.ticks++;
 	
 }
 
@@ -323,7 +351,16 @@ function simulateStepSlow(){
 	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
 	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
 	
+	if(state.ticks % 10 == 0){
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", state.s1 * state.scale);
+		tCircle.attr("cy", 200);
+		tCircle.attr("fill", "#000");
+		pointList.push(tCircle);
+	}
+	
 	state.currentTime += (1 / fps);
+	state.ticks++;
 	
 	if(graphLine){
 		graphLine.remove();
@@ -451,7 +488,16 @@ function simulateStepReach(){
 	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
 	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
 	
+	if(state.ticks % 10 == 0){
+		var tCircle = paper.circle(0, 0, 2);
+		tCircle.attr("cx", state.s1 * state.scale);
+		tCircle.attr("cy", 200);
+		tCircle.attr("fill", "#000");
+		pointList.push(tCircle);
+	}
+	
 	state.currentTime += (1 / fps);
+	state.ticks++;
 	
 	if(graphLine){
 		graphLine.remove();
@@ -537,5 +583,22 @@ function clearInput(){
 }
 
 function stopSimulation(){
+	
+	if(clearID){
+		
+		clearInterval(clearID);
+		
+		circle.attr("cx", -10);
+		circle.attr("cy", -10);
+		circle1.attr("cx", -10);
+		circle1.attr("cy", -10);
+		
+		if(pointList){
+			for(var i = 0; i < pointList.length; i++){
+				pointList[i].remove();
+			}
+			pointList = [];
+		}
+	}
 	
 }
