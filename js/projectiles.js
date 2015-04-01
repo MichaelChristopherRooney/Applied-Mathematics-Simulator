@@ -98,10 +98,10 @@ function simulateStep(){
 	tCircle.attr("fill", "#000");
 	pointList.push(tCircle);
 	
-	document.getElementById("vx").innerHTML = "vx: " + proj.vx.toFixed(3);
-	document.getElementById("vy").innerHTML = "vy: " + proj.vy.toFixed(3);
-	document.getElementById("sx").innerHTML = "sx: " + proj.sx.toFixed(3);
-	document.getElementById("sy").innerHTML = "sy: " + proj.sy.toFixed(3);
+	document.getElementById("vx").innerHTML = "Current x velocity: " + proj.vx.toFixed(3);
+	document.getElementById("vy").innerHTML = "Current y velocity: " + proj.vy.toFixed(3);
+	document.getElementById("sx").innerHTML = "Current x position: " + proj.sx.toFixed(3);
+	document.getElementById("sy").innerHTML = "Current y position: " + proj.sy.toFixed(3);
 	
 }
 
@@ -140,10 +140,10 @@ function simulateStepOffGround(){
 	tCircle.attr("fill", "#000");
 	pointList.push(tCircle);
 	
-	document.getElementById("vx").innerHTML = "vx: " + proj.vx.toFixed(3);
-	document.getElementById("vy").innerHTML = "vy: " + proj.vy.toFixed(3);
-	document.getElementById("sx").innerHTML = "sx: " + proj.sx.toFixed(3);
-	document.getElementById("sy").innerHTML = "sy: " + proj.sy.toFixed(3);
+	document.getElementById("vx").innerHTML = "Current x velocity: " + proj.vx.toFixed(3);
+	document.getElementById("vy").innerHTML = "Current y velocity: " + proj.vy.toFixed(3);
+	document.getElementById("sx").innerHTML = "Current x position: " + proj.sx.toFixed(3);
+	document.getElementById("sy").innerHTML = "Current y position: " + proj.sy.toFixed(3);
 	
 }
 
@@ -217,10 +217,10 @@ function simulateStepSloped(){
 	tCircle.attr("fill", "#000");
 	pointList.push(tCircle);
 	
-	document.getElementById("vx").innerHTML = "vx: " + proj.vx.toFixed(3);
-	document.getElementById("vy").innerHTML = "vy: " + proj.vy.toFixed(3);
-	document.getElementById("sx").innerHTML = "sx: " + proj.sx.toFixed(3);
-	document.getElementById("sy").innerHTML = "sy: " + proj.sy.toFixed(3);
+	document.getElementById("vx").innerHTML = "Current x velocity: " + proj.vx.toFixed(3);
+	document.getElementById("vy").innerHTML = "Current y velocity: " + proj.vy.toFixed(3);
+	document.getElementById("sx").innerHTML = "Current x position: " + proj.sx.toFixed(3);
+	document.getElementById("sy").innerHTML = "Current y position: " + proj.sy.toFixed(3);
 	
 }
 /*
@@ -293,16 +293,16 @@ function run(){
 		getScale();
 	}
 	
-	document.getElementById("ux").innerHTML = "ux: " + proj.ux.toFixed(3);
-	document.getElementById("uy").innerHTML = "uy: " + proj.uy.toFixed(3);
-	document.getElementById("vx").innerHTML = "vx: ";
-	document.getElementById("vy").innerHTML = "vy: ";
-	document.getElementById("sx").innerHTML = "sx: ";
-	document.getElementById("sy").innerHTML = "sy: ";
+	document.getElementById("ux").innerHTML = "Initial x velocity: " + proj.ux.toFixed(3);
+	document.getElementById("uy").innerHTML = "Initial y velocity: " + proj.uy.toFixed(3);
+	document.getElementById("vx").innerHTML = "Current x velocity:: ";
+	document.getElementById("vy").innerHTML = "Current y velocity:: ";
+	document.getElementById("sx").innerHTML = "Current x position: ";
+	document.getElementById("sy").innerHTML = "Current y position: ";
 	document.getElementById("tof").innerHTML = 
-		"TOF: " + proj.tof.toFixed(3);
+		"Time of flight: " + proj.tof.toFixed(3);
 	document.getElementById("range").innerHTML = 
-		"Range: " + proj.range.toFixed(3);
+		"Max range: " + proj.range.toFixed(3);
 	document.getElementById("height").innerHTML = 
 		"Max height: " + proj.maxHeight.toFixed(3);
 	document.getElementById("scale").innerHTML = 
@@ -387,7 +387,7 @@ function getScale(){
 			}else{
 				scale = size / proj.startHeight;
 			}
-		}else if(proj.range > proj.maxHeight && proj.range > proj.maxHeight){
+		}else if(proj.range > (proj.maxHeight + proj.startHeight)){
 			scale = size / proj.range;
 		}else if(proj.maxHeight > proj.startHeight){
 			scale = size / proj.maxHeight;
@@ -467,6 +467,14 @@ function verifyInput(){
 		return false;
 	}
 	
+}
+
+function slopeChecked(){
+	document.getElementById("offGround").checked = false;
+}
+
+function offgroundChecked(){
+	document.getElementById("isSloped").checked = false;
 }
 
 function clearInput(){

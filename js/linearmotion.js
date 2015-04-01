@@ -1,6 +1,7 @@
 var size = 600;
 var graphSize = 225;
 var graphLine;
+var graphLine2;
 var baseLine;
 var circle1;
 var circle2;
@@ -53,6 +54,9 @@ function stateObject(){
 	this.startV = 0;
 	this.priorX = 0;
 	this.priorT = 0;
+	this.startV2 = 0;
+	this.priorX2 = 0;
+	this.priorT2 = 0;
 	this.startS = 0;
 	this.ticks = 0;
 }
@@ -68,6 +72,10 @@ function run(){
 	}
 	
 	if(graphLine){
+		graphLine.remove();
+	}
+	
+	if(graphLine2){
 		graphLine.remove();
 	}
 	
@@ -115,14 +123,13 @@ function runCatchup(){
 	
 	setInfo();
 	
-	//state.priorV = state.u1;
-	//state.priorX = state.s1;
-	//state.priorT = 0;
+	state.priorV = state.u1;
+	state.priorX = state.s1;
 	
-	var graphString = 
-		"M" + (0) + " " + (graphSize - (state.u1 * state.graphScale)) 
-		+ "L" +  (graphSize) + " " + (graphSize - (state.u1 * state.graphScale));
-	//baseLine = graph.path(graphString);
+	state.priorV2 = state.u2;
+	state.priorX2 = state.s2;
+	
+	state.priorT = 0;
 	
 	clearID = setInterval(simulateStepCatchup, (1/fps) * 1000);
 	
@@ -183,7 +190,21 @@ function getCatchupValues(){
 		alert("Car two will never overtake car one");
 		return false;
 	}
+	
 	state.scale = size / (0.5 * state.a1 * state.endTime * state.endTime);
+	state.graphScale = graphSize / state.endTime;
+	
+	var tT = graphSize / state.endTime;
+	var tV1 = graphSize / (state.u1 + (state.a1 * (state.endTime)));
+	var tV2 = graphSize / (state.u2 + (state.a2 * (state.endTime - state.delay)));
+	
+	if(tT < tV1 && tT < tV2){
+		state.graphScale = tT;
+	}else if(tV1 < tV2){
+		state.graphScale = tV1;
+	}else{
+		state.graphScale = tV2;
+	}
 	
 	return true;
 	
@@ -211,35 +232,79 @@ function simulateStepCatchup(){
 		circle2.attr("cy", 300);
 		
 		if(state.ticks % 10 == 0){
-			var tCircle = paper.circle(0, 0, 2);
-			tCircle.attr("cx", state.s2 * state.scale);
-			tCircle.attr("cy", 300);
-			tCircle.attr("fill", "#000");
-			pointList.push(tCircle);
+			var tCircle1 = paper.circle(0, 0, 2);
+			tCircle1.attr("cx", state.s2 * state.scale);
+			tCircle1.attr("cy", 300);
+			tCircle1.attr("fill", "#000");
+			pointList.push(tCircle1);
 		}
 		
 	}
 	
 	if(state.ticks % 10 == 0){
-		tCircle = paper.circle(0, 0, 2);
-		tCircle.attr("cx", state.s1 * state.scale);
-		tCircle.attr("cy", 200);
-		tCircle.attr("fill", "#000");
-		pointList.push(tCircle);
+		tCircle2 = paper.circle(0, 0, 2);
+		tCircle2.attr("cx", state.s1 * state.scale);
+		tCircle2.attr("cy", 200);
+		tCircle2.attr("fill", "#000");
+		pointList.push(tCircle2);
 	}
 	
-	
-	pointList.push(tCircle);
 	circle1.attr("cx", state.s1 * state.scale);
 	circle1.attr("cy", 200);
-
 	
 	document.getElementById("cv1").innerHTML = "Current velocity: " + state.v1.toFixed(3);
 	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
 	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
 	
+	document.getElementById("cv2").innerHTML = "Current velocity: " + state.v2.toFixed(3);
+	document.getElementById("cs2").innerHTML = "Current position: " + state.s2.toFixed(3);
+	
 	state.currentTime += (1 / fps);
 	state.ticks++;
+	
+	if(graphLine){
+		graphLine.remove();
+		graphLine = false;
+	}
+	
+	if(graphLine2){
+		graphLine2.remove();
+		graphLine2 = false;
+	}
+	
+	var graphString = 
+		"M" + (0) 
+		+ " " + (graphSize - (state.startV * state.graphScale)) 
+		+ "L" +  (state.currentTime * state.graphScale) 
+		+ " " + (graphSize - (state.v1 * state.graphScale));
+	graphLine = graph.path(graphString);
+	
+	if(state.currentTime > state.delay){
+		
+		if(!baseLine){
+			graphString = 
+			"M" + (state.delay * state.graphScale)
+			+ " " + graphSize
+			+ "L" +  (state.delay * state.graphScale) 
+			+ " " + (graphSize - (state.u2 * state.graphScale));
+			baseLine = graph.path(graphString);
+		}
+
+		graphString = 
+		"M" + (state.delay * state.graphScale)
+		+ " " + (graphSize - (state.u2 * state.graphScale))
+		+ "L" +  (state.currentTime * state.graphScale) 
+		+ " " + (graphSize - (state.v2 * state.graphScale));
+		graphLine2 = graph.path(graphString);
+	}
+	
+	state.priorV = state.v1;
+	state.priorX = state.s1;
+	
+	state.priorV2 = state.v2;
+	state.priorX2 = state.s2;
+	
+	state.priorT = state.currentTime;
 	
 }
 
@@ -349,7 +414,9 @@ function simulateStepSlow(){
 	
 	document.getElementById("cv1").innerHTML = "Current velocity: " + state.v1.toFixed(3);
 	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
+	
 	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
+	
 	
 	if(state.ticks % 10 == 0){
 		var tCircle = paper.circle(0, 0, 2);
@@ -527,18 +594,23 @@ function setInfo(){
 		"Current velocity: " + state.v1.toFixed(3);
 	document.getElementById("cs1").innerHTML = 
 		"Current position: " + state.s1.toFixed(3);
+		
+	document.getElementById("iu2").innerHTML = 
+		"Initial speed: " + state.u2.toFixed(3);
+	document.getElementById("ia2").innerHTML = 
+		"Initial accleration: " + state.a2.toFixed(3);
+	document.getElementById("is2").innerHTML = 
+		"Initial position: " + state.s2.toFixed(3);
+	document.getElementById("cv2").innerHTML = 
+		"Current velocity: " + state.v2.toFixed(3);
+	document.getElementById("cs2").innerHTML = 
+		"Current position: " + state.s2.toFixed(3);
+	
 	
 	document.getElementById("time").innerHTML = 
 		"Time: " + state.currentTime.toFixed(3);
 	document.getElementById("scale").innerHTML = 
 		"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
-	
-	if(state.type == "reachSpeed" || state.type == "slowToZero"){
-		document.getElementById("graphText").innerHTML = 
-			"Velocity vs time";
-	}else if(state.type == "catchup"){
-		
-	}
 	
 	
 }
