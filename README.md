@@ -19,6 +19,9 @@
 	
 #Planned features:
 - Connected particles:
+	- Particle on surface connected via pulley to falling particles
+	- Simple pulley system
+	- Sliding wedge system
 - Circular motion and Simple harmonic motion:
 	- Horizontal circle
 	- Vertical circle
@@ -26,4 +29,7 @@
 	- Display speed vs displacement in a graph beside main graphics panel
 - Relative velocity:
 	- Crossing river
+	- Wind appearing to change direction
 - Collisions:
+	- Moving particle hitting stationary particle
+	- Two moving particles hitting each other
