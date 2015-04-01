@@ -153,7 +153,8 @@ function run(){
 	}
 	
 	if(graphLine2){
-		graphLine.remove();
+		graphLine2.remove();
+		
 	}
 	
 	if(baseLine){

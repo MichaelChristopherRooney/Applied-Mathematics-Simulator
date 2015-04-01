@@ -77,6 +77,8 @@ function getNewSize(){
 		oldScale = scale;
 		x = oldSize / scale;
 		scale = size / x;
+		document.getElementById("scale").innerHTML = 
+		"Scale: 1 metre = " + scale.toFixed(3) + " pixels";
 	}
 	
 	if(circle){
@@ -123,6 +125,8 @@ function getNewSize(){
 	
 	document.getElementById("graphics_panel").style.width = size;
 	document.getElementById("info_pane").style.left = size + 10 + 165;
+	
+	
 			
 }
 
@@ -355,6 +359,12 @@ function run(){
 		pointList = [];
 	}
 
+	if(circle){
+		circle.remove();
+	}
+	circle = paper.circle(-10, -10, 10);
+	circle.attr("fill", "#f00");
+	circle.attr("stroke", "#000");
 	proj = new Projectile(parseInt(
 		document.getElementById("u").value),
 		parseInt(document.getElementById("angle").value)
