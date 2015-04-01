@@ -1,4 +1,5 @@
 var size = 600;
+var oldSize;
 var graphSize = 225;
 var graphLine;
 var graphLine2;
@@ -11,29 +12,105 @@ var clearID;
 var fps = 60;
 var state;
 var pointList = [];
+var backgroundRectangle;
+var graphBackground;
 
 $(document).ready(function(){
+	
+	paper = Raphael(document.getElementById("graphics_panel"), size, size);
 
-	paper = Raphael(160, 0, size, size);
-
-	var backgroundRectangle = paper.rect(0, 0, size, size);
+	backgroundRectangle = paper.rect(0, 0, size, size);
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
 	
-	graph = Raphael(770, 375, graphSize, graphSize);
-	var graphBackground = graph.rect(0, 0, graphSize, graphSize);
+	graph = Raphael(document.getElementById("graph_panel"), graphSize, graphSize);
+	graphBackground = graph.rect(0, 0, graphSize, graphSize);
 	graphBackground.attr("fill", "#bdbdbd");
 	graphBackground.attr("stroke", "#000");
 	
-	circle1 = paper.circle(-10, -10, 10);
-	circle1.attr("fill", "#f00");
-	circle1.attr("stroke", "#000");
-	
-	circle2 = paper.circle(-10, -10, 10);
-	circle2.attr("fill", "#f00");
-	circle2.attr("stroke", "#000");
+	getNewSize();
 
 });
+
+var resizeTimer;
+$(window).resize(function (){
+	
+	clearTimeout(resizeTimer);
+	resizeTimer = setTimeout(getNewSize, 250);
+	
+	
+});
+
+function getNewSize(){
+	
+	var w = 0, h = 0;
+	if( typeof( window.innerWidth ) == 'number' ) {
+		//Non-IE
+		w = window.innerWidth;
+		h = window.innerHeight;
+	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+		//IE 6+ in 'standards compliant mode'
+		w = document.documentElement.clientWidth;
+		h = document.documentElement.clientHeight;
+	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+		//IE 4 compatible
+		w = document.body.clientWidth;
+		h = document.body.clientHeight;
+	}
+	
+		
+	var x;
+	var oldSize = size;
+	var oldScale;
+		
+	if(w > h){
+		size = w - 250 - 10 - 165;
+	}else{
+		size = h - 250 - 10 - 165 - 80;
+	}
+	
+	if(size < 600){
+		size = 600;
+	}else if(size + 80 > h){
+		size = h - 80;
+	}
+	
+	console.log(w + ", " + h + ", " + size);
+	
+		
+	if(state){
+		if(state.scale){
+			oldScale = state.scale;
+			x = oldSize / state.scale;
+			state.scale = size / x;
+		}
+	}
+
+	
+	if(circle1){
+		circle1.attr("cx", (circle1.attr("cx") / oldScale) * state.scale);
+	}
+
+	if(circle2){
+		circle2.attr("cx", (circle2.attr("cx") / oldScale) * state.scale);
+	}
+	
+	if(pointList){
+		for(var i = 0; i < pointList.length; i++){
+			pointList[i].attr("cx", (pointList[i].attr("cx") / oldScale) * state.scale);
+		}
+	}
+	
+	paper.setSize(size, size);
+	backgroundRectangle.attr("height", size);
+	backgroundRectangle.attr("width", size);
+	
+	document.getElementById("graphics_panel").style.width = size;
+	document.getElementById("info_pane").style.left = size + 10 + 165;
+	document.getElementById("graph_panel").style.left = size + 10 + 165;
+	document.getElementById("graphText").style.left = size + 10 + 165;
+			
+}
 
 /*
 this holds the state at the moment the run button is pressed
@@ -83,6 +160,16 @@ function run(){
 		baseLine.remove();
 	}
 	
+	if(circle1){
+		circle1.remove();
+		circle1 = null;
+	}
+	
+	if(circle2){
+		circle2.remove();
+		circle2 = null;
+	}
+	
 	if(pointList){
 		for(var i = 0; i < pointList.length; i++){
 			pointList[i].remove();
@@ -96,17 +183,39 @@ function run(){
 	state.type = select[select.selectedIndex].id;
 	
 	if(state.type == "reachSpeed"){
+		
+		circle1 = paper.circle(-10, -10, 10);
+		circle1.attr("fill", "#f00");
+		circle1.attr("stroke", "#000");
+	
 		if(!runReach()){
 			return false;
 		}
+		
 	}else if(state.type == "slowToZero"){
+		
+		circle1 = paper.circle(-10, -10, 10);
+		circle1.attr("fill", "#f00");
+		circle1.attr("stroke", "#000");
+	
 		if(!runSlow()){
 			return false;
 		}
+		
 	}else if(state.type == "catchup"){
+		
+		circle1 = paper.circle(-10, -10, 10);
+		circle1.attr("fill", "#f00");
+		circle1.attr("stroke", "#000");
+		
+		circle2 = paper.circle(-10, -10, 10);
+		circle2.attr("fill", "#f00");
+		circle2.attr("stroke", "#000");
+		
 		if(!runCatchup()){
 			return false;
 		}
+		
 	}
 
 }

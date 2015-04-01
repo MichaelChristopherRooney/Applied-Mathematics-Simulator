@@ -8,21 +8,123 @@ var offGround;
 var fps = 60;
 var scale;
 var pointList = [];
+var paper;
+var backgroundRectangle;
 
 $(document).ready(function(){
 	
-	paper = Raphael(160, 0, size, size);
+	paper = Raphael(document.getElementById("graphics_panel"), size, size);
 	
-	var backgroundRectangle = paper.rect(0, 0, size, size);
+	backgroundRectangle = paper.rect(0, 0, size, size);
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
+	
+	getNewSize();
 	
 	circle = paper.circle(-10, -10, 10);
 	circle.attr("fill", "#f00");
 	circle.attr("stroke", "#000");
 	
+});
+
+var resizeTimer;
+$(window).resize(function (){
+	
+	clearTimeout(resizeTimer);
+	resizeTimer = setTimeout(getNewSize, 250);
+	
 	
 });
+
+function getNewSize(){
+	
+	var w = 0, h = 0;
+	if( typeof( window.innerWidth ) == 'number' ) {
+		//Non-IE
+		w = window.innerWidth;
+		h = window.innerHeight;
+	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+		//IE 6+ in 'standards compliant mode'
+		w = document.documentElement.clientWidth;
+		h = document.documentElement.clientHeight;
+	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+		//IE 4 compatible
+		w = document.body.clientWidth;
+		h = document.body.clientHeight;
+	}
+	
+		
+	var x;
+	var oldSize = size;
+	var oldScale;
+		
+	if(w > h){
+		size = w - 250 - 10 - 165;
+	}else{
+		size = h - 250 - 10 - 165 - 80;
+	}
+	
+	if(size < 600){
+		size = 600;
+	}else if(size + 80 > h){
+		size = h - 80;
+	}
+	
+	console.log(w + ", " + h + ", " + size);
+	
+		
+	if(scale){
+		oldScale = scale;
+		x = oldSize / scale;
+		scale = size / x;
+	}
+	
+	if(circle){
+		circle.attr("cx", (circle.attr("cx") / oldScale) * scale);
+		circle.attr("cy", (circle.attr("cy") / oldScale) * scale);
+	}
+	
+	if(pointList){
+		for(var i = 0; i < pointList.length; i++){
+			pointList[i].attr("cx", (pointList[i].attr("cx") / oldScale) * scale);
+			pointList[i].attr("cy", (pointList[i].attr("cy") / oldScale) * scale);
+		}
+	}
+
+	
+	paper.setSize(size, size);
+	backgroundRectangle.attr("height", size);
+	backgroundRectangle.attr("width", size);
+	
+	if(proj && proj.startHeight != -1){
+		
+		line.remove();
+		line = null;
+		line = paper.path("M0 " 
+			+ (size - (proj.startHeight * scale)) + " " + "L"
+			+ size
+			+ " "
+			+ (size - (proj.startHeight * scale))
+		);
+		
+	}else if(proj && proj.slopeAngle != -1){
+		
+		line.remove();
+		line = null;
+		line = paper.path("M0 " + size + "L"
+			+ size
+			+ " "
+			+ (size - 
+			(size * Math.tan(proj.slopeAngle * (Math.PI / 180)))
+			)
+		);
+		
+	}
+	
+	document.getElementById("graphics_panel").style.width = size;
+	document.getElementById("info_pane").style.left = size + 10 + 165;
+			
+}
 
 /*
 see appendix for detailed explanations of
@@ -243,6 +345,7 @@ function run(){
 	
 	if(line){
 		line.remove();
+		line = null;
 	}
 	
 	if(pointList){
@@ -252,7 +355,6 @@ function run(){
 		pointList = [];
 	}
 
-	
 	proj = new Projectile(parseInt(
 		document.getElementById("u").value),
 		parseInt(document.getElementById("angle").value)
@@ -281,7 +383,7 @@ function run(){
 		getSlopedValues();
 		getScale();
 		
-		line = paper.path("M0 600" + "L"
+		line = paper.path("M0 " + size + "L"
 			+ size
 			+ " "
 			+ (size - 
