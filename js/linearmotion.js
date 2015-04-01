@@ -79,11 +79,17 @@ function getNewSize(){
 	
 		
 	if(state){
+		
 		if(state.scale){
 			oldScale = state.scale;
 			x = oldSize / state.scale;
 			state.scale = size / x;
+			
+			document.getElementById("scale").innerHTML = 
+			"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
 		}
+		
+		
 	}
 
 	
@@ -770,10 +776,15 @@ function stopSimulation(){
 		
 		clearInterval(clearID);
 		
-		circle.attr("cx", -10);
-		circle.attr("cy", -10);
-		circle1.attr("cx", -10);
-		circle1.attr("cy", -10);
+		if(circle1){
+			circle1.attr("cx", -10);
+			circle1.attr("cy", -10);
+		}
+		
+		if(circle2){
+			circle2.attr("cx", -10);
+			circle2.attr("cy", -10);
+		}
 		
 		if(pointList){
 			for(var i = 0; i < pointList.length; i++){
