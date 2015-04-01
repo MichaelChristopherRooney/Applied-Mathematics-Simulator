@@ -25,11 +25,11 @@ $(document).ready(function(){
 	
 	circle1 = paper.circle(-10, -10, 10);
 	circle1.attr("fill", "#f00");
-	circle1.attr("stroke", "#fff");
+	circle1.attr("stroke", "#000");
 	
 	circle2 = paper.circle(-10, -10, 10);
 	circle2.attr("fill", "#f00");
-	circle2.attr("stroke", "#fff");
+	circle2.attr("stroke", "#000");
 
 });
 
@@ -47,8 +47,11 @@ function stateObject(){
 	this.s2 = 0;
 	this.currentTime = 0;
 	this.endTime = 0;
+	this.delay = 0;
 	this.graphScale = 0;
 	this.startV = 0;
+	this.priorX = 0;
+	this.priorT = 0;
 	this.startS = 0;
 }
 
@@ -91,13 +94,137 @@ function run(){
 
 }
 
+function runCatchup(){
+	
+	if(!parseInputCatchup()){
+		return false;
+	}
+	
+	if(!getCatchupValues()){
+		return false;
+	}
+	
+	setInfo();
+	
+	//state.priorV = state.u1;
+	//state.priorX = state.s1;
+	//state.priorT = 0;
+	
+	var graphString = 
+		"M" + (0) + " " + (graphSize - (state.u1 * state.graphScale)) 
+		+ "L" +  (graphSize) + " " + (graphSize - (state.u1 * state.graphScale));
+	//baseLine = graph.path(graphString);
+	
+	clearID = setInterval(simulateStepCatchup, (1/fps) * 1000);
+	
+}
+
+function parseInputCatchup(){
+	
+	/* parse all relevant input */
+	//state.u1 = parseFloat(document.getElementById("catch-u1").value);
+	state.a1 = parseFloat(document.getElementById("catch-a1").value);
+	state.u2 = parseFloat(document.getElementById("catch-u2").value);
+	state.a2 = parseFloat(document.getElementById("catch-a2").value);
+	state.delay = parseFloat(document.getElementById("delay").value);
+	
+	/* now verify the input */
+	var alertMessage = "";
+	
+	/*
+	if(isNaN(state.u1) || state.u1 <= 0 || (state.u1 == "" && state.u1 != 0)){
+		alertMessage += "Initial velocity (u1) must be a number > 0\n";
+	}
+	*/
+	if(isNaN(state.a1) || state.a1 < 0 || (state.a1 == "" && state.a1 != 0)){
+		alertMessage += "Acceleration (a1) must be a number ≥ 0\n";
+	}
+	
+	if(isNaN(state.u2) || state.u2 < 0 || (state.u2 == "" && state.u2 != 0)){
+		alertMessage += "Initial speed (u2) must be a number ≥ 0\n";
+	}
+	
+	if(isNaN(state.a2) || state.a2 < 0 || (state.a2 == "" && state.a2 != 0)){
+		alertMessage += "Acceleration (a2) must be a number ≥ 0\n";
+	}
+	
+	if(isNaN(state.delay) || state.delay <= 0 || state.delay == ""){
+		alertMessage += "Delay must be a number > 0\n";
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+	
+	return true;
+	
+}
+
+function getCatchupValues(){
+
+	var a = (0.5 * state.a2) - (0.5 * state.a1);
+	var b = state.u2 - (state.a2 * state.delay);
+	var c = (0.5 * state.a2 * state.delay * state.delay) 
+		- (state.u2 * state.delay);
+
+	state.endTime = (-b + Math.sqrt((b * b) - (4 * a * c))) / (2 * a);
+	
+	if(isNaN(state.endTime)){
+		alert("Car two will never overtake car one");
+		return false;
+	}
+	state.scale = size / (0.5 * state.a1 * state.endTime * state.endTime);
+	
+	return true;
+	
+}
+
+function simulateStepCatchup(){
+	
+	if(state.currentTime > state.endTime){
+		console.log("Simulation done");
+		clearInterval(clearID);
+		state.currentTime = state.endTime;
+	}
+	
+	state.v1 = state.u1 + (state.a1 * state.currentTime);
+	state.s1 = (state.u1 * state.currentTime)
+		+ (0.5 * state.a1 * state.currentTime * state.currentTime);
+	
+	if(state.currentTime > state.delay){
+		
+		state.v2 = state.u2 + (state.a2 * (state.currentTime - state.delay));
+		state.s2 = (state.u2 * (state.currentTime - state.delay))
+		+ (0.5 * state.a2 * (state.currentTime - state.delay) * (state.currentTime - state.delay));
+		
+		circle2.attr("cx", state.s2 * state.scale);
+		circle2.attr("cy", 300);
+	}
+	
+	circle1.attr("cx", state.s1 * state.scale);
+	circle1.attr("cy", 200);
+
+	
+	document.getElementById("cv1").innerHTML = "Current velocity: " + state.v1.toFixed(3);
+	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
+	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
+	
+	state.currentTime += (1 / fps);
+
+	
+}
+
 function runSlow(){
 	
 	if(!parseInputSlow()){
 		return false;
 	}
 	
-	getSlowValues();
+	if(!getSlowValues()){
+		return false;
+	}
+	
 	setInfo();
 	
 	state.priorV = state.u1;
@@ -173,6 +300,8 @@ function getSlowValues(){
 		state.graphScale = tY;
 	}
 	
+	return true;
+	
 }
 
 function simulateStepSlow(){
@@ -218,7 +347,10 @@ function runReach(){
 		return false;
 	}
 	
-	getReachValues();
+	if(!getReachValues()){
+		return false;
+	}
+	
 	setInfo();
 	
 	state.priorV = state.u1;
@@ -296,6 +428,8 @@ function getReachValues(){
 		state.graphScale = tY;
 	}
 	
+	return true;
+	
 }
 
 function simulateStepReach(){
@@ -368,7 +502,6 @@ function typeChange(){
 	
 	var select = document.getElementById("typeSelect");
 	var type = select[select.selectedIndex].id;
-	console.log(type);
 	
 	if(type == "reachSpeed"){
 		document.getElementById("reach").style.display = "block";
@@ -387,6 +520,20 @@ function typeChange(){
 
 function clearInput(){
 	
+	document.getElementById("reach-u1").value = "";
+	document.getElementById("reach-a1").value = "";
+	document.getElementById("reach-v1").value = "";
+	
+	document.getElementById("slow-u1").value = "";
+	document.getElementById("slow-a1").value = "";
+	
+	document.getElementById("catch-a1").value = "";
+	document.getElementById("catch-u2").value = "";
+	document.getElementById("catch-a2").value = "";
+	document.getElementById("delay").value = "";
+	
+	
+	document.getElementById("typeSelect").selectedIndex = 0;
 }
 
 function stopSimulation(){

@@ -19,7 +19,7 @@ $(document).ready(function(){
 	
 	circle = paper.circle(-10, -10, 10);
 	circle.attr("fill", "#f00");
-	circle.attr("stroke", "#fff");
+	circle.attr("stroke", "#000");
 	
 	
 });
