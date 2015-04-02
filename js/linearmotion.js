@@ -767,8 +767,9 @@ function clearInput(){
 	document.getElementById("catch-a2").value = "";
 	document.getElementById("delay").value = "";
 	
-	
 	document.getElementById("typeSelect").selectedIndex = 0;
+	
+	typeChange();
 }
 
 function stopSimulation(){
