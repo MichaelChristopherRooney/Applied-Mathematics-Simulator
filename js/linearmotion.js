@@ -165,6 +165,7 @@ function run(){
 	
 	if(baseLine){
 		baseLine.remove();
+		baseLine = false;
 	}
 	
 	if(circle1){
