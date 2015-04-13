@@ -4,7 +4,7 @@
 
 <script src="js/raphael.js"></script>
 <script src="js/jquery-1.11.2.js"></script>
-<script src="js/linearmotion.js"></script>
+<script src="js/relative.js"></script>
 <script src="js/placeholders.min.js"></script>
 
 
@@ -42,11 +42,11 @@ a:hover, a:active {
 </head>
 	
 <body>
-	<div style="height: 60px;width:1024px;">
+	<div style="width:100%;height: 60px;width:1024px;">
 		<ul>
-		<li><a style="color:black; background-color:#A0A0A0" href="linearmotion.html">Linear motion</a><li>
+		<li><a href="linearmotion.html">Linear motion</a><li>
 		<li><a href="projectiles.html">Projectiles</a><li>
-		<li><a href="relative.html">Relative velocity</a></li>
+		<li><a style="color:black; background-color:#A0A0A0" href="relative.html">Relative velocity</a></li>
 		<li><a href="connected.html">Connected particles</a></li>
 		<li><a href="circular.html">Circular motion</a></li>
 		<li><a href="shm.html">Simple harmonic</a></li>
@@ -61,23 +61,33 @@ a:hover, a:active {
 		<div style="height:10px;"></div>
 		
 		<select id="typeSelect" onchange="typeChange()" autocomplete="off">
-			<option id="reachSpeed">Reach given speed</option>
-			<option id="slowToZero">Slow to zero</option>
-			<option id="catchup">Catchup</option>
+			<option id="vab">Simple Vab</option>
+			<option id="closest">Closest distance</option>
+			<option id="river">River crossing</option>
 		</select>
 		<div style="height:5px;"></div>
 		<hr style = "float:left; width:85%;">
 		</br>
 			
 		<!-- SHOWN WHEN "REACH GIVEN SPEED" IS SELECTED -->
-		<div id = "reach">
-			<input id="reach-u1" type="text" placeholder="Initial speed u (≥ 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>	
-			
-			<input id="reach-a1" type="text" placeholder="Acceleration a (≥ 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
+		<div id = "vabdiv">
+			<input id="vab-vi1" type="text" placeholder="A i velocity Vai" style = "float:left;width:90%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 			
-			<input id="reach-v1" type="text" placeholder="Final velocity v (> u ≥ 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<input id="vab-vj1" type="text" placeholder="A j velocity Vaj" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>	
+			
+			<div style="height:5px;"></div>
+			
+			<input id="vab-vi2" type="text" placeholder="B i velocity Vbi" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>
+			
+			<input id="vab-vj2" type="text" placeholder="B j velocity Vbj" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>
+			
+			<div style="height:5px;"></div>
+			
+			<input id="vab-t" type="text" placeholder="Run for t seconds (>0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 			
 			<hr style = "float:left; width:85%;">
@@ -85,35 +95,36 @@ a:hover, a:active {
 		</div>
 		
 		<!-- SHOW WHEN "SLOW TO ZERO" IS SELECTED -->
-		<div id = "slow" style="display:none;">
-			<input id="slow-u1" type="text" placeholder="Initial speed u (> 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
+		<div id = "closestdiv" style="display:none;">
+			<input id="closest-ai" type="text" placeholder="A's i velocity (>0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>	
 			
-			<input id="slow-a1" type="text" placeholder="Acceleration a (< 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<input id="closest-as" type="text" placeholder="A's distance west (>0)" style = "float:left;width:90%; height:auto;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
+			
+			<div style="height:5px;"></div>
+			
+			<input id="closest-bi" type="text" placeholder="B's j velocity (>0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>
+			
+			<input id="closest-bs" type="text" placeholder="B's distance south (>0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>
+			
 
 			<hr style = "float:left; width:85%;">
 			</br>
 		</div>
 			
 		<!-- SHOWN WHEN "CATCHUP" IS SELECTED -->
-		<div id = "catch" style="display:none;">
-		
-			<!-- FIRST OBJECT 
-			<input id="catch-u1" type="text" placeholder="Initial speed u1 (≥ 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>	-->
+		<div id = "riverdiv" style="display:none;">
 			
-			<input id="catch-a1" type="text" placeholder="Acceleration a1 (≥ 0)" style = "float:left;width:90%;" autocomplete="off"> </br>
-			<div style="height:15px;"></div>
+			<input id="river-vp" type="text" placeholder="Person's speed (>0)" style = "float:left;width:90%;" autocomplete="off"> </br>
+			<div style="height:5px;"></div>
 			
-			<!-- SECOND OBJECT -->
-			<input id="catch-u2" type="text" placeholder="Initial speed u2 (≥ 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>	
+			<input id="river-angle" type="text" placeholder="Starting angle  (90>Θ>0)" style = "float:left;width:90%;" autocomplete="off"> </br>
+			<div style="height:5px;"></div>
 			
-			<input id="catch-a2" type="text" placeholder="Acceleration a2 (≥ 0)" style = "float:left;width:90%;" autocomplete="off"> </br>
-			<div style="height:15px;"></div>
-			
-			<input id="delay" type="text" placeholder="Delay x (> 0)" style = "float:left;width:90%;" autocomplete="off"/> </br>
+			<input id="river-vr" type="text" placeholder="Speed of the current (>0)" style = "float:left;width:90%;" autocomplete="off"> </br>
 			<div style="height:5px;"></div>
 			
 			<hr style = "float:left; width:85%;">

@@ -69,9 +69,6 @@ function getNewSize(){
 	}else if(size + 80 > h){
 		size = h - 80;
 	}
-	
-	console.log(w + ", " + h + ", " + size);
-	
 		
 	if(scale){
 		oldScale = scale;
