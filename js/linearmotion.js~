@@ -668,9 +668,9 @@ function simulateStepReach(){
 	circle1.attr("cx", state.s1 * state.scale);
 	circle1.attr("cy", 200);
 	
-	document.getElementById("cv1").innerHTML = "Current velocity: " + state.v1.toFixed(3) + "m/s";
-	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3) + "m";
-	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3) + "s";
+	document.getElementById("cv1").innerHTML = "Current velocity: " + state.v1.toFixed(3);
+	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3);
+	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3);
 	
 	if(state.ticks % 10 == 0){
 		var tCircle = paper.circle(0, 0, 2);

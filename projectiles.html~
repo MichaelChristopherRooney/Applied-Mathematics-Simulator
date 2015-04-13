@@ -116,6 +116,7 @@ a:hover, a:active {
 		<div id="vy">Current y velocity:</div>
 		<div id="sx">Current x position:</div>
 		<div id="sy">Current y position:</div>
+		<div id="ct">Current time:</div>
 		<div id="range">Max range:</div>
 		<div id="height">Max height:</div>
 		<div id="tof">Time of flight:</div>
