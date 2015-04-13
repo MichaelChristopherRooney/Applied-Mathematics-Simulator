@@ -768,9 +768,8 @@ function clearInput(){
 	document.getElementById("delay").value = "";
 	
 	document.getElementById("typeSelect").selectedIndex = 0;
-
 	typeChange();
-
+	
 }
 
 function stopSimulation(){
