@@ -2,11 +2,10 @@ var size = 600;
 var circle;
 var line;
 var paper;
-var proj;
+var state;
 var clearID;
 var offGround;
 var fps = 60;
-var scale;
 var pointList = [];
 var paper;
 var backgroundRectangle;
@@ -20,10 +19,7 @@ $(document).ready(function(){
 	backgroundRectangle.attr("stroke", "#000");
 	
 	getNewSize();
-	
-	circle = paper.circle(-10, -10, 10);
-	circle.attr("fill", "#f00");
-	circle.attr("stroke", "#000");
+
 	
 });
 
@@ -54,7 +50,6 @@ function getNewSize(){
 	}
 	
 		
-	var x;
 	var oldSize = size;
 	var oldScale;
 		
@@ -67,85 +62,247 @@ function getNewSize(){
 	if(size + 80 > h){
 		size = h - 80;
 	}
-		
-	if(scale){
-		oldScale = scale;
-		x = oldSize / scale;
-		scale = size / x;
-		document.getElementById("scale").innerHTML = 
-		"Scale: 1 metre = " + scale.toFixed(3) + " pixels";
-	}
 	
-	if(circle){
-		circle.attr("cx", (circle.attr("cx") / oldScale) * scale);
-		circle.attr("cy", (circle.attr("cy") / oldScale) * scale);
+	if(state){
+		oldScale = state.scale;
+		var x = oldSize / state.scale;
+		state.scale = size / x;
+		console.log(state.scale);
+		rescale(oldSize, oldScale);
 	}
-	
-	if(pointList){
-		for(var i = 0; i < pointList.length; i++){
-			pointList[i].attr("cx", (pointList[i].attr("cx") / oldScale) * scale);
-			pointList[i].attr("cy", (pointList[i].attr("cy") / oldScale) * scale);
-		}
-	}
-
 	
 	paper.setSize(size, size);
 	backgroundRectangle.attr("height", size);
 	backgroundRectangle.attr("width", size);
 	
-	if(proj && proj.startHeight != -1){
+	document.getElementById("graphics_panel").style.width = size;
+	document.getElementById("info_pane").style.left = size + 10 + 165;
+		
+}
+
+function rescale(oldSize, oldScale){
+	
+	
+	
+	document.getElementById("scale").innerHTML = 
+	"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";	
+			
+	if(circle){
+		circle.attr("cx", (circle.attr("cx") / oldScale) * state.scale);
+		circle.attr("cy", (circle.attr("cy") / oldScale) * state.scale);
+	}
+			
+	if(pointList){
+		for(var i = 0; i < pointList.length; i++){
+			pointList[i].attr("cx", (pointList[i].attr("cx") / oldScale) * state.scale);
+			pointList[i].attr("cy", (pointList[i].attr("cy") / oldScale) * state.scale);
+		}
+	}
+		
+	if(line){
 		
 		line.remove();
 		line = null;
-		line = paper.path("M0 " 
-			+ (size - (proj.startHeight * scale)) + " " + "L"
+		
+		if(state.type == "offGround"){
+			line = paper.path("M0 " 
+			+ (size - (state.startHeight * scale)) + " " + "L"
 			+ size
 			+ " "
-			+ (size - (proj.startHeight * scale))
-		);
-		
-	}else if(proj && proj.slopeAngle != -1){
-		
-		line.remove();
-		line = null;
-		line = paper.path("M0 " + size + "L"
+			+ (size - (state.startHeight * scale))
+			);
+		}else if(state.type == "sloped"){
+			line = paper.path("M0 " + size + "L"
 			+ size
 			+ " "
 			+ (size - 
-			(size * Math.tan(proj.slopeAngle * (Math.PI / 180)))
+			(size * Math.tan(state.slopeAngle * (Math.PI / 180)))
 			)
-		);
-		
+			);
+		}
 	}
-	
-	document.getElementById("graphics_panel").style.width = size;
-	document.getElementById("info_pane").style.left = size + 10 + 165;
-	
-	
-			
 }
-
 /*
 see appendix for detailed explanations of
 values and formulae used in projectiles
 */
-function Projectile(u, projectileAngle){
-		this.ux = u * Math.cos(projectileAngle * (Math.PI / 180));
-		this.uy = u * Math.sin(projectileAngle * (Math.PI / 180));
-		this.vx = this.ux;
+function stateObject(){
+		this.u = 0;
+		this.ux = 0;
+		this.uy = 0;
+		this.vx = 0;
 		this.vy = 0;
-		this.pa = projectileAngle;
-		this.tof = (2 * this.uy) / 9.8;
+		this.projectileAngle = 0;
+		this.tof = 0;
 		this.sx = 0;
 		this.sy = 0; 
 		this.time = 0;
-		this.range = this.ux * this.tof;
-		this.maxHeight = 
-			(this.uy * (this.tof / 2) 
-			+ (-4.9 * (this.tof / 2) 
-			* (this.tof / 2)));
-		this.startHeight = -1;
-		this.slopeAngle = -1;
+		this.range = 0;
+		this.maxHeight = 0;
+		this.startHeight = 0;
+		this.slopeAngle = 0;
+		this.type = "";
+		this.scale = 0;
+}
+
+/*
+called when the "Run simulation" button is pressed
+*/
+function run(){
+	
+	cleanUp();
+	
+	/*
+	
+	//parseInt(document.getElementById("u").value),parseInt(document.getElementById("angle").value)
+	*/
+	
+	circle = paper.circle(-10, -10, 10);
+	circle.attr("fill", "#f00");
+	circle.attr("stroke", "#000");
+	
+	state = new stateObject();
+	
+	if(document.getElementById("offGround").checked){
+		
+		state.type = "offGround";
+		
+		if(parseInputOffGround()){
+			return false;
+		}
+		
+		getOffGroundValues();
+		getScaleOffGround();
+		
+		line = paper.path("M0 " 
+			+ (size - (state.startHeight * scale)) + " " + "L"
+			+ size
+			+ " "
+			+ (size - (state.startHeight * scale))
+		);
+		
+		clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
+		
+	}else if(document.getElementById("isSloped").checked){
+		
+		state.type = "sloped";
+		
+		if(parseInputSloped()){
+			return false;
+		}
+		
+		getSlopedValues();
+		getScaleSloped();
+		
+		line = paper.path("M0 " + size + "L"
+			+ size
+			+ " "
+			+ (size - 
+			(size * Math.tan(state.slopeAngle * (Math.PI / 180)))
+			)
+		);
+		
+		clearID = setInterval(simulateStepSloped, (1/fps) * 1000);
+		
+	}else{
+		
+		state.type = "normal";
+		
+		if(parseInput()){
+			return false;
+		}
+		
+		getValues();
+		getScale();
+		setData();
+		clearID = setInterval(simulateStep, (1/fps) * 1000);
+		
+	}
+	
+}
+
+function parseInput(){
+	
+	var alertMessage = "";
+	
+	state.u = parseFloat(document.getElementById("u").value);
+	
+	if(isNaN(state.u) || state.u == "" || state.u <= 0){
+		alertMessage += "Initial speed must be a number and be > 0\n";
+	}
+	
+	state.projectileAngle = parseFloat(document.getElementById("angle").value);
+	
+	if(isNaN(state.projectileAngle) || state.projectileAngle < 0 || state.projectileAngle > 90 
+	|| (state.projectileAngle == "" && state.projectileAngle != 0)){
+		alertMessage += 
+		"Projectile angle must be a number and be >= 0 and <= 90\n";
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+}
+
+/*
+gets constant values for the normal case
+*/
+function getValues(){
+	
+	state.ux = state.u * Math.cos(state.projectileAngle * (Math.PI / 180));
+	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
+	state.vx = state.ux;
+	state.vy = 0;
+	state.tof = (2 * state.uy) / 9.8;
+	state.sx = 0;
+	state.sy = 0; 
+	state.time = 0;
+	state.range = state.ux * state.tof;
+	state.maxHeight = 
+		(state.uy * (state.tof / 2) 
+		+ (-4.9 * (state.tof / 2) 
+		* (state.tof / 2)));
+		
+}
+
+/*
+gets values for the next step in the simulation
+*/
+function simulateStep(){
+	
+	if(state.time < state.tof){
+		
+		state.vy = state.uy + (-9.8 * state.time);
+		state.sx = (state.ux * state.time);
+		state.sy = (state.uy * state.time) 
+			+ (-4.9 * state.time * state.time);
+		state.time = state.time + (1/fps);
+
+	}else{
+		
+		state.vy = state.uy + (-9.8 * state.tof);
+		state.sy = 0;
+		state.sx = (state.ux * state.tof);
+		
+		clearInterval(clearID);
+		
+	}
+	
+	circle.attr("cx", state.sx * state.scale);
+	circle.attr("cy", size - (state.sy * state.scale));
+	
+	var tCircle = paper.circle(0, 0, 2);
+	tCircle.attr("cx", state.sx * state.scale);
+	tCircle.attr("cy", size - (state.sy * state.scale));
+	tCircle.attr("fill", "#000");
+	pointList.push(tCircle);
+	
+	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
+	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
+	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
+	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
+	
 }
 
 function stopSimulation(){
@@ -167,44 +324,6 @@ function stopSimulation(){
 	}
 	
 }
-/*
-gets values for the next step in the simulation
-*/
-function simulateStep(){
-	
-	if(proj.time < proj.tof){
-		
-		proj.vy = proj.uy + (-9.8 * proj.time);
-		proj.sx = (proj.ux * proj.time);
-		proj.sy = (proj.uy * proj.time) 
-			+ (-4.9 * proj.time * proj.time);
-		proj.time = proj.time + (1/fps);
-
-	}else{
-		
-		proj.vy = proj.uy + (-9.8 * proj.tof);
-		proj.sy = 0;
-		proj.sx = (proj.ux * proj.tof);
-		
-		clearInterval(clearID);
-		
-	}
-	
-	circle.attr("cx", proj.sx * scale);
-	circle.attr("cy", size - (proj.sy * scale));
-	
-	var tCircle = paper.circle(0, 0, 2);
-	tCircle.attr("cx", proj.sx * scale);
-	tCircle.attr("cy", size - (proj.sy * scale));
-	tCircle.attr("fill", "#000");
-	pointList.push(tCircle);
-	
-	document.getElementById("vx").innerHTML = "Current x velocity: " + proj.vx.toFixed(3) + "m/s";
-	document.getElementById("vy").innerHTML = "Current y velocity: " + proj.vy.toFixed(3) + "m/s";
-	document.getElementById("sx").innerHTML = "Current x position: " + proj.sx.toFixed(3) + "m";
-	document.getElementById("sy").innerHTML = "Current y position: " + proj.sy.toFixed(3) + "m";
-	
-}
 
 /*
 gets values for the next step in the simulation
@@ -212,99 +331,99 @@ specific for when the projectile starts off the ground
 */
 function simulateStepOffGround(){
 	
-	if(proj.time < proj.tof){
+	if(state.time < state.tof){
 		
-		proj.vy = proj.uy + (-9.8 * proj.time);
-		proj.sx = (proj.ux * proj.time);
-		proj.sy = (proj.uy * proj.time) 
-			+ (-4.9 * proj.time * proj.time);
-		proj.time = proj.time + (1/fps);
+		state.vy = state.uy + (-9.8 * state.time);
+		state.sx = (state.ux * state.time);
+		state.sy = (state.uy * state.time) 
+			+ (-4.9 * state.time * state.time);
+		state.time = state.time + (1/fps);
 	
 		
 	}else{
 		
-		proj.vx = proj.ux;
-		proj.vy = proj.uy + (-9.8 * proj.tof);
-		proj.sy = -proj.startHeight;
-		proj.sx = (proj.ux * proj.tof);
+		state.vx = state.ux;
+		state.vy = state.uy + (-9.8 * state.tof);
+		state.sy = -state.startHeight;
+		state.sx = (state.ux * state.tof);
 
 		clearInterval(clearID);
 		
 	}
 	
-	circle.attr("cx", proj.sx * scale);
-	circle.attr("cy", size - ((proj.startHeight + proj.sy) * scale));
+	circle.attr("cx", state.sx * scale);
+	circle.attr("cy", size - ((state.startHeight + state.sy) * scale));
 	
 	var tCircle = paper.circle(0, 0, 2);
-	tCircle.attr("cx", proj.sx * scale);
-	tCircle.attr("cy", size - ((proj.startHeight + proj.sy) * scale));
+	tCircle.attr("cx", state.sx * scale);
+	tCircle.attr("cy", size - ((state.startHeight + state.sy) * scale));
 	tCircle.attr("fill", "#000");
 	pointList.push(tCircle);
 	
-	document.getElementById("vx").innerHTML = "Current x velocity: " + proj.vx.toFixed(3) + "m/s";
-	document.getElementById("vy").innerHTML = "Current y velocity: " + proj.vy.toFixed(3) + "m/s";
-	document.getElementById("sx").innerHTML = "Current x position: " + proj.sx.toFixed(3) + "m";
-	document.getElementById("sy").innerHTML = "Current y position: " + proj.sy.toFixed(3) + "m";
+	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
+	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
+	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
+	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
 	
 }
 
 function simulateStepSloped(){
 	
-	if(proj.time < proj.tof){
+	if(state.time < state.tof){
 		
-		proj.vx = proj.ux + 
+		state.vx = state.ux + 
 			(-9.8 
-			* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
-			* proj.time
+			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
+			* state.time
 		);
-		proj.vy = proj.uy + 
+		state.vy = state.uy + 
 			(-9.8 
-			* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
-			* proj.time
+			* Math.cos(state.slopeAngle * (Math.PI / 180)) 
+			* state.time
 		);
-		proj.sx = (proj.ux * proj.time) 
+		state.sx = (state.ux * state.time) 
 			+ (-4.9 
-			* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
-			* proj.time * proj.time
+			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
+			* state.time * state.time
 		);
-		proj.sy = (proj.uy * proj.time) 
+		state.sy = (state.uy * state.time) 
 			+ (-4.9 
-			* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
-			* proj.time * proj.time
+			* Math.cos(state.slopeAngle * (Math.PI / 180)) 
+			* state.time * state.time
 		);
-		proj.time = proj.time + (1/fps);
+		state.time = state.time + (1/fps);
 		
 		var x = 
-			(proj.sx * Math.cos(proj.slopeAngle * (Math.PI / 180))) 
-			- (proj.sy * Math.sin(proj.slopeAngle * (Math.PI / 180)));
+			(state.sx * Math.cos(state.slopeAngle * (Math.PI / 180))) 
+			- (state.sy * Math.sin(state.slopeAngle * (Math.PI / 180)));
 			
 		var y = 
-			(proj.sx * Math.sin(proj.slopeAngle * (Math.PI / 180))) 
-			+ (proj.sy * Math.cos(proj.slopeAngle * (Math.PI / 180)));
+			(state.sx * Math.sin(state.slopeAngle * (Math.PI / 180))) 
+			+ (state.sy * Math.cos(state.slopeAngle * (Math.PI / 180)));
 			
 	}else{
 		
-		proj.vx = proj.ux + 
+		state.vx = state.ux + 
 			(-9.8 
-			* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
-			* proj.tof
+			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
+			* state.tof
 		);
-		proj.vy = proj.uy + 
+		state.vy = state.uy + 
 			(-9.8 
-			* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
-			* proj.tof
+			* Math.cos(state.slopeAngle * (Math.PI / 180)) 
+			* state.tof
 		);
-		proj.sy = 0;
-		proj.sx = proj.range;
-		proj.time = proj.tof;
+		state.sy = 0;
+		state.sx = state.range;
+		state.time = state.tof;
 	
 		var x = 
-			(proj.sx * Math.cos(proj.slopeAngle * (Math.PI / 180))) 
-			- (proj.sy * Math.sin(proj.slopeAngle * (Math.PI / 180)));
+			(state.sx * Math.cos(state.slopeAngle * (Math.PI / 180))) 
+			- (state.sy * Math.sin(state.slopeAngle * (Math.PI / 180)));
 			
 		var y = 
-			(proj.sx * Math.sin(proj.slopeAngle * (Math.PI / 180))) 
-			+ (proj.sy * Math.cos(proj.slopeAngle * (Math.PI / 180)));
+			(state.sx * Math.sin(state.slopeAngle * (Math.PI / 180))) 
+			+ (state.sy * Math.cos(state.slopeAngle * (Math.PI / 180)));
 		
 		clearInterval(clearID);
 		
@@ -319,23 +438,16 @@ function simulateStepSloped(){
 	tCircle.attr("fill", "#000");
 	pointList.push(tCircle);
 	
-	document.getElementById("vx").innerHTML = "Current x velocity: " + proj.vx.toFixed(3) + "m/s";
-	document.getElementById("vy").innerHTML = "Current y velocity: " + proj.vy.toFixed(3) + "m/s";
-	document.getElementById("sx").innerHTML = "Current x position: " + proj.sx.toFixed(3) + "m";
-	document.getElementById("sy").innerHTML = "Current y position: " + proj.sy.toFixed(3) + "m";
+	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
+	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
+	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
+	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
 	
 }
-/*
-called when the "Run simulation" button is pressed
-*/
-function run(){
-	
-	if(verifyInput() == false){
-		return;
-	}
-	
-	if(proj){
-		proj = null;
+
+function cleanUp(){
+	if(state){
+		state = null;
 	}
 	
 	if(clearID){
@@ -357,104 +469,47 @@ function run(){
 
 	if(circle){
 		circle.remove();
-	}
-	circle = paper.circle(-10, -10, 10);
-	circle.attr("fill", "#f00");
-	circle.attr("stroke", "#000");
-	proj = new Projectile(parseInt(
-		document.getElementById("u").value),
-		parseInt(document.getElementById("angle").value)
-	);
-	
-	if(document.getElementById("offGround").checked){
-		
-		proj.startHeight = 
-			parseInt(document.getElementById("startHeight").value);
-			
-		getOffGroundValues();
-		getScale();
-		
-		line = paper.path("M0 " 
-			+ (size - (proj.startHeight * scale)) + " " + "L"
-			+ size
-			+ " "
-			+ (size - (proj.startHeight * scale))
-		);
-		
-	}else if(document.getElementById("isSloped").checked){
-		
-		proj.slopeAngle =
-			parseInt(document.getElementById("slopeAngle").value);
-			
-		getSlopedValues();
-		getScale();
-		
-		line = paper.path("M0 " + size + "L"
-			+ size
-			+ " "
-			+ (size - 
-			(size * Math.tan(proj.slopeAngle * (Math.PI / 180)))
-			)
-		);
-		
-	}else{
-		getScale();
-	}
-	
-	document.getElementById("ux").innerHTML = "Initial x velocity: " + proj.ux.toFixed(3) + "m/s";
-	document.getElementById("uy").innerHTML = "Initial y velocity: " + proj.uy.toFixed(3) + "m/s";
-	document.getElementById("vx").innerHTML = "Current x velocity: ";
-	document.getElementById("vy").innerHTML = "Current y velocity: ";
-	document.getElementById("sx").innerHTML = "Current x position: ";
-	document.getElementById("sy").innerHTML = "Current y position: ";
-	document.getElementById("tof").innerHTML = 
-		"Time of flight: " + proj.tof.toFixed(3) + "s";
-	document.getElementById("range").innerHTML = 
-		"Max range: " + proj.range.toFixed(3) + "m";
-	document.getElementById("height").innerHTML = 
-		"Max height: " + proj.maxHeight.toFixed(3) + "m";
-	document.getElementById("scale").innerHTML = 
-		"Scale: 1 metre = " + scale.toFixed(3) + " pixels";
-	
-	if(proj.startHeight != -1){
-		clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
-	}else if(proj.slopeAngle != -1){
-		clearID = setInterval(simulateStepSloped, (1/fps) * 1000);
-	}else{
-		clearID = setInterval(simulateStep, (1/fps) * 1000);
+		circle = null;
 	}
 	
 }
 
+function parseInputOffGround(){
+	
+}
 /*
 gets constant values for when the specific case where the projectile starts
 off the ground
 */
 function getOffGroundValues(){
 	
-	proj.tof = (-proj.uy 
-		- Math.sqrt((proj.uy * proj.uy) - (-19.6 * proj.startHeight)))
+	state.tof = (-state.uy 
+		- Math.sqrt((state.uy * state.uy) - (-19.6 * state.startHeight)))
 		/ -9.8;
-	proj.range = proj.ux * proj.tof;
-	var tempTOF = (2 * proj.uy) / 9.8
-	proj.maxHeight = (proj.uy * (tempTOF / 2) 
+	state.range = state.ux * state.tof;
+	var tempTOF = (2 * state.uy) / 9.8
+	state.maxHeight = (state.uy * (tempTOF / 2) 
 		+ (-4.9 * (tempTOF / 2) * (tempTOF / 2)));
 	
 }
 
+/*
+gets constant values for when the specific case where the projectile is
+fired up an inclined plane
+*/
 function getSlopedValues(){
 	
-	proj.tof = (2 * proj.uy) 
-		/ (9.8 * Math.cos(proj.slopeAngle * (Math.PI / 180)));
-	proj.range = (proj.ux * proj.tof) 
+	state.tof = (2 * state.uy) 
+		/ (9.8 * Math.cos(state.slopeAngle * (Math.PI / 180)));
+	state.range = (state.ux * state.tof) 
 		+ (-4.9 
-		* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
-		* proj.tof * proj.tof
+		* Math.sin(state.slopeAngle * (Math.PI / 180)) 
+		* state.tof * state.tof
 	);
-	proj.maxHeight = (proj.uy * (proj.tof / 2)) 
+	state.maxHeight = (state.uy * (state.tof / 2)) 
 		+ (-4.9 
-		* Math.cos(proj.slopeAngle * (Math.PI / 180)) 
-		* (proj.tof / 2) * (proj.tof / 2)
+		* Math.cos(state.slopeAngle * (Math.PI / 180)) 
+		* (state.tof / 2) * (state.tof / 2)
 	);
 
 	
@@ -462,60 +517,59 @@ function getSlopedValues(){
 	
 function getScale(){
 	
-	if(proj.slopeAngle != -1){ // if incline plane
-		
-		if(proj.pa == 0){
-			scale = 1;
-		}else if(proj.maxHeight > proj.range){
-			
-			var tempRange = (proj.ux * (proj.tof / 2)) 
-				+ (-4.9 
-				* Math.sin(proj.slopeAngle * (Math.PI / 180)) 
-				* ((proj.tof / 2) * (proj.tof / 2))
-			);
-		
-			var y = 
-				((tempRange) 
-				* Math.sin(proj.slopeAngle * (Math.PI / 180))) 
-				+ (proj.maxHeight 
-				* Math.cos(proj.slopeAngle * (Math.PI / 180))
-			);
-		
-			scale = size / y;
-		
-		}else{
-			scale = size / proj.range;
-		}
-		
-	}else if(proj.startHeight != -1){ // if starting off ground
-		
-		if(proj.pa == 0){
-			if(proj.range > proj.startHeight){
-				scale = size / proj.range;
-			}else{
-				scale = size / proj.startHeight;
-			}
-		}else if(proj.range > (proj.maxHeight + proj.startHeight)){
-			scale = size / proj.range;
-		}else if(proj.maxHeight > proj.startHeight){
-			scale = size / proj.maxHeight;
-		}else{
-			scale = size / (proj.startHeight + proj.maxHeight);
-		}
-		
-	}else{ // normal
-		
-		if(proj.pa == 0){
-			scale = 1;
-		}else if(proj.range > proj.maxHeight){
-			scale = size / proj.range;
-		}else{
-			scale = size / proj.maxHeight;
-		}
+	if(state.projectileAngle == 0){
+			state.scale = 1;
+	}else if(state.range > state.maxHeight){
+			state.scale = size / state.range;
+	}else{
+			state.scale = size / state.maxHeight;
 	}
 
 }
 
+function getScaleOffGround(){
+	
+	if(state.projectileAngle == 0){
+		if(state.range > state.startHeight){
+			state.scale = size / state.range;
+		}else{
+			state.scale = size / state.startHeight;
+		}
+	}else if(state.range > (state.maxHeight + state.startHeight)){
+		scale = size / state.range;
+	}else if(state.maxHeight > state.startHeight){
+		scale = size / state.maxHeight;
+	}else{
+		scale = size / (state.startHeight + state.maxHeight);
+	}
+}
+
+function getScaleIncline(){
+	
+	if(state.projectileAngle == 0){
+		state.scale = 1;
+	}else if(state.maxHeight > state.range){
+			
+		var tempRange = (state.ux * (state.tof / 2)) 
+			+ (-4.9 
+			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
+			* ((state.tof / 2) * (state.tof / 2))
+		);
+		
+		var y = 
+			((tempRange) 
+			* Math.sin(state.slopeAngle * (Math.PI / 180))) 
+			+ (state.maxHeight 
+			* Math.cos(state.slopeAngle * (Math.PI / 180))
+		);
+		
+		state.scale = size / y;
+		
+	}else{
+		state.scale = size / state.range;
+	}
+	
+}
 function verifyInput(){
 
 	var alertMessage = "";
@@ -583,6 +637,25 @@ function slopeChecked(){
 
 function offgroundChecked(){
 	document.getElementById("isSloped").checked = false;
+}
+
+function setData(){
+	
+	document.getElementById("ux").innerHTML = "Initial x velocity: " + state.ux.toFixed(3) + "m/s";
+	document.getElementById("uy").innerHTML = "Initial y velocity: " + state.uy.toFixed(3) + "m/s";
+	document.getElementById("vx").innerHTML = "Current x velocity: ";
+	document.getElementById("vy").innerHTML = "Current y velocity: ";
+	document.getElementById("sx").innerHTML = "Current x position: ";
+	document.getElementById("sy").innerHTML = "Current y position: ";
+	document.getElementById("tof").innerHTML = 
+		"Time of flight: " + state.tof.toFixed(3) + "s";
+	document.getElementById("range").innerHTML = 
+		"Max range: " + state.range.toFixed(3) + "m";
+	document.getElementById("height").innerHTML = 
+		"Max height: " + state.maxHeight.toFixed(3) + "m";
+	document.getElementById("scale").innerHTML = 
+		"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+		
 }
 
 function clearInput(){
