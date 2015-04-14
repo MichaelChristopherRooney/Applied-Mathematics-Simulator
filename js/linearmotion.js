@@ -69,13 +69,9 @@ function getNewSize(){
 		size = h - 250 - 10 - 165 - 80;
 	}
 	
-	if(size < 600){
-		size = 600;
-	}else if(size + 80 > h){
+	if(size + 80 > h){
 		size = h - 80;
 	}
-	
-	console.log(w + ", " + h + ", " + size);
 	
 		
 	if(state){
@@ -330,7 +326,6 @@ function getCatchupValues(){
 function simulateStepCatchup(){
 	
 	if(state.currentTime > state.endTime){
-		console.log("Simulation done");
 		clearInterval(clearID);
 		state.currentTime = state.endTime;
 	}
@@ -517,7 +512,6 @@ function getSlowValues(){
 function simulateStepSlow(){
 	
 	if(state.currentTime > state.endTime){
-		console.log("Simulation done");
 		clearInterval(clearID);
 		state.currentTime = state.endTime;
 	}
@@ -656,7 +650,6 @@ function getReachValues(){
 function simulateStepReach(){
 	
 	if(state.currentTime > state.endTime){
-		console.log("Simulation done");
 		clearInterval(clearID);
 		state.currentTime = state.endTime;
 	}

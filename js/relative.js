@@ -1,19 +1,16 @@
 var size = 600;
 var oldSize;
-var graphSize = 225;
-var graphLine;
-var graphLine2;
-var baseLine;
+var vaLine;
+var vbLine;
+var vabLine;
 var circle1;
 var circle2;
 var paper;
-var graph;
 var clearID;
 var fps = 60;
 var state;
 var pointList = [];
 var backgroundRectangle;
-var graphBackground;
 
 $(document).ready(function(){
 	
@@ -22,11 +19,6 @@ $(document).ready(function(){
 	backgroundRectangle = paper.rect(0, 0, size, size);
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
-	
-	graph = Raphael(document.getElementById("graph_panel"), graphSize, graphSize);
-	graphBackground = graph.rect(0, 0, graphSize, graphSize);
-	graphBackground.attr("fill", "#bdbdbd");
-	graphBackground.attr("stroke", "#000");
 	
 	getNewSize();
 
@@ -69,12 +61,11 @@ function getNewSize(){
 		size = h - 250 - 10 - 165 - 80;
 	}
 	
-	if(size < 600){
-		size = 600;
-	}else if(size + 80 > h){
+	if(size + 80 > h){
 		size = h - 80;
 	}
 		
+	
 	if(state){
 		
 		if(state.scale){
@@ -109,36 +100,23 @@ function getNewSize(){
 	backgroundRectangle.attr("width", size);
 	
 	document.getElementById("graphics_panel").style.width = size;
+	document.getElementById("graphics_panel").style.height = size;
 	document.getElementById("info_pane").style.left = size + 10 + 165;
-	document.getElementById("graph_panel").style.left = size + 10 + 165;
-	document.getElementById("graphText").style.left = size + 10 + 165;
-			
+	
 }
 
 /*
 this holds the state at the moment the run button is pressed
 */
 function stateObject(){
-	this.u1 = 0;
-	this.v1 = 0;
-	this.a1 = 0;
-	this.s1 = 0;
-	this.u2 = 0;
-	this.v2 = 0;
-	this.a2 = 0;
-	this.s2 = 0;
-	this.currentTime = 0;
-	this.endTime = 0;
-	this.delay = 0;
-	this.graphScale = 0;
-	this.startV = 0;
-	this.priorX = 0;
-	this.priorT = 0;
-	this.startV2 = 0;
-	this.priorX2 = 0;
-	this.priorT2 = 0;
-	this.startS = 0;
-	this.ticks = 0;
+	this.vai = 0;
+	this.vaj = 0;
+	this.vbi = 0;
+	this.vbj = 0;
+	this.vabi = 0;
+	this.vabj = 0;
+	this.scale = 0;
+	this.type = "";
 }
 
 /*
@@ -146,28 +124,100 @@ when the "Run simulation" button is pressed
 */
 function run(){
 
+	cleanUp();
+	
+	state = new stateObject();
+	
+	var select = document.getElementById("typeSelect");
+	var type = select[select.selectedIndex].id;
+	
+	if(type == "vab"){
+		
+		state.type = "vab";
+		
+		if(parseInputVAB()){
+			return false;
+		}
+		
+		getScaleVAB();
+		runVAB();
+		
+	}else if(type == "closest"){
+		
+	}else if(type == "river"){
+		
+	}
+		
+
+}
+
+function parseInputVAB(){
+
+	state.vai = parseFloat(document.getElementById("vab-vai").value);
+	state.vaj = parseFloat(document.getElementById("vab-vaj").value);
+	state.vbi = parseFloat(document.getElementById("vab-vbi").value);
+	state.vbj = parseFloat(document.getElementById("vab-vbj").value);
+	
+	var alertMessage = "";
+	
+	if(isNaN(state.vai) || (state.vai == "" && state.vai != 0)){
+		alertMessage += "Vai must be a number\n";
+	}
+	
+	if(isNaN(state.vaj) || (state.vaj == "" && state.vaj != 0)){
+		alertMessage += "Vaj must be a number\n";
+	}
+	
+	if(isNaN(state.vbi) || (state.vbi == "" && state.vbi != 0)){
+		alertMessage += "Vbi must be a number\n";
+	}
+	
+	if(isNaN(state.vbj) || (state.vbj == "" && state.vbj != 0)){
+		alertMessage += "Vbj must be a number\n";
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+	
+	state.vabi = state.vai - state.vbi;
+	state.vabj = state.vaj - state.vbj;
+	
+}
+
+function getScaleVAB(){
+	
+	var aMax = Math.max(Math.abs(state.vai), Math.abs(state.vaj));
+	var bMax = Math.max(Math.abs(state.vbi), Math.abs(state.vbj));
+	var abMax = Math.max(Math.abs(state.vabi), Math.abs(state.vabj));
+	
+	state.scale = size / Math.max(abMax, Math.max(aMax, bMax));
+	
+}
+
+function runVAB(){
+	//MX YLX Y
+	var centre = size / 2;
+	vaLine = paper.path("M" + centre + " " + centre + 
+		"L" + (state.vai * state.scale / 2) 
+		+ " " + (size - (state.vaj * state.scale / 2)));
+	vbLine = paper.path("M" + centre + " " + centre + 
+		"L" + (state.vbi * state.scale / 2) 
+		+ " " + (size - (state.vbj * state.scale / 2)));
+	vabLine = paper.path("M" + centre + " " + centre + 
+		"L" + (state.vabi * state.scale / 2) 
+		+ " " + (size - (state.vabj * state.scale / 2)));
+	
+	
+	
+}
+
+function cleanUp(){
+	
 	if(clearID){
 		clearInterval(clearID);
 		clearID = null;
-	}
-	
-	if(graphLine){
-		graphLine.remove();
-	}
-	
-	if(graphLine2){
-		graphLine2.remove();
-		
-	}
-	
-	if(baseLine){
-		baseLine.remove();
-		baseLine = false;
-	}
-	
-	if(circle1){
-		circle1.remove();
-		circle1 = null;
 	}
 	
 	if(circle2){
@@ -182,9 +232,21 @@ function run(){
 		pointList = [];
 	}
 	
-	state = new stateObject();
-		
-
+	if(vaLine){
+		vaLine.remove();
+		vaLine = null;
+	}
+	
+	if(vbLine){
+		vbLine.remove();
+		vbLine = null;
+	}
+	
+	if(vabLine){
+		vabLine.remove;
+		vabLine = null;
+	}
+	
 }
 
 function typeChange(){
@@ -209,10 +271,12 @@ function typeChange(){
 
 function clearInput(){
 	
-	document.getElementById("reach-u1").value = "";
-	document.getElementById("reach-a1").value = "";
-	document.getElementById("reach-v1").value = "";
+	document.getElementById("vab-vai").value = "";
+	document.getElementById("vab-vaj").value = "";
+	document.getElementById("vab-vbi").value = "";
+	document.getElementById("vab-vbj").value = "";
 	
+	/*
 	document.getElementById("slow-u1").value = "";
 	document.getElementById("slow-a1").value = "";
 	
@@ -220,6 +284,7 @@ function clearInput(){
 	document.getElementById("catch-u2").value = "";
 	document.getElementById("catch-a2").value = "";
 	document.getElementById("delay").value = "";
+	*/
 	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();

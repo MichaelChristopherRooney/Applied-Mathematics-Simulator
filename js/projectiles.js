@@ -64,9 +64,7 @@ function getNewSize(){
 		size = h - 250 - 10 - 165 - 80;
 	}
 	
-	if(size < 600){
-		size = 600;
-	}else if(size + 80 > h){
+	if(size + 80 > h){
 		size = h - 80;
 	}
 		
