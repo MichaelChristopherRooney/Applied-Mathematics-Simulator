@@ -81,7 +81,7 @@ function getNewSize(){
 		call runVAB again to recreate the
 		lines with the new size in mind
 		*/
-		if(state.type = "vab"){
+		if(state.type == "vab"){
 			vaLine.remove();
 			vbLine.remove();
 			vabLine.remove();
@@ -180,6 +180,8 @@ function run(){
 		*/
 		
 	}else if(type == "river"){
+		
+		state.type = "river";
 		
 		if(!parseInputRiver()){
 			return fasle;
