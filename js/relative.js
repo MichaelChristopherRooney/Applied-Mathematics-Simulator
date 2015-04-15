@@ -140,6 +140,7 @@ function run(){
 		}
 		
 		getScaleVAB();
+		setDataVAB();
 		runVAB();
 		
 	}else if(type == "closest"){
@@ -186,6 +187,13 @@ function parseInputVAB(){
 	
 }
 
+function setDataVAB(){
+	
+	document.getElementById("va-value").innerHTML = "Va: " + state.vai + "i + " + state.vaj + "j";
+	document.getElementById("vb-value").innerHTML = "Vb: " + state.vbi + "i + " + state.vbj + "j";
+	document.getElementById("vab-value").innerHTML = "Vab: " + state.vabi + "i + " + state.vabj + "j";
+	
+}
 function getScaleVAB(){
 	
 	var aMax = Math.max(Math.abs(state.vai), Math.abs(state.vaj));
@@ -199,17 +207,25 @@ function getScaleVAB(){
 function runVAB(){
 	//MX YLX Y
 	var centre = size / 2;
+	
+	console.log("Vai: " + state.vai + ", Vaj: " + state.vaj);
+	console.log("Vbi: " + state.vbi + ", Vbj: " + state.vbj);
+	console.log("Vabi: " + state.vabi + ", Vabj: " + state.vabj);
 	vaLine = paper.path("M" + centre + " " + centre + 
-		"L" + (state.vai * state.scale / 2) 
-		+ " " + (size - (state.vaj * state.scale / 2)));
+		"L" + ((state.vai * state.scale / 2) + centre)
+		+ " " + (centre - (state.vaj * state.scale / 2)));
+	
 	vbLine = paper.path("M" + centre + " " + centre + 
-		"L" + (state.vbi * state.scale / 2) 
-		+ " " + (size - (state.vbj * state.scale / 2)));
+		"L" + ((state.vbi * state.scale / 2) + centre)
+		+ " " + (centre - (state.vbj * state.scale / 2)));
+	
 	vabLine = paper.path("M" + centre + " " + centre + 
-		"L" + (state.vabi * state.scale / 2) 
-		+ " " + (size - (state.vabj * state.scale / 2)));
+		"L" + ((state.vabi * state.scale / 2) + centre)
+		+ " " + (centre - (state.vabj * state.scale / 2)));
 	
-	
+	vaLine.attr("stroke", "#00FF00"); // green
+	vbLine.attr("stroke", "#FF3399"); // purple
+	vabLine.attr("stroke", "#663300"); // brown
 	
 }
 
@@ -243,7 +259,7 @@ function cleanUp(){
 	}
 	
 	if(vabLine){
-		vabLine.remove;
+		vabLine.remove();
 		vabLine = null;
 	}
 	
