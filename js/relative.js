@@ -3,6 +3,8 @@ var oldSize;
 var vaLine;
 var vbLine;
 var vabLine;
+var riverLine;
+var waterBackground;
 var circle1;
 var circle2;
 var paper;
@@ -137,6 +139,7 @@ function stateObject(){
 	this.width = 0;
 	this.endTime = 0;
 	this.across = 0;
+	this.time = 0;
 }
 
 /*
@@ -188,6 +191,17 @@ function run(){
 		}
 		
 		getValuesRiver();
+		getScaleRiver();
+		
+		waterBackground = paper.rect(0, (size - (state.width * state.scale)), size, size);
+		waterBackground.attr("fill", "#1fcbd0");
+		waterBackground.attr("stroke", "#000");
+		
+		riverLine = paper.path("M" + (size/2) + " " + size + 
+			"L" + (size/2)
+			+ " " + (size - (state.width * state.scale)));
+		
+		clearID = setInterval(simulateStepRiver, (1/fps) * 1000);
 		
 	}
 		
@@ -371,9 +385,6 @@ function getValuesRiver(){
 	state.vabi = state.vabi - state.riverSpeed;
 	state.endTime = state.width / state.vabj;
 	state.across = state.endTime * state.vabi;
-	
-	console.log("Vabj: " + state.vabj + ", Vabi: " + state.vabi);
-	console.log("End time: " + state.endTime + ", across: " + state.across);
 
 }
 
@@ -383,10 +394,35 @@ function setDataRiver(){
 
 function getScaleRiver(){
 	
+	if(state.width > (state.across * 2)){
+		state.scale = size / state.width;
+	}else{
+		state.scale = (size / 2) / state.across;
+	}
 	
 }
 
-function runRiver(){
+function simulateStepRiver(){
+	
+	if(state.time > state.endTime){
+		clearInterval(clearID);
+		state.time = state.endTime;
+	}
+	
+	var x = state.vabi * state.time;
+	var y = state.vabj * state.time;
+	
+	if(vabLine){
+		vabLine.remove();
+		vabLine = null;
+	}
+	
+	var centre = size / 2;
+	vabLine = paper.path("M" + centre + " " + size + 
+		"L" + (centre - (x * state.scale))
+		+ " " + (size - (y * state.scale)));
+	
+	state.time += (1 / fps);
 	
 }
 
@@ -422,6 +458,16 @@ function cleanUp(){
 	if(vabLine){
 		vabLine.remove();
 		vabLine = null;
+	}
+	
+	if(riverLine){
+		riverLine.remove();
+		riverLine = null;
+	}
+	
+	if(waterBackground){
+		waterBackground.remove();
+		waterBackground = null;
 	}
 	
 }
