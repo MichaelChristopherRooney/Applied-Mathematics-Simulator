@@ -6,17 +6,19 @@
 - Uses raphael.js for drawing and jquery-1.11.2.js
 
 #Implemented features:
-- Projectiles:
-	- Normal
-	- Starting off ground
-	- Incline plane
-	- Display real time info
 - Linear motion:
 	- Accelerate to a given speed
 	- Decelerate to zero
 	- One object catches up to another
 	- Display real time info
-	
+- Projectiles:
+	- Normal
+	- Starting off ground
+	- Incline plane
+	- Display real time info
+- Relative velocity
+	- Simple Vab scenario
+
 #Planned features:
 - Connected particles:
 	- Particle on surface connected via pulley to falling particles
