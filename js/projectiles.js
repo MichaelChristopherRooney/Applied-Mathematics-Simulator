@@ -67,7 +67,6 @@ function getNewSize(){
 		oldScale = state.scale;
 		var x = oldSize / state.scale;
 		state.scale = size / x;
-		console.log(state.scale);
 		rescale(oldSize, oldScale);
 	}
 	
@@ -81,8 +80,6 @@ function getNewSize(){
 }
 
 function rescale(oldSize, oldScale){
-	
-	
 	
 	document.getElementById("scale").innerHTML = 
 	"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";	
@@ -111,17 +108,18 @@ function rescale(oldSize, oldScale){
 			+ " "
 			+ (size - (state.startHeight * scale))
 			);
-		}else if(state.type == "sloped"){
+		}else if(state.type == "incline"){
 			line = paper.path("M0 " + size + "L"
 			+ size
 			+ " "
 			+ (size - 
-			(size * Math.tan(state.slopeAngle * (Math.PI / 180)))
+			(size * Math.tan(state.inclineAngle * (Math.PI / 180)))
 			)
 			);
 		}
 	}
 }
+
 /*
 see appendix for detailed explanations of
 values and formulae used in projectiles
@@ -140,7 +138,7 @@ function stateObject(){
 		this.range = 0;
 		this.maxHeight = 0;
 		this.startHeight = 0;
-		this.slopeAngle = 0;
+		this.inclineAngle = 0;
 		this.type = "";
 		this.scale = 0;
 }
@@ -183,26 +181,27 @@ function run(){
 		
 		clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
 		
-	}else if(document.getElementById("isSloped").checked){
+	}else if(document.getElementById("isIncline").checked){
 		
-		state.type = "sloped";
+		state.type = "incline";
 		
-		if(parseInputSloped()){
+		if(parseInputIncline()){
 			return false;
 		}
 		
-		getSlopedValues();
-		getScaleSloped();
+		getInclineValues();
+		getScaleIncline();
+		setData();
 		
 		line = paper.path("M0 " + size + "L"
 			+ size
 			+ " "
 			+ (size - 
-			(size * Math.tan(state.slopeAngle * (Math.PI / 180)))
+			(size * Math.tan(state.inclineAngle * (Math.PI / 180)))
 			)
 		);
 		
-		clearID = setInterval(simulateStepSloped, (1/fps) * 1000);
+		clearID = setInterval(simulateStepIncline, (1/fps) * 1000);
 		
 	}else{
 		
@@ -305,6 +304,131 @@ function simulateStep(){
 	
 }
 
+function parseInputIncline(){
+	
+	var alertMessage = "";
+	
+	state.u = parseFloat(document.getElementById("u").value);
+	
+	if(isNaN(state.u) || state.u == "" || state.u <= 0){
+		alertMessage += "Initial speed must be a number and be > 0\n";
+	}
+	
+	state.projectileAngle = parseFloat(document.getElementById("angle").value);
+	
+	if(isNaN(state.projectileAngle) || state.projectileAngle < 0 || state.projectileAngle > 90 
+	|| (state.projectileAngle == "" && state.projectileAngle != 0)){
+		alertMessage += 
+		"Projectile angle must be a number and be >= 0 and <= 90\n";
+	}
+	
+	state.inclineAngle = parseFloat(document.getElementById("inclineAngle").value);
+	
+	if(isNaN(state.inclineAngle) || state.inclineAngle <= 0 || state.inclineAngle > 90
+	|| (state.inclineAngle == "" && state.inclineAngle != 0)){
+		alertMessage +=
+		"Incline plane angle must be a number > 0 and <= 90"
+	}
+	
+	if(state.inclineAngle + state.projectileAngle > 90){
+		alertMessage +=
+		"Incline angle + projectile angle must be < 90"
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+	
+}
+
+function simulateStepIncline(){
+	
+	if(state.time > state.tof){
+		state.time = state.tof;
+		clearInterval(clearID);
+	}
+		
+	state.vx = state.ux + 
+		(-9.8 
+		* Math.sin(state.inclineAngle * (Math.PI / 180)) 
+		* state.time
+	);
+	state.vy = state.uy + 
+		(-9.8 
+		* Math.cos(state.inclineAngle * (Math.PI / 180)) 
+		* state.time
+	);
+	state.sx = (state.ux * state.time) 
+		+ (-4.9 
+		* Math.sin(state.inclineAngle * (Math.PI / 180)) 
+		* state.time * state.time
+	);
+	state.sy = (state.uy * state.time) 
+		+ (-4.9 
+		* Math.cos(state.inclineAngle * (Math.PI / 180)) 
+		* state.time * state.time
+	);
+	
+	var x = 
+	(state.sx * Math.cos(state.inclineAngle * (Math.PI / 180))) 
+	- (state.sy * Math.sin(state.inclineAngle * (Math.PI / 180)));
+			
+	var y = 
+	(state.sx * Math.sin(state.inclineAngle * (Math.PI / 180))) 
+	+ (state.sy * Math.cos(state.inclineAngle * (Math.PI / 180)));
+			
+	circle.attr("cx", x * state.scale);
+	circle.attr("cy", size - (y * state.scale));
+	
+	var tCircle = paper.circle(0, 0, 2);
+	tCircle.attr("cx", x * state.scale);
+	tCircle.attr("cy", size - (y * state.scale));
+	tCircle.attr("fill", "#000");
+	pointList.push(tCircle);
+	
+	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
+	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
+	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
+	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
+	
+	state.time = state.time + (1/fps);
+	
+}
+
+/*
+gets constant values for when the specific case where the projectile is
+fired up an inclined plane
+*/
+function getInclineValues(){
+	
+	state.ux = state.u * Math.cos(state.projectileAngle * (Math.PI / 180));
+	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
+	state.vx = state.ux;
+	state.vy = 0;
+	state.sx = 0;
+	state.sy = 0; 
+	state.time = 0;
+
+	state.tof = (2 * state.uy) 
+		/ (9.8 * Math.cos(state.inclineAngle * (Math.PI / 180))
+	);
+		
+	state.range = (state.ux * state.tof) 
+		+ (-4.9 
+		* Math.sin(state.inclineAngle * (Math.PI / 180)) 
+		* state.tof * state.tof
+	);
+	
+	state.maxHeight = (state.uy * (state.tof / 2)) 
+		+ (-4.9 
+		* Math.cos(state.inclineAngle * (Math.PI / 180)) 
+		* (state.tof / 2) * (state.tof / 2)
+	);
+
+	
+}
+
 function stopSimulation(){
 	
 	if(clearID){
@@ -367,84 +491,6 @@ function simulateStepOffGround(){
 	
 }
 
-function simulateStepSloped(){
-	
-	if(state.time < state.tof){
-		
-		state.vx = state.ux + 
-			(-9.8 
-			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
-			* state.time
-		);
-		state.vy = state.uy + 
-			(-9.8 
-			* Math.cos(state.slopeAngle * (Math.PI / 180)) 
-			* state.time
-		);
-		state.sx = (state.ux * state.time) 
-			+ (-4.9 
-			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
-			* state.time * state.time
-		);
-		state.sy = (state.uy * state.time) 
-			+ (-4.9 
-			* Math.cos(state.slopeAngle * (Math.PI / 180)) 
-			* state.time * state.time
-		);
-		state.time = state.time + (1/fps);
-		
-		var x = 
-			(state.sx * Math.cos(state.slopeAngle * (Math.PI / 180))) 
-			- (state.sy * Math.sin(state.slopeAngle * (Math.PI / 180)));
-			
-		var y = 
-			(state.sx * Math.sin(state.slopeAngle * (Math.PI / 180))) 
-			+ (state.sy * Math.cos(state.slopeAngle * (Math.PI / 180)));
-			
-	}else{
-		
-		state.vx = state.ux + 
-			(-9.8 
-			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
-			* state.tof
-		);
-		state.vy = state.uy + 
-			(-9.8 
-			* Math.cos(state.slopeAngle * (Math.PI / 180)) 
-			* state.tof
-		);
-		state.sy = 0;
-		state.sx = state.range;
-		state.time = state.tof;
-	
-		var x = 
-			(state.sx * Math.cos(state.slopeAngle * (Math.PI / 180))) 
-			- (state.sy * Math.sin(state.slopeAngle * (Math.PI / 180)));
-			
-		var y = 
-			(state.sx * Math.sin(state.slopeAngle * (Math.PI / 180))) 
-			+ (state.sy * Math.cos(state.slopeAngle * (Math.PI / 180)));
-		
-		clearInterval(clearID);
-		
-	}
-	
-	circle.attr("cx", x * scale);
-	circle.attr("cy", size - (y * scale));
-	
-	var tCircle = paper.circle(0, 0, 2);
-	tCircle.attr("cx", x * scale);
-	tCircle.attr("cy", size - (y * scale));
-	tCircle.attr("fill", "#000");
-	pointList.push(tCircle);
-	
-	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
-	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
-	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
-	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
-	
-}
-
 function cleanUp(){
 	if(state){
 		state = null;
@@ -492,28 +538,6 @@ function getOffGroundValues(){
 		+ (-4.9 * (tempTOF / 2) * (tempTOF / 2)));
 	
 }
-
-/*
-gets constant values for when the specific case where the projectile is
-fired up an inclined plane
-*/
-function getSlopedValues(){
-	
-	state.tof = (2 * state.uy) 
-		/ (9.8 * Math.cos(state.slopeAngle * (Math.PI / 180)));
-	state.range = (state.ux * state.tof) 
-		+ (-4.9 
-		* Math.sin(state.slopeAngle * (Math.PI / 180)) 
-		* state.tof * state.tof
-	);
-	state.maxHeight = (state.uy * (state.tof / 2)) 
-		+ (-4.9 
-		* Math.cos(state.slopeAngle * (Math.PI / 180)) 
-		* (state.tof / 2) * (state.tof / 2)
-	);
-
-	
-}
 	
 function getScale(){
 	
@@ -552,15 +576,15 @@ function getScaleIncline(){
 			
 		var tempRange = (state.ux * (state.tof / 2)) 
 			+ (-4.9 
-			* Math.sin(state.slopeAngle * (Math.PI / 180)) 
+			* Math.sin(state.inclineAngle * (Math.PI / 180)) 
 			* ((state.tof / 2) * (state.tof / 2))
 		);
 		
 		var y = 
 			((tempRange) 
-			* Math.sin(state.slopeAngle * (Math.PI / 180))) 
+			* Math.sin(state.inclineAngle * (Math.PI / 180))) 
 			+ (state.maxHeight 
-			* Math.cos(state.slopeAngle * (Math.PI / 180))
+			* Math.cos(state.inclineAngle * (Math.PI / 180))
 		);
 		
 		state.scale = size / y;
@@ -588,22 +612,22 @@ function verifyInput(){
 		"Projectile angle must be a number and be >= 0 and <= 90\n";
 	}
 	
-	/* if the "sloped" check box is checked */
-	if(document.getElementById("isSloped").checked){
+	/* if the "incline" check box is checked */
+	if(document.getElementById("isIncline").checked){
 		
 		var angleTotal = value;
-		value = parseInt(document.getElementById("slopeAngle").value);
+		value = parseInt(document.getElementById("inclineAngle").value);
 		/* add the two angles together and make sure they are < 90 */
 		angleTotal += value;
 		
 		if(isNaN(value) || value == "" || value <= 0 || value > 90){
 			alertMessage += 
-			"Slope angle must be a number and be > 0 and <= 90\n";
+			"Incline angle must be a number and be > 0 and <= 90\n";
 		}
 		
 		if(angleTotal >= 90){
 			alertMessage += 
-			"Slope angle + projectile angle must be < 90";
+			"Incline angle + projectile angle must be < 90";
 		}
 		
 	}
@@ -620,8 +644,8 @@ function verifyInput(){
 	}
 	
 	if(document.getElementById("offGround").checked 
-	&& document.getElementById("isSloped").checked){
-		alertMessage += "Projectiles cannot be on a slope and off ground\n";
+	&& document.getElementById("isIncline").checked){
+		alertMessage += "Projectiles cannot be on a incline and off ground\n";
 	}
 	
 	if(alertMessage != ""){
@@ -631,12 +655,12 @@ function verifyInput(){
 	
 }
 
-function slopeChecked(){
+function inclineChecked(){
 	document.getElementById("offGround").checked = false;
 }
 
 function offgroundChecked(){
-	document.getElementById("isSloped").checked = false;
+	document.getElementById("isIncline").checked = false;
 }
 
 function setData(){
@@ -662,8 +686,8 @@ function clearInput(){
 	
 	document.getElementById("u").value = "";
 	document.getElementById("angle").value = "";
-	document.getElementById("isSloped").checked = false;
-	document.getElementById("slopeAngle").value = "";
+	document.getElementById("isIncline").checked = false;
+	document.getElementById("inclineAngle").value = "";
 	document.getElementById("offGround").checked = false;
 	document.getElementById("startHeight").value = "";
 	
