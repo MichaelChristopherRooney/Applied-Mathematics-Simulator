@@ -73,8 +73,20 @@ function getNewSize(){
 			x = oldSize / state.scale;
 			state.scale = size / x;
 			
-			document.getElementById("scale").innerHTML = 
-			"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+			//document.getElementById("scale").innerHTML = "Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+		}
+		
+		/*
+		if Vab scenario then we can just
+		call runVAB again to recreate the
+		lines with the new size in mind
+		*/
+		if(state.type = "vab"){
+			vaLine.remove();
+			vbLine.remove();
+			vabLine.remove();
+			vabLine = vbLine = vaLine = null;
+			runVAB();
 		}
 		
 		
@@ -115,6 +127,8 @@ function stateObject(){
 	this.vbj = 0;
 	this.vabi = 0;
 	this.vabj = 0;
+	this.sa = 0;
+	this.sb = 0;
 	this.scale = 0;
 	this.type = "";
 }
@@ -135,7 +149,7 @@ function run(){
 		
 		state.type = "vab";
 		
-		if(parseInputVAB()){
+		if(!parseInputVAB()){
 			return false;
 		}
 		
@@ -144,6 +158,20 @@ function run(){
 		runVAB();
 		
 	}else if(type == "closest"){
+		
+		state.type = "closest";
+		
+		if(!parseInputClosest()){
+			return false;
+		}
+		
+		//getClosestDistance();
+		
+		/*
+		getScaleClosest();
+		setDataClosest();
+		runClosest();
+		*/
 		
 	}else if(type == "river"){
 		
@@ -162,19 +190,19 @@ function parseInputVAB(){
 	var alertMessage = "";
 	
 	if(isNaN(state.vai) || (state.vai == "" && state.vai != 0)){
-		alertMessage += "Vai must be a number\n";
+		alertMessage += "A's i velocity must be a number\n";
 	}
 	
 	if(isNaN(state.vaj) || (state.vaj == "" && state.vaj != 0)){
-		alertMessage += "Vaj must be a number\n";
+		alertMessage += "A's j velocity must be a number\n";
 	}
 	
 	if(isNaN(state.vbi) || (state.vbi == "" && state.vbi != 0)){
-		alertMessage += "Vbi must be a number\n";
+		alertMessage += "B's i velocity must be a number\n";
 	}
 	
 	if(isNaN(state.vbj) || (state.vbj == "" && state.vbj != 0)){
-		alertMessage += "Vbj must be a number\n";
+		alertMessage += "B's j velocity must be a number\n";
 	}
 	
 	if(alertMessage != ""){
@@ -185,6 +213,7 @@ function parseInputVAB(){
 	state.vabi = state.vai - state.vbi;
 	state.vabj = state.vaj - state.vbj;
 	
+	return true;
 }
 
 function setDataVAB(){
@@ -194,6 +223,7 @@ function setDataVAB(){
 	document.getElementById("vab-value").innerHTML = "Vab: " + state.vabi + "i + " + state.vabj + "j";
 	
 }
+
 function getScaleVAB(){
 	
 	var aMax = Math.max(Math.abs(state.vai), Math.abs(state.vaj));
@@ -208,9 +238,6 @@ function runVAB(){
 	//MX YLX Y
 	var centre = size / 2;
 	
-	console.log("Vai: " + state.vai + ", Vaj: " + state.vaj);
-	console.log("Vbi: " + state.vbi + ", Vbj: " + state.vbj);
-	console.log("Vabi: " + state.vabi + ", Vabj: " + state.vabj);
 	vaLine = paper.path("M" + centre + " " + centre + 
 		"L" + ((state.vai * state.scale / 2) + centre)
 		+ " " + (centre - (state.vaj * state.scale / 2)));
@@ -227,6 +254,42 @@ function runVAB(){
 	vbLine.attr("stroke", "#FF3399"); // purple
 	vabLine.attr("stroke", "#663300"); // brown
 	
+}
+
+function parseInputClosest(){
+
+	state.vai = parseFloat(document.getElementById("closest-ai").value);
+	state.vbj = parseFloat(document.getElementById("closest-bj").value);
+	state.sa  = parseFloat(document.getElementById("closest-as").value);
+	state.sb  = parseFloat(document.getElementById("closest-bs").value);
+	
+	var alertMessage = "";
+	
+	if(isNaN(state.vai) || state.vai <= 0 || (state.vai == "" && state.vai != 0)){
+		alertMessage += "A's i velocity must be a number > 0\n";
+	}
+	
+	if(isNaN(state.sa) || state.sa <= 0 || (state.sa == "" && state.sa != 0)){
+		alertMessage += "A's distance west must be a number > 0\n";
+	}
+	
+	if(isNaN(state.vbj) || state.vbj <= 0 || (state.vbj == "" && state.vbh != 0)){
+		alertMessage += "B's j velocity must be a number > 0\n";
+	}
+	
+	if(isNaN(state.sb) || state.sb <= 0 || (state.sb == "" && state.sb != 0)){
+		alertMessage += "B's distance south must be a number > 0\n";
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+	
+	state.vabi = state.vai;
+	state.vabj = state.vbj;
+	
+	return true;
 }
 
 function cleanUp(){
