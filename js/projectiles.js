@@ -165,18 +165,19 @@ function run(){
 		
 		state.type = "offGround";
 		
-		if(parseInputOffGround()){
+		if(!parseInputOffGround()){
 			return false;
 		}
 		
 		getOffGroundValues();
 		getScaleOffGround();
+		setData();
 		
 		line = paper.path("M0 " 
-			+ (size - (state.startHeight * scale)) + " " + "L"
+			+ (size - (state.startHeight * state.scale)) + " " + "L"
 			+ size
 			+ " "
-			+ (size - (state.startHeight * scale))
+			+ (size - (state.startHeight * state.scale))
 		);
 		
 		clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
@@ -185,7 +186,7 @@ function run(){
 		
 		state.type = "incline";
 		
-		if(parseInputIncline()){
+		if(!parseInputIncline()){
 			return false;
 		}
 		
@@ -207,7 +208,7 @@ function run(){
 		
 		state.type = "normal";
 		
-		if(parseInput()){
+		if(!parseInput()){
 			return false;
 		}
 		
@@ -242,6 +243,9 @@ function parseInput(){
 		alert(alertMessage);
 		return false;
 	}
+	
+	return true;
+	
 }
 
 /*
@@ -270,23 +274,16 @@ gets values for the next step in the simulation
 */
 function simulateStep(){
 	
-	if(state.time < state.tof){
-		
-		state.vy = state.uy + (-9.8 * state.time);
-		state.sx = (state.ux * state.time);
-		state.sy = (state.uy * state.time) 
-			+ (-4.9 * state.time * state.time);
-		state.time = state.time + (1/fps);
-
-	}else{
-		
-		state.vy = state.uy + (-9.8 * state.tof);
-		state.sy = 0;
-		state.sx = (state.ux * state.tof);
-		
+	if(state.time > state.tof){
 		clearInterval(clearID);
-		
+		state.time = state.tof;
 	}
+	
+	state.vy = state.uy + (-9.8 * state.time);
+	state.sx = (state.ux * state.time);
+	state.sy = (state.uy * state.time) 
+		+ (-4.9 * state.time * state.time);
+	
 	
 	circle.attr("cx", state.sx * state.scale);
 	circle.attr("cy", size - (state.sy * state.scale));
@@ -297,10 +294,42 @@ function simulateStep(){
 	tCircle.attr("fill", "#000");
 	pointList.push(tCircle);
 	
-	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
-	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
-	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
-	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
+	setData();
+	
+	state.time = state.time + (1/fps);
+	
+}
+
+/*
+gets constant values for when the specific case where the projectile is
+fired up an inclined plane
+*/
+function getInclineValues(){
+	
+	state.ux = state.u * Math.cos(state.projectileAngle * (Math.PI / 180));
+	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
+	state.vx = state.ux;
+	state.vy = 0;
+	state.sx = 0;
+	state.sy = 0; 
+	state.time = 0;
+
+	state.tof = (2 * state.uy) 
+		/ (9.8 * Math.cos(state.inclineAngle * (Math.PI / 180))
+	);
+		
+	state.range = (state.ux * state.tof) 
+		+ (-4.9 
+		* Math.sin(state.inclineAngle * (Math.PI / 180)) 
+		* state.tof * state.tof
+	);
+	
+	state.maxHeight = (state.uy * (state.tof / 2)) 
+		+ (-4.9 
+		* Math.cos(state.inclineAngle * (Math.PI / 180)) 
+		* (state.tof / 2) * (state.tof / 2)
+	);
+
 	
 }
 
@@ -339,6 +368,8 @@ function parseInputIncline(){
 		alert(alertMessage);
 		return false;
 	}
+	
+	return true;
 	
 }
 
@@ -387,45 +418,100 @@ function simulateStepIncline(){
 	tCircle.attr("fill", "#000");
 	pointList.push(tCircle);
 	
-	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
-	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
-	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
-	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
+	setData();
 	
 	state.time = state.time + (1/fps);
 	
 }
 
+function parseInputOffGround(){
+	
+	var alertMessage = "";
+	
+	state.u = parseFloat(document.getElementById("u").value);
+	
+	if(isNaN(state.u) || state.u == "" || state.u <= 0){
+		alertMessage += "Initial speed must be a number and be > 0\n";
+	}
+	
+	state.projectileAngle = parseFloat(document.getElementById("angle").value);
+	
+	if(isNaN(state.projectileAngle) || state.projectileAngle < 0 || state.projectileAngle > 90 
+	|| (state.projectileAngle == "" && state.projectileAngle != 0)){
+		alertMessage += 
+		"Projectile angle must be a number and be >= 0 and <= 90\n";
+	}
+	
+	state.startHeight = parseFloat(document.getElementById("startHeight").value);
+	
+	if(isNaN(state.startHeight) || state.startHeight <= 0 || state.startHeight == ""){
+		alertMessage +=
+		"Start height must be a number > 0"
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+	
+	return true;
+	
+}
+
 /*
-gets constant values for when the specific case where the projectile is
-fired up an inclined plane
+gets constant values for when the specific case where the projectile starts
+off the ground
 */
-function getInclineValues(){
+function getOffGroundValues(){
 	
 	state.ux = state.u * Math.cos(state.projectileAngle * (Math.PI / 180));
 	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
 	state.vx = state.ux;
 	state.vy = 0;
+	state.tof = (2 * state.uy) / 9.8;
 	state.sx = 0;
 	state.sy = 0; 
 	state.time = 0;
-
-	state.tof = (2 * state.uy) 
-		/ (9.8 * Math.cos(state.inclineAngle * (Math.PI / 180))
-	);
-		
-	state.range = (state.ux * state.tof) 
-		+ (-4.9 
-		* Math.sin(state.inclineAngle * (Math.PI / 180)) 
-		* state.tof * state.tof
+	
+	state.tof = (-state.uy 
+		- Math.sqrt((state.uy * state.uy) - (-19.6 * state.startHeight)))
+		/ -9.8;
+	state.range = state.ux * state.tof;
+	var tempTOF = (2 * state.uy) / 9.8;
+	state.maxHeight = (state.uy * (tempTOF / 2) 
+		+ (-4.9 * (tempTOF / 2) * (tempTOF / 2))
 	);
 	
-	state.maxHeight = (state.uy * (state.tof / 2)) 
-		+ (-4.9 
-		* Math.cos(state.inclineAngle * (Math.PI / 180)) 
-		* (state.tof / 2) * (state.tof / 2)
-	);
+}
 
+/*
+gets values for the next step in the simulation
+specific for when the projectile starts off the ground
+*/
+function simulateStepOffGround(){
+	
+	if(state.time > state.tof){
+		clearInterval(clearID);
+		state.time = state.tof;
+	}
+	
+	state.vy = state.uy + (-9.8 * state.time);
+	state.sx = (state.ux * state.time);
+	state.sy = (state.uy * state.time) 
+		+ (-4.9 * state.time * state.time);
+		
+	circle.attr("cx", state.sx * state.scale);
+	circle.attr("cy", size - ((state.startHeight + state.sy) * state.scale));
+	
+	var tCircle = paper.circle(0, 0, 2);
+	tCircle.attr("cx", state.sx * state.scale);
+	tCircle.attr("cy", size - ((state.startHeight + state.sy) * state.scale));
+	tCircle.attr("fill", "#000");
+	pointList.push(tCircle);
+	
+	setData();
+	
+	state.time = state.time + (1/fps);
 	
 }
 
@@ -449,49 +535,8 @@ function stopSimulation(){
 	
 }
 
-/*
-gets values for the next step in the simulation
-specific for when the projectile starts off the ground
-*/
-function simulateStepOffGround(){
-	
-	if(state.time < state.tof){
-		
-		state.vy = state.uy + (-9.8 * state.time);
-		state.sx = (state.ux * state.time);
-		state.sy = (state.uy * state.time) 
-			+ (-4.9 * state.time * state.time);
-		state.time = state.time + (1/fps);
-	
-		
-	}else{
-		
-		state.vx = state.ux;
-		state.vy = state.uy + (-9.8 * state.tof);
-		state.sy = -state.startHeight;
-		state.sx = (state.ux * state.tof);
-
-		clearInterval(clearID);
-		
-	}
-	
-	circle.attr("cx", state.sx * scale);
-	circle.attr("cy", size - ((state.startHeight + state.sy) * scale));
-	
-	var tCircle = paper.circle(0, 0, 2);
-	tCircle.attr("cx", state.sx * scale);
-	tCircle.attr("cy", size - ((state.startHeight + state.sy) * scale));
-	tCircle.attr("fill", "#000");
-	pointList.push(tCircle);
-	
-	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
-	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
-	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
-	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
-	
-}
-
 function cleanUp(){
+	
 	if(state){
 		state = null;
 	}
@@ -519,25 +564,6 @@ function cleanUp(){
 	}
 	
 }
-
-function parseInputOffGround(){
-	
-}
-/*
-gets constant values for when the specific case where the projectile starts
-off the ground
-*/
-function getOffGroundValues(){
-	
-	state.tof = (-state.uy 
-		- Math.sqrt((state.uy * state.uy) - (-19.6 * state.startHeight)))
-		/ -9.8;
-	state.range = state.ux * state.tof;
-	var tempTOF = (2 * state.uy) / 9.8
-	state.maxHeight = (state.uy * (tempTOF / 2) 
-		+ (-4.9 * (tempTOF / 2) * (tempTOF / 2)));
-	
-}
 	
 function getScale(){
 	
@@ -560,11 +586,11 @@ function getScaleOffGround(){
 			state.scale = size / state.startHeight;
 		}
 	}else if(state.range > (state.maxHeight + state.startHeight)){
-		scale = size / state.range;
+		state.scale = size / state.range;
 	}else if(state.maxHeight > state.startHeight){
-		scale = size / state.maxHeight;
+		state.scale = size / state.maxHeight;
 	}else{
-		scale = size / (state.startHeight + state.maxHeight);
+		state.scale = size / (state.startHeight + state.maxHeight);
 	}
 }
 
@@ -594,66 +620,6 @@ function getScaleIncline(){
 	}
 	
 }
-function verifyInput(){
-
-	var alertMessage = "";
-	
-	var value = parseInt(document.getElementById("u").value);
-	
-	if(isNaN(value) || value == "" || value <= 0){
-		alertMessage += "Initial speed must be a number and be > 0\n";
-	}
-	
-	value = parseInt(document.getElementById("angle").value);
-	
-	if(isNaN(value) || value < 0 || value > 90 
-	|| (value == "" && value != 0)){
-		alertMessage += 
-		"Projectile angle must be a number and be >= 0 and <= 90\n";
-	}
-	
-	/* if the "incline" check box is checked */
-	if(document.getElementById("isIncline").checked){
-		
-		var angleTotal = value;
-		value = parseInt(document.getElementById("inclineAngle").value);
-		/* add the two angles together and make sure they are < 90 */
-		angleTotal += value;
-		
-		if(isNaN(value) || value == "" || value <= 0 || value > 90){
-			alertMessage += 
-			"Incline angle must be a number and be > 0 and <= 90\n";
-		}
-		
-		if(angleTotal >= 90){
-			alertMessage += 
-			"Incline angle + projectile angle must be < 90";
-		}
-		
-	}
-	
-	/* if the "off ground" check box is checked */
-	if(document.getElementById("offGround").checked){
-		
-		value = parseInt(document.getElementById("startHeight").value);
-		if(isNaN(value) || value == "" || value <= 0){
-			alertMessage += 
-			"Starting height must be a number and be > 0\n";
-		}
-
-	}
-	
-	if(document.getElementById("offGround").checked 
-	&& document.getElementById("isIncline").checked){
-		alertMessage += "Projectiles cannot be on a incline and off ground\n";
-	}
-	
-	if(alertMessage != ""){
-		alert(alertMessage);
-		return false;
-	}
-	
-}
 
 function inclineChecked(){
 	document.getElementById("offGround").checked = false;
@@ -667,10 +633,10 @@ function setData(){
 	
 	document.getElementById("ux").innerHTML = "Initial x velocity: " + state.ux.toFixed(3) + "m/s";
 	document.getElementById("uy").innerHTML = "Initial y velocity: " + state.uy.toFixed(3) + "m/s";
-	document.getElementById("vx").innerHTML = "Current x velocity: ";
-	document.getElementById("vy").innerHTML = "Current y velocity: ";
-	document.getElementById("sx").innerHTML = "Current x position: ";
-	document.getElementById("sy").innerHTML = "Current y position: ";
+	document.getElementById("vx").innerHTML = "Current x velocity: " + state.vx.toFixed(3) + "m/s";
+	document.getElementById("vy").innerHTML = "Current y velocity: " + state.vy.toFixed(3) + "m/s";
+	document.getElementById("sx").innerHTML = "Current x position: " + state.sx.toFixed(3) + "m";
+	document.getElementById("sy").innerHTML = "Current y position: " + state.sy.toFixed(3) + "m";
 	document.getElementById("tof").innerHTML = 
 		"Time of flight: " + state.tof.toFixed(3) + "s";
 	document.getElementById("range").innerHTML = 
@@ -679,6 +645,8 @@ function setData(){
 		"Max height: " + state.maxHeight.toFixed(3) + "m";
 	document.getElementById("scale").innerHTML = 
 		"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+		
+		
 		
 }
 
