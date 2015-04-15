@@ -165,7 +165,7 @@ function run(){
 			return false;
 		}
 		
-		//getClosestDistance();
+		getClosestDistance();
 		
 		/*
 		getScaleClosest();
@@ -286,10 +286,24 @@ function parseInputClosest(){
 		return false;
 	}
 	
-	state.vabi = state.vai;
+	state.vabi = -state.vai;
 	state.vabj = state.vbj;
 	
 	return true;
+}
+
+function getClosestDistance(){
+
+	// get slope of line L = Vabj / Vabi
+	var slope =  Math.abs(state.vabi) / Math.abs(state.vabj);
+	var pq, tq, rt;
+	pq = slope * state.sb;
+	tq = state.sa - pq;
+	
+	console.log("Vab: " + state.vabi + " " + state.vabj);
+	console.log("Slope: " + slope);
+	console.log("PQ: " + pq);
+	console.log("TQ: " + tq);
 }
 
 function cleanUp(){
