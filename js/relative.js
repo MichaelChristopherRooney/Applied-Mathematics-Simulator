@@ -127,10 +127,16 @@ function stateObject(){
 	this.vbj = 0;
 	this.vabi = 0;
 	this.vabj = 0;
+	this.vp = 0;
 	this.sa = 0;
 	this.sb = 0;
 	this.scale = 0;
 	this.type = "";
+	this.riverAngle = 0;
+	this.riverSpeed = 0;
+	this.width = 0;
+	this.endTime = 0;
+	this.across = 0;
 }
 
 /*
@@ -165,7 +171,7 @@ function run(){
 			return false;
 		}
 		
-		getClosestDistance();
+		getValuesClosest();
 		
 		/*
 		getScaleClosest();
@@ -174,6 +180,12 @@ function run(){
 		*/
 		
 	}else if(type == "river"){
+		
+		if(!parseInputRiver()){
+			return fasle;
+		}
+		
+		getValuesRiver();
 		
 	}
 		
@@ -286,24 +298,94 @@ function parseInputClosest(){
 		return false;
 	}
 	
-	state.vabi = -state.vai;
-	state.vabj = state.vbj;
-	
 	return true;
 }
 
-function getClosestDistance(){
+function getValuesClosest(){
 
+	state.vabi = -state.vai;
+	state.vabj = state.vbj;
+	
 	// get slope of line L = Vabj / Vabi
 	var slope =  Math.abs(state.vabi) / Math.abs(state.vabj);
 	var pq, tq, rt;
 	pq = slope * state.sb;
 	tq = state.sa - pq;
-	
+	var theta = Math.atan(slope);
+	rt = Math.cos(theta) * tq;
 	console.log("Vab: " + state.vabi + " " + state.vabj);
 	console.log("Slope: " + slope);
 	console.log("PQ: " + pq);
 	console.log("TQ: " + tq);
+	console.log("RT: " + rt);
+}
+
+function parseInputRiver(){
+	
+	alertMessage = "";
+	
+	state.vp = parseFloat(document.getElementById("river-vp").value);
+	
+	if(isNaN(state.vp) || state.vp <= 0 || state.vp == ""){
+		alertMessage +=
+		"Person's speed must be a number > 0\n";
+	}
+	
+	state.riverAngle = parseFloat(document.getElementById("river-angle").value);
+	
+	if(isNaN(state.riverAngle) || state.riverAngle <= 0 
+	|| state.riverAngle > 90 || state.riverAngle == ""){
+		alertMessage += 
+		"Starting angle must be ≤ 90 and > 0\n";
+	}
+	
+	state.riverSpeed = parseFloat(document.getElementById("river-vr").value);
+	
+	if(isNaN(state.riverSpeed) || state.riverSpeed <= 0 || state.riverSpeed == ""){
+		alertMessage += 
+		"River speed must be a number > 0\n";
+	}
+	
+	state.width = parseFloat(document.getElementById("river-w").value);
+	
+	if(isNaN(state.width) || state.width <= 0 || state.width == ""){
+		alertMessage += 
+		"River width must be a number > 0\n";
+	}
+	
+	if(alertMessage != ""){
+		alert(alertMessage);
+		return false;
+	}
+	
+	return true;
+	
+}
+
+function getValuesRiver(){
+	
+	state.vabj = state.vp * Math.sin(state.riverAngle * (Math.PI / 180));
+	state.vabi = state.vp * Math.cos(state.riverAngle * (Math.PI / 180));
+	state.vabi = state.vabi - state.riverSpeed;
+	state.endTime = state.width / state.vabj;
+	state.across = state.endTime * state.vabi;
+	
+	console.log("Vabj: " + state.vabj + ", Vabi: " + state.vabi);
+	console.log("End time: " + state.endTime + ", across: " + state.across);
+
+}
+
+function setDataRiver(){
+	
+}
+
+function getScaleRiver(){
+	
+	
+}
+
+function runRiver(){
+	
 }
 
 function cleanUp(){
