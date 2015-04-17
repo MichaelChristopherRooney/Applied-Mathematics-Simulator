@@ -333,8 +333,8 @@ function getValuesClosest(){
 	var theta = Math.atan(slope);
 	rt = Math.cos(theta) * tq;
 	
-	var qr = rt * Math.sin(theta);
-	var sq = state.startB * Math.sin(theta)
+	var qr = rt * Math.tan(theta);
+	var sq = state.startB * Math.cos(theta)
 	
 	state.distance = qr + sq;
 	state.endTime = state.distance / Math.sqrt((Math.pow(state.vabj, 2) + Math.pow(state.vabi, 2)));
@@ -347,6 +347,8 @@ function getValuesClosest(){
 	console.log("PQ: " + pq);
 	console.log("TQ: " + tq);
 	console.log("RT: " + rt);
+	console.log("QR: " + qr);
+	console.log("SQ: " + sq)
 	console.log("Distance: " + state.distance);
 	console.log("End time: " + state.endTime);
 }
