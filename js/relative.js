@@ -7,6 +7,7 @@ var riverLine;
 var hLine;
 var vLine;
 var cLine;
+var pLine;
 var waterBackground;
 var circle1;
 var circle2;
@@ -355,11 +356,12 @@ function getValuesClosest(){
 	var pq, tq, rt;
 	pq = slope * state.startB;
 	tq = state.startA - pq;
+	
 	var theta = Math.atan(slope);
 	rt = Math.cos(theta) * tq;
 	
 	var qr = rt * Math.tan(theta);
-	var sq = state.startB * Math.cos(theta)
+	var sq = state.startB / Math.cos(theta)
 	
 	state.distance = qr + sq;
 	state.endTime = state.distance / Math.sqrt((Math.pow(state.vabj, 2) + Math.pow(state.vabi, 2)));
@@ -422,18 +424,28 @@ function simulateStepClosest(){
 		"L" + circle2.attr("cx")
 		+ " " + circle2.attr("cy"));
 	
-	var x = (state.vabi * state.time);
-	var y = (state.vabj * state.time);
-	
 	if(vabLine){
 		vabLine.remove();
 		vabLine = null;
 	}
 	
-	vabLine = paper.path("M" + (size / 2) + " " + size + 
+	var x = (state.vabi * state.time);
+	var y = (state.vabj * state.time) - state.startB;
+
+	vabLine = paper.path("M" + (size / 2) + " " + ((size / 2) + (state.startB * state.scale)) + 
 		"L" + ((size / 2) + (x * state.scale))
-		+ " " + (size - (y * state.scale)));
+		+ " " + ((size / 2) - (y * state.scale))
+	);
 		
+	
+	if(state.time == state.endTime){
+		
+		pLine = paper.path("M" + aCircle.attr("cx") + " " +  aCircle.attr("cy") + 
+		"L" + ((size / 2) + (x * state.scale))
+		+ " " + ((size / 2) - (y * state.scale)));
+		
+	}
+	
 	state.time += (1 / fps);
 	
 }
@@ -613,6 +625,11 @@ function cleanUp(){
 	if(cLine){
 		cLine.remove();
 		cLine = null;
+	}
+	
+	if(pLine){
+		pLine.remove();
+		pLine = null;
 	}
 	
 }
