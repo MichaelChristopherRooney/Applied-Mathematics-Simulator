@@ -4,9 +4,14 @@ var vaLine;
 var vbLine;
 var vabLine;
 var riverLine;
+var hLine;
+var vLine;
+var cLine;
 var waterBackground;
 var circle1;
 var circle2;
+var aCricle;
+var bCircle;
 var paper;
 var clearID;
 var fps = 60;
@@ -281,6 +286,26 @@ function runClosest(){
 	circle2.attr("fill", "#f00");
 	circle2.attr("stroke", "#000");
 	
+	vLine = paper.path("M" + (size/2) + " " + 0 + 
+		"L" + (size/2)
+		+ " " + size);
+		
+	hLine = paper.path("M" + 0 + " " + (size / 2) + 
+		"L" + size
+		+ " " + (size / 2));
+	
+	var x = -state.startA;
+	var y = -state.startB;
+	
+	aCircle = paper.circle((size / 2) + (x * state.scale), (size / 2), 3);
+	aCircle.attr("fill", "#000");
+	aCircle.attr("stroke", "#000");
+	
+	
+	//circle2.attr("cx", size / 2);
+	//circle2.attr("cy", (size / 2) - (y * state.scale));
+	
+	
 	//state.endTime = state.endTime * 3;
 	clearID = setInterval(simulateStepClosest, (1/fps) * 1000);
 	
@@ -341,16 +366,7 @@ function getValuesClosest(){
 	
 	state.endA = (state.vai * state.endTime) - state.startA;
 	state.endB = (state.vbj * state.endTime) - state.startB;
-	
-	console.log("Vab: " + state.vabi + " " + state.vabj);
-	console.log("Slope: " + slope);
-	console.log("PQ: " + pq);
-	console.log("TQ: " + tq);
-	console.log("RT: " + rt);
-	console.log("QR: " + qr);
-	console.log("SQ: " + sq)
-	console.log("Distance: " + state.distance);
-	console.log("End time: " + state.endTime);
+
 }
 
 function setDataClosest(){
@@ -379,11 +395,6 @@ function getScaleClosest(){
 		state.scale = size / b / 2;
 	}
 	
-	console.log(size);
-	console.log(a);
-	console.log(b);
-	console.log(state.scale);
-	
 }
 
 function simulateStepClosest(){
@@ -402,13 +413,27 @@ function simulateStepClosest(){
 	circle2.attr("cx", size / 2);
 	circle2.attr("cy", (size / 2) - (y * state.scale));
 	
-	/*
-	console.log(Math.sqrt(
-		Math.pow((circle1.attr("cx") - circle2.attr("cx")), 2)
-		+ Math.pow((circle1.attr("cy") - circle2.attr("cy")), 2)
-	));
-	*/
+	if(cLine){
+		cLine.remove();
+		cLine = null;
+	}
 	
+	cLine = paper.path("M" + circle1.attr("cx") + " " + circle1.attr("cy") + 
+		"L" + circle2.attr("cx")
+		+ " " + circle2.attr("cy"));
+	
+	var x = (state.vabi * state.time);
+	var y = (state.vabj * state.time);
+	
+	if(vabLine){
+		vabLine.remove();
+		vabLine = null;
+	}
+	
+	vabLine = paper.path("M" + (size / 2) + " " + size + 
+		"L" + ((size / 2) + (x * state.scale))
+		+ " " + (size - (y * state.scale)));
+		
 	state.time += (1 / fps);
 	
 }
@@ -435,6 +460,7 @@ function runRiver(){
 	clearID = setInterval(simulateStepRiver, (1/fps) * 1000);
 	
 }
+
 function parseInputRiver(){
 	
 	alertMessage = "";
@@ -572,6 +598,21 @@ function cleanUp(){
 	if(waterBackground){
 		waterBackground.remove();
 		waterBackground = null;
+	}
+	
+	if(hLine){
+		hLine.remove();
+		hLine = null;
+	}
+	
+	if(vLine){
+		vLine.remove();
+		vLine = null;
+	}
+	
+	if(cLine){
+		cLine.remove();
+		cLine = null;
 	}
 	
 }
