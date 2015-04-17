@@ -140,6 +140,11 @@ function stateObject(){
 	this.endTime = 0;
 	this.across = 0;
 	this.time = 0;
+	this.distance = 0;
+	this.startA = 0;
+	this.startB = 0;
+	this.endA = 0;
+	this.endB = 0;
 }
 
 /*
@@ -155,57 +160,28 @@ function run(){
 	var type = select[select.selectedIndex].id;
 	
 	if(type == "vab"){
-		
-		state.type = "vab";
-		
-		if(!parseInputVAB()){
-			return false;
-		}
-		
-		getScaleVAB();
-		setDataVAB();
 		runVAB();
-		
 	}else if(type == "closest"){
-		
-		state.type = "closest";
-		
-		if(!parseInputClosest()){
-			return false;
-		}
-		
-		getValuesClosest();
-		
-		/*
-		getScaleClosest();
-		setDataClosest();
 		runClosest();
-		*/
-		
 	}else if(type == "river"){
-		
-		state.type = "river";
-		
-		if(!parseInputRiver()){
-			return fasle;
-		}
-		
-		getValuesRiver();
-		getScaleRiver();
-		
-		waterBackground = paper.rect(0, (size - (state.width * state.scale)), size, size);
-		waterBackground.attr("fill", "#1fcbd0");
-		waterBackground.attr("stroke", "#000");
-		
-		riverLine = paper.path("M" + (size/2) + " " + size + 
-			"L" + (size/2)
-			+ " " + (size - (state.width * state.scale)));
-		
-		clearID = setInterval(simulateStepRiver, (1/fps) * 1000);
-		
+		runRiver();
 	}
 		
 
+}
+
+function runVAB(){
+	
+	state.type = "vab";
+		
+	if(!parseInputVAB()){
+		return false;
+	}
+		
+	getScaleVAB();
+	setDataVAB();
+	simulateStepVAB();
+	
 }
 
 function parseInputVAB(){
@@ -262,7 +238,7 @@ function getScaleVAB(){
 	
 }
 
-function runVAB(){
+function simulateStepVAB(){
 	//MX YLX Y
 	var centre = size / 2;
 	
@@ -284,12 +260,38 @@ function runVAB(){
 	
 }
 
+function runClosest(){
+	
+	state.type = "closest";
+		
+	if(!parseInputClosest()){
+		return false;
+	}
+		
+	getValuesClosest();
+		
+	getScaleClosest();
+	setDataClosest();
+	
+	circle1 = paper.circle(-10, -10, 10);
+	circle1.attr("fill", "#f00");
+	circle1.attr("stroke", "#000");
+	
+	circle2 = paper.circle(-10, -10, 10);
+	circle2.attr("fill", "#f00");
+	circle2.attr("stroke", "#000");
+	
+	//state.endTime = state.endTime * 3;
+	clearID = setInterval(simulateStepClosest, (1/fps) * 1000);
+	
+		
+}
 function parseInputClosest(){
 
 	state.vai = parseFloat(document.getElementById("closest-ai").value);
 	state.vbj = parseFloat(document.getElementById("closest-bj").value);
-	state.sa  = parseFloat(document.getElementById("closest-as").value);
-	state.sb  = parseFloat(document.getElementById("closest-bs").value);
+	state.startA  = parseFloat(document.getElementById("closest-as").value);
+	state.startB  = parseFloat(document.getElementById("closest-bs").value);
 	
 	var alertMessage = "";
 	
@@ -297,7 +299,7 @@ function parseInputClosest(){
 		alertMessage += "A's i velocity must be a number > 0\n";
 	}
 	
-	if(isNaN(state.sa) || state.sa <= 0 || (state.sa == "" && state.sa != 0)){
+	if(isNaN(state.startA) || state.startA <= 0 || (state.startA == "" && state.startA != 0)){
 		alertMessage += "A's distance west must be a number > 0\n";
 	}
 	
@@ -305,7 +307,7 @@ function parseInputClosest(){
 		alertMessage += "B's j velocity must be a number > 0\n";
 	}
 	
-	if(isNaN(state.sb) || state.sb <= 0 || (state.sb == "" && state.sb != 0)){
+	if(isNaN(state.startB) || state.startB <= 0 || (state.startB == "" && state.startB != 0)){
 		alertMessage += "B's distance south must be a number > 0\n";
 	}
 	
@@ -324,18 +326,113 @@ function getValuesClosest(){
 	
 	// get slope of line L = Vabj / Vabi
 	var slope =  Math.abs(state.vabi) / Math.abs(state.vabj);
+	
 	var pq, tq, rt;
-	pq = slope * state.sb;
-	tq = state.sa - pq;
+	pq = slope * state.startB;
+	tq = state.startA - pq;
 	var theta = Math.atan(slope);
 	rt = Math.cos(theta) * tq;
+	
+	var qr = rt * Math.sin(theta);
+	var sq = state.startB * Math.sin(theta)
+	
+	state.distance = qr + sq;
+	state.endTime = state.distance / Math.sqrt((Math.pow(state.vabj, 2) + Math.pow(state.vabi, 2)));
+	
+	state.endA = (state.vai * state.endTime) - state.startA;
+	state.endB = (state.vbj * state.endTime) - state.startB;
+	
 	console.log("Vab: " + state.vabi + " " + state.vabj);
 	console.log("Slope: " + slope);
 	console.log("PQ: " + pq);
 	console.log("TQ: " + tq);
 	console.log("RT: " + rt);
+	console.log("Distance: " + state.distance);
+	console.log("End time: " + state.endTime);
 }
 
+function setDataClosest(){
+	
+}
+
+function getScaleClosest(){
+	
+	var a, b;
+	
+	if(state.endA > state.startA){
+		a = state.endA;
+	}else{
+		a = state.startA;
+	}
+	
+	if(state.endB > state.startB){
+		b = state.endB;
+	}else{
+		b = state.startB;
+	}
+	
+	if(a > b){
+		state.scale = size / a / 2;
+	}else{
+		state.scale = size / b / 2;
+	}
+	
+	console.log(size);
+	console.log(a);
+	console.log(b);
+	console.log(state.scale);
+	
+}
+
+function simulateStepClosest(){
+	
+	if(state.time > state.endTime){
+		clearInterval(clearID);
+		state.time = state.endTime;
+	}
+	
+	var x = (state.vai * state.time) - state.startA;
+	var y = (state.vbj * state.time) - state.startB;
+	
+	circle1.attr("cx", (size / 2) + (x * state.scale));
+	circle1.attr("cy", size / 2);
+	
+	circle2.attr("cx", size / 2);
+	circle2.attr("cy", (size / 2) - (y * state.scale));
+	
+	/*
+	console.log(Math.sqrt(
+		Math.pow((circle1.attr("cx") - circle2.attr("cx")), 2)
+		+ Math.pow((circle1.attr("cy") - circle2.attr("cy")), 2)
+	));
+	*/
+	
+	state.time += (1 / fps);
+	
+}
+
+function runRiver(){
+	
+	state.type = "river";
+		
+	if(!parseInputRiver()){
+		return fasle;
+	}
+	
+	getValuesRiver();
+	getScaleRiver();
+		
+	waterBackground = paper.rect(0, (size - (state.width * state.scale)), size, size);
+	waterBackground.attr("fill", "#1fcbd0");
+	waterBackground.attr("stroke", "#000");
+		
+	riverLine = paper.path("M" + (size/2) + " " + size + 
+		"L" + (size/2)
+		+ " " + (size - (state.width * state.scale)));
+		
+	clearID = setInterval(simulateStepRiver, (1/fps) * 1000);
+	
+}
 function parseInputRiver(){
 	
 	alertMessage = "";
@@ -431,6 +528,11 @@ function cleanUp(){
 	if(clearID){
 		clearInterval(clearID);
 		clearID = null;
+	}
+	
+	if(circle1){
+		circle1.remove();
+		circle1 = null;
 	}
 	
 	if(circle2){
