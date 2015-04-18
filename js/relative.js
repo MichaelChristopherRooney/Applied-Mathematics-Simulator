@@ -11,7 +11,7 @@ var pLine;
 var waterBackground;
 var circle1;
 var circle2;
-var aCricle;
+var aCircle;
 var bCircle;
 var paper;
 var clearID;
@@ -19,6 +19,8 @@ var fps = 60;
 var state;
 var pointList = [];
 var backgroundRectangle;
+var oldScale;
+var oldSize;
 
 $(document).ready(function(){
 	
@@ -60,19 +62,14 @@ function getNewSize(){
 	
 		
 	var x;
-	var oldSize = size;
-	var oldScale;
+	oldSize = size;
+	oldScale;
 		
-	if(w > h){
-		size = w - 250 - 10 - 165;
-	}else{
-		size = h - 250 - 10 - 165 - 80;
-	}
+	size = w - 250 - 10 - 165;
 	
 	if(size + 80 > h){
 		size = h - 80;
-	}
-		
+	}	
 	
 	if(state){
 		
@@ -90,29 +87,12 @@ function getNewSize(){
 		lines with the new size in mind
 		*/
 		if(state.type == "vab"){
-			vaLine.remove();
-			vbLine.remove();
-			vabLine.remove();
-			vabLine = vbLine = vaLine = null;
-			runVAB();
+			rescaleVAB();
+		}else if(state.type == "closest"){
+			rescaleClosest();
 		}
 		
 		
-	}
-
-	
-	if(circle1){
-		circle1.attr("cx", (circle1.attr("cx") / oldScale) * state.scale);
-	}
-
-	if(circle2){
-		circle2.attr("cx", (circle2.attr("cx") / oldScale) * state.scale);
-	}
-	
-	if(pointList){
-		for(var i = 0; i < pointList.length; i++){
-			pointList[i].attr("cx", (pointList[i].attr("cx") / oldScale) * state.scale);
-		}
 	}
 	
 	paper.setSize(size, size);
@@ -122,6 +102,119 @@ function getNewSize(){
 	document.getElementById("graphics_panel").style.width = size;
 	document.getElementById("graphics_panel").style.height = size;
 	document.getElementById("info_pane").style.left = size + 10 + 165;
+	
+}
+
+function rescaleVAB(){
+	
+	vaLine.remove();
+	vbLine.remove();
+	vabLine.remove();
+	vabLine = vbLine = vaLine = null;
+	simulateStepVAB();
+	
+}
+
+function rescaleClosest(){
+	
+	if(circle1){
+		circle1.attr("cx", (circle1.attr("cx") / oldScale) * state.scale);
+		circle1.attr("cy", (circle1.attr("cy") / oldScale) * state.scale);
+	}
+
+	if(circle2){
+		circle2.attr("cx", (circle2.attr("cx") / oldScale) * state.scale);
+		circle2.attr("cy", (circle2.attr("cy") / oldScale) * state.scale);
+	}
+	
+	if(vLine){
+
+		vLine.remove();
+		vLine = null;
+		
+		vLine = paper.path("M" + (size/2) + " " + 0 + 
+		"L" + (size/2)
+		+ " " + size
+		);
+		
+	}
+	
+	if(hLine){
+		
+		hLine.remove();
+		hLine = null;
+		
+		hLine = paper.path("M" + 0 + " " + (size / 2) + 
+		"L" + size
+		+ " " + (size / 2)
+		);
+	}
+	
+	
+	var x = -state.startA;
+	var y = -state.startB;
+	
+	if(aCircle){
+		
+		aCircle.remove();
+		aCircle = null;
+		
+		aCircle = paper.circle((size / 2) + (x * state.scale), (size / 2), 3);
+		aCircle.attr("fill", "#000");
+		aCircle.attr("stroke", "#000");
+		
+	}
+	
+	if(bCircle){
+		
+		bCircle.remove();
+		bCircle = null;
+		
+		bCircle = paper.circle((size / 2), (size / 2) - (y * state.scale), 3);
+		bCircle.attr("fill", "#000");
+		bCircle.attr("stroke", "#000");
+		
+	}
+	
+	if(cLine){
+		
+		cLine.remove();
+		cLine = null;
+		
+		cLine = paper.path("M" + circle1.attr("cx") + " " + circle1.attr("cy") + 
+		"L" + circle2.attr("cx")
+		+ " " + circle2.attr("cy")
+		);
+	}
+	
+	if(vabLine){
+		
+		vabLine.remove();
+		vabLine = null;
+		
+		x = (state.vabi * state.time);
+		y = (state.vabj * state.time) - state.startB;
+
+		vabLine = paper.path("M" + (size / 2) + " " + ((size / 2) + (state.startB * state.scale)) + 
+		"L" + ((size / 2) + (x * state.scale))
+		+ " " + ((size / 2) - (y * state.scale))
+		);
+	}
+	
+	if(pLine){
+		
+		pLine.remove();
+		pLine = null;
+		
+		pLine = paper.path("M" + aCircle.attr("cx") + " " +  aCircle.attr("cy") + 
+		"L" + ((size / 2) + (x * state.scale))
+		+ " " + ((size / 2) - (y * state.scale)));
+		
+	}
+	
+}
+
+function rescaleRiver(){
 	
 }
 
@@ -302,6 +395,10 @@ function runClosest(){
 	aCircle.attr("fill", "#000");
 	aCircle.attr("stroke", "#000");
 	
+	bCircle = paper.circle((size / 2), (size / 2) - (y * state.scale), 3);
+	bCircle.attr("fill", "#000");
+	bCircle.attr("stroke", "#000");
+	
 	
 	//circle2.attr("cx", size / 2);
 	//circle2.attr("cy", (size / 2) - (y * state.scale));
@@ -312,6 +409,7 @@ function runClosest(){
 	
 		
 }
+
 function parseInputClosest(){
 
 	state.vai = parseFloat(document.getElementById("closest-ai").value);
@@ -632,6 +730,16 @@ function cleanUp(){
 		pLine = null;
 	}
 	
+	if(aCircle){
+		aCircle.remove();
+		aCircle = null;
+	}
+	
+	if(bCircle){
+		bCircle.remove();
+		bCircle = null;
+	}
+	
 }
 
 function typeChange(){
@@ -679,25 +787,7 @@ function clearInput(){
 function stopSimulation(){
 	
 	if(clearID){
-		
 		clearInterval(clearID);
-		
-		if(circle1){
-			circle1.attr("cx", -10);
-			circle1.attr("cy", -10);
-		}
-		
-		if(circle2){
-			circle2.attr("cx", -10);
-			circle2.attr("cy", -10);
-		}
-		
-		if(pointList){
-			for(var i = 0; i < pointList.length; i++){
-				pointList[i].remove();
-			}
-			pointList = [];
-		}
 	}
 	
 }
