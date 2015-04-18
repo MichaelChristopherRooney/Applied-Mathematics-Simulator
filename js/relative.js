@@ -90,6 +90,8 @@ function getNewSize(){
 			rescaleVAB();
 		}else if(state.type == "closest"){
 			rescaleClosest();
+		}else if(state.type == "river"){
+			rescaleRiver();
 		}
 		
 		
@@ -215,6 +217,45 @@ function rescaleClosest(){
 }
 
 function rescaleRiver(){
+	
+	if(waterBackground){
+		
+		waterBackground.remove();
+		waterBackground = null;
+		
+		waterBackground = paper.rect(0, (size - (state.width * state.scale)), size, size);
+		waterBackground.attr("fill", "#1fcbd0");
+		waterBackground.attr("stroke", "#000");
+		
+	}
+	
+	if(riverLine){
+		
+		riverLine.remove();
+		riverLine = null;
+		
+		riverLine = paper.path("M" + (size/2) + " " + size + 
+		"L" + (size/2)
+		+ " " + (size - (state.width * state.scale))
+		);
+	}
+	
+	
+	if(vabLine){
+		
+		vabLine.remove();
+		vabLine = null;
+		
+		var centre = size / 2;
+		var x = state.vabi * state.time;
+		var y = state.vabj * state.time;
+	
+		vabLine = paper.path("M" + centre + " " + size + 
+		"L" + (centre - (x * state.scale))
+		+ " " + (size - (y * state.scale))
+		);
+		
+	}
 	
 }
 
