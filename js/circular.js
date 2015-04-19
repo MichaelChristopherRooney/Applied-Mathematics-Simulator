@@ -816,33 +816,15 @@ function typeChange(){
 
 function clearInput(){
 	
-	document.getElementById("vab-vai").value = "";
-	document.getElementById("vab-vaj").value = "";
-	document.getElementById("vab-vbi").value = "";
-	document.getElementById("vab-vbj").value = "";
-	
-	document.getElementById("closest-ai").value = "";
-	document.getElementById("closest-as").value = "";
-	document.getElementById("closest-bj").value = "";
-	document.getElementById("closest-bs").value = "";
-	
-	document.getElementById("river-vp").value = "";
-	document.getElementById("river-angle").value = "";
-	document.getElementById("river-vr").value = "";
-	document.getElementById("river-w").value = "";
-	
-	/*
-	document.getElementById("slow-u1").value = "";
-	document.getElementById("slow-a1").value = "";
-	
-	document.getElementById("catch-a1").value = "";
-	document.getElementById("catch-u2").value = "";
-	document.getElementById("catch-a2").value = "";
-	document.getElementById("delay").value = "";
-	*/
 	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();
+	
+	/*
+	for non HTML5 browsers this is needed
+	to display placeholder text again
+	*/
+	Placeholders.enable();
 	
 }
 

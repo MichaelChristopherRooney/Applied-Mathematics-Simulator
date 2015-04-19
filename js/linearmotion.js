@@ -114,9 +114,12 @@ function getNewSize(){
 	backgroundRectangle.attr("width", size);
 	
 	document.getElementById("graphics_panel").style.width = size;
-	document.getElementById("info_pane").style.left = size + 10 + 165;
-	document.getElementById("graph_panel").style.left = size + 10 + 165;
-	document.getElementById("graphText").style.left = size + 10 + 165;
+	document.getElementById("graphics_panel").style.height = size;
+	document.getElementById("graphics_panel").style.left = "165px";
+	
+	document.getElementById("info_pane").style.left = (size + 10 + 165) + "px";
+	document.getElementById("graph_panel").style.left = (size + 10 + 165) + "px";
+	document.getElementById("graphText").style.left = (size + 10 + 165) + "px";
 			
 }
 
@@ -768,6 +771,12 @@ function clearInput(){
 	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();
+	
+	/*
+	for non HTML5 browsers this is needed
+	to display placeholder text again
+	*/
+	Placeholders.enable();
 	
 }
 

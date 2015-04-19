@@ -831,18 +831,14 @@ function clearInput(){
 	document.getElementById("river-vr").value = "";
 	document.getElementById("river-w").value = "";
 	
-	/*
-	document.getElementById("slow-u1").value = "";
-	document.getElementById("slow-a1").value = "";
-	
-	document.getElementById("catch-a1").value = "";
-	document.getElementById("catch-u2").value = "";
-	document.getElementById("catch-a2").value = "";
-	document.getElementById("delay").value = "";
-	*/
-	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();
+	
+	/*
+	for non HTML5 browsers this is needed
+	to display placeholder text again
+	*/
+	Placeholders.enable();
 	
 }
 

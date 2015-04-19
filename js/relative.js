@@ -100,7 +100,7 @@ function getNewSize(){
 	if(w < 1024){
 		document.getElementById("navbar").style.display = "none";
 		document.getElementById("navselect").style.display = "block";
-		document.getElementById("navselect").style.width = w - 20;
+		document.getElementById("navselect").style.width = (w - 20) + "px";
 	}else{
 		document.getElementById("navbar").style.display = "block";
 		document.getElementById("navselect").style.display = "none";
@@ -110,9 +110,10 @@ function getNewSize(){
 	backgroundRectangle.attr("height", size);
 	backgroundRectangle.attr("width", size);
 	
-	document.getElementById("graphics_panel").style.width = size;
-	document.getElementById("graphics_panel").style.height = size;
-	document.getElementById("info_pane").style.left = size + 10 + 165;
+	document.getElementById("graphics_panel").style.width = size + "px";
+	document.getElementById("graphics_panel").style.height = size + "px";
+	document.getElementById("graphics_panel").style.left = "165px";
+	document.getElementById("info_pane").style.left = (size + 10 + 165) + "px";
 	
 }
 
@@ -842,6 +843,12 @@ function clearInput(){
 	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();
+	
+	/*
+	for non HTML5 browsers this is needed
+	to display placeholder text again
+	*/
+	Placeholders.enable();
 	
 }
 

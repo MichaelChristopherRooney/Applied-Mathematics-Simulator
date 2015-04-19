@@ -53,11 +53,8 @@ function getNewSize(){
 	var oldSize = size;
 	var oldScale;
 		
-	if(w > h){
-		size = w - 250 - 10 - 165;
-	}else{
-		size = h - 250 - 10 - 165 - 80;
-	}
+	
+	size = w - 250 - 10 - 165;
 	
 	if(size + 80 > h){
 		size = h - 80;
@@ -66,7 +63,7 @@ function getNewSize(){
 	if(w < 1024){
 		document.getElementById("navbar").style.display = "none";
 		document.getElementById("navselect").style.display = "block";
-		document.getElementById("navselect").style.width = w - 20;
+		document.getElementById("navselect").style.width = (w - 20) + "px";
 	}else{
 		document.getElementById("navbar").style.display = "block";
 		document.getElementById("navselect").style.display = "none";
@@ -83,8 +80,9 @@ function getNewSize(){
 	backgroundRectangle.attr("height", size);
 	backgroundRectangle.attr("width", size);
 	
-	document.getElementById("graphics_panel").style.width = size;
-	document.getElementById("info_pane").style.left = size + 10 + 165;
+	document.getElementById("graphics_panel").style.width = size + "px";
+	document.getElementById("graphics_panel").style.left = "165px";
+	document.getElementById("info_pane").style.left = size + 10 + 165 + "px";
 		
 }
 
@@ -527,18 +525,7 @@ function simulateStepOffGround(){
 function stopSimulation(){
 	
 	if(clearID){
-		
 		clearInterval(clearID);
-		
-		circle.attr("cx", -10);
-		circle.attr("cy", -10);
-		
-		if(pointList){
-			for(var i = 0; i < pointList.length; i++){
-				pointList[i].remove();
-			}
-			pointList = [];
-		}
 
 	}
 	
@@ -667,6 +654,12 @@ function clearInput(){
 	document.getElementById("inclineAngle").value = "";
 	document.getElementById("offGround").checked = false;
 	document.getElementById("startHeight").value = "";
+	
+	/*
+	for non HTML5 browsers this is needed
+	to display placeholder text again
+	*/
+	Placeholders.enable();
 	
 }
 
