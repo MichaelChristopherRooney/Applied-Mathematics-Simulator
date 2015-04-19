@@ -70,6 +70,15 @@ function getNewSize(){
 		size = h - 80;
 	}
 	
+	if(w < 1024){
+		document.getElementById("navbar").style.display = "none";
+		document.getElementById("navselect").style.display = "block";
+		document.getElementById("navselect").style.width = w - 20;
+	}else{
+		document.getElementById("navbar").style.display = "block";
+		document.getElementById("navselect").style.display = "none";
+	}
+	
 		
 	if(state){
 		
@@ -765,25 +774,18 @@ function clearInput(){
 function stopSimulation(){
 	
 	if(clearID){
-		
 		clearInterval(clearID);
-		
-		if(circle1){
-			circle1.attr("cx", -10);
-			circle1.attr("cy", -10);
-		}
-		
-		if(circle2){
-			circle2.attr("cx", -10);
-			circle2.attr("cy", -10);
-		}
-		
-		if(pointList){
-			for(var i = 0; i < pointList.length; i++){
-				pointList[i].remove();
-			}
-			pointList = [];
-		}
 	}
 	
+}
+
+function showHelp(){
+	var alertMessage =
+	"Reach speed shows an object accelerating to a given speed.\n\n"
+	+ "Slow to zero shows an object decelerating to zero.\n\n"
+	+ "Catchup shows one object starting from zero and accelerating.\n" 
+	+ "After a given time the second object starts from a given speed and accelerates.\n"
+	+ "The simulation continues until they have caught up.\n";
+	
+	alert(alertMessage);
 }

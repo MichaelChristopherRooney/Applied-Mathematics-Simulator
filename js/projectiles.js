@@ -63,6 +63,15 @@ function getNewSize(){
 		size = h - 80;
 	}
 	
+	if(w < 1024){
+		document.getElementById("navbar").style.display = "none";
+		document.getElementById("navselect").style.display = "block";
+		document.getElementById("navselect").style.width = w - 20;
+	}else{
+		document.getElementById("navbar").style.display = "block";
+		document.getElementById("navselect").style.display = "none";
+	}
+	
 	if(state){
 		oldScale = state.scale;
 		var x = oldSize / state.scale;
@@ -659,4 +668,14 @@ function clearInput(){
 	document.getElementById("offGround").checked = false;
 	document.getElementById("startHeight").value = "";
 	
+}
+
+function showHelp(){
+	var alertMessage =
+	"The projectile is launched at a given speed at a given angle α to the ground.\n\n"
+	+ "When incline plane is checked, the projectile is launched at an angle α relative to an inclined plane of angle Θ to the ground.\n\n"
+	+ "When off ground is checked the projectile is launched from a starting height above the ground.\n\n"
+	+ "Incline plane and off ground cannot be selected at the same.\n";
+	
+	alert(alertMessage);
 }

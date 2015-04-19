@@ -97,15 +97,6 @@ function getNewSize(){
 		
 	}
 	
-	if(w < 1024){
-		document.getElementById("navbar").style.display = "none";
-		document.getElementById("navselect").style.display = "block";
-		document.getElementById("navselect").style.width = w - 20;
-	}else{
-		document.getElementById("navbar").style.display = "block";
-		document.getElementById("navselect").style.display = "none";
-	}
-	
 	paper.setSize(size, size);
 	backgroundRectangle.attr("height", size);
 	backgroundRectangle.attr("width", size);
@@ -682,10 +673,10 @@ function setDataRiver(){
 
 function getScaleRiver(){
 	
-	if(state.width > (Math.abs(state.across * 2))){
+	if(state.width > (state.across * 2)){
 		state.scale = size / state.width;
 	}else{
-		state.scale = (size / 2) / Math.abs(state.across);
+		state.scale = (size / 2) / state.across;
 	}
 	
 }
@@ -840,6 +831,16 @@ function clearInput(){
 	document.getElementById("river-vr").value = "";
 	document.getElementById("river-w").value = "";
 	
+	/*
+	document.getElementById("slow-u1").value = "";
+	document.getElementById("slow-a1").value = "";
+	
+	document.getElementById("catch-a1").value = "";
+	document.getElementById("catch-u2").value = "";
+	document.getElementById("catch-a2").value = "";
+	document.getElementById("delay").value = "";
+	*/
+	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();
 	
@@ -851,16 +852,4 @@ function stopSimulation(){
 		clearInterval(clearID);
 	}
 	
-}
-
-function showHelp(){
-	var alertMessage =
-	"In simple Vab the result of Vab = Va - Vb is shown.\n\n"
-	+ "In closest distance one object approaches from the west and another from the south.\n"
-	+ "The closest distance between these objects is shown.\n\n"
-	+ "In river crossing a person swims with speed v at an angle Θ.\n"
-	+ "The river has a given width and a current of a given speed.\n"
-	+ "The affect the current has on the swimmer is shown in the path they take.\n";
-	
-	alert(alertMessage);
 }

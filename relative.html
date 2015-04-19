@@ -23,12 +23,13 @@ li {
 a:link, a:visited {
     top:0px;
     display: block;
-    width: 140px;
+    width: 125px;
     height:50px;
     font-weight: medium;
     color: #FFFFFF;
     background-color: #585858;
     text-align: center;
+    vertical-align: middle;
     text-decoration: none;
     text-transform: uppercase;
     border: 1px solid black;
@@ -42,7 +43,7 @@ a:hover, a:active {
 </head>
 	
 <body>
-	<div style="width:100%;height: 60px;width:1024px;">
+	<div id="navbar" style="width:100%;height: 60px;width:1024px;">
 		<ul>
 		<li><a href="linearmotion.html">Linear motion</a><li>
 		<li><a href="projectiles.html">Projectiles</a><li>
@@ -51,7 +52,17 @@ a:hover, a:active {
 		<li><a href="circular.html">Circular motion</a></li>
 		<li><a href="shm.html">Simple harmonic</a></li>
 		<li><a href="collisions.html">Collisions</a></li>
+		<li><a href="index.html">Index</a></li>
 		</ul>
+	</div>
+	
+	<div id="navselect" style="width:100%; height:55px;display:none;background-color:#585858;border: 1px solid black;">
+		<select id="navselectmenu" style="position:relative;height:35px;top:10px; left:5px;width:98%;">
+			<option>Linear Motion</option>
+			<option>Projectiles</option>
+			<option>Relative Velocity</option>
+			<option>Simple Harmonic</option>
+		</select>
 	</div>
 	
 	<div style="width:165px;top:60px;">
@@ -140,6 +151,10 @@ a:hover, a:active {
 		<!-- CLEAR INPUT BUTTON -->
 		<button onclick="clearInput()" type="button">Clear input</button>
 		<div style="height:5px;"></div>
+		
+		<!-- HELP BUTTON -->
+		<button onclick="showHelp()" type="button">Help</button>
+		<div style="height:5px;"></div>
 
 	</div>
 	
@@ -149,10 +164,22 @@ a:hover, a:active {
 	<!-- real time info relevant to the simulation -->
 	<div id ="info_pane" style="position:absolute;left:770px;width:250px;top:65px;height:345px;">
 		
-		<div id="vab-info">
-			<div id="va-value">Va:</div>
-			<div id="vb-value">Vb:</div>
-			<div id="vab-value">Vab:</div>
+		<div id="vab-info" style="display:none;">
+			<div id="va-value">Va (red line):</div>
+			<div id="vb-value">Vb (blue line):</div>
+			<div id="vab-value">Vab (purple line):</div>
+		</div>
+		
+		<div id="closest-info" style="display:none;">
+			<div id="vai-value"></div>
+			<div id="vbj-value"></div>
+			<div id="vab-closest-value"></div>
+			<div id="time-closest-value"></div>
+			<div id="distance-closest-value"></div>
+		</div>
+		
+		<div id="river-info" style="display:none;">
+		
 		</div>
 		
 	</div>	
