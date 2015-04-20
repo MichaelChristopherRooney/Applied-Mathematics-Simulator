@@ -60,6 +60,10 @@ function getNewSize(){
 		size = h - 80;
 	}
 	
+	if(h < 480){
+		size = 400;
+	}
+	
 	if(w < 1024){
 		document.getElementById("navbar").style.display = "none";
 		document.getElementById("navselect").style.display = "block";

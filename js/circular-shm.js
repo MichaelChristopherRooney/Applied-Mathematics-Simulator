@@ -61,6 +61,10 @@ function getNewSize(){
 		size = h - 80;
 	}	
 	
+	if(h < 480){
+		size = 400;
+	}
+	
 	if(state){
 		
 		console.log("hi?");

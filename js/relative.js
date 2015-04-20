@@ -69,6 +69,10 @@ function getNewSize(){
 	
 	if(size + 80 > h){
 		size = h - 80;
+	}
+
+	if(h < 480){
+		size = 400;
 	}	
 	
 	if(state){
