@@ -63,10 +63,11 @@ function getNewSize(){
 	var oldSize = size;
 	var oldScale;
 		
-	if(w > h){
-		size = w - 250 - 10 - 165;
-	}else{
-		size = h - 80 - 250 - 10 - 165;
+	size = w - 250 - 10 - 165;
+	
+	
+	if(size + 80 > h){
+		size = h - 80;
 	}
 	
 	if(w < 1024){
