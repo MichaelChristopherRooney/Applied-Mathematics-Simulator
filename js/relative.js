@@ -298,6 +298,7 @@ function stateObject(){
 	this.startB = 0;
 	this.endA = 0;
 	this.endB = 0;
+	this.closest = 0;
 }
 
 /*
@@ -376,9 +377,20 @@ function parseInputVAB(){
 function setDataVAB(){
 	
 	document.getElementById("vab-info").style.display = "block";
-	document.getElementById("va-value").innerHTML = "Va (red line): " + state.vai + "i + " + state.vaj + "j";
-	document.getElementById("vb-value").innerHTML = "Vb (blue line): " + state.vbi + "i + " + state.vbj + "j";
-	document.getElementById("vab-value").innerHTML = "Vab (purple line): " + state.vabi + "i + " + state.vabj + "j";
+	document.getElementById("closest-info").style.display = "none";
+	document.getElementById("river-info").style.display = "none";
+	
+	document.getElementById("va-value").innerHTML 
+	= "Va (red line): " + state.vai.toFixed(3) + "i + " + state.vaj.toFixed(3) + "j";
+	document.getElementById("vb-value").innerHTML 
+	= "Vb (blue line): " + state.vbi.toFixed(3) + "i + " + state.vbj + "j";
+	document.getElementById("vab-value").innerHTML 
+	= "Vab (purple line): " + state.vabi.toFixed(3) + "i + " + state.vabj + "j";
+	
+	document.getElementById("scale").innerHTML
+	= "Scale: 1 metre : 1" + state.scale.toFixed(3) + " pixels";
+	
+	document.getElementById("time").innerHTML = "";
 	
 }
 
@@ -408,8 +420,8 @@ function simulateStepVAB(){
 		"L" + ((state.vabi * state.scale / 2) + centre)
 		+ " " + (centre - (state.vabj * state.scale / 2)));
 	
-	vaLine.attr("stroke", "#FF3300"); // green
-	vbLine.attr("stroke", "#0000FF"); // purple
+	vaLine.attr("stroke", "#FF3300");
+	vbLine.attr("stroke", "#0000FF");
 	vabLine.attr("stroke", "#CC00CC");
 	
 }
@@ -454,12 +466,6 @@ function runClosest(){
 	bCircle.attr("fill", "#000");
 	bCircle.attr("stroke", "#000");
 	
-	
-	//circle2.attr("cx", size / 2);
-	//circle2.attr("cy", (size / 2) - (y * state.scale));
-	
-	
-	//state.endTime = state.endTime * 3;
 	clearID = setInterval(simulateStepClosest, (1/fps) * 1000);
 	
 		
@@ -512,6 +518,7 @@ function getValuesClosest(){
 	
 	var theta = Math.atan(slope);
 	rt = Math.cos(theta) * tq;
+	state.closest = rt;
 	
 	var qr = rt * Math.tan(theta);
 	var sq = state.startB / Math.cos(theta)
@@ -525,6 +532,25 @@ function getValuesClosest(){
 }
 
 function setDataClosest(){
+	
+	document.getElementById("vab-info").style.display = "none";
+	document.getElementById("closest-info").style.display = "block";
+	document.getElementById("river-info").style.display = "none";
+	
+	document.getElementById("vai-value").innerHTML 
+	= "Vai: " + state.vai.toFixed(3) + "i";
+	document.getElementById("vbj-value").innerHTML 
+	= "Vbj: " + state.vbj.toFixed(3) + "j";
+	document.getElementById("vab-closest-value").innerHTML 
+	= "Vab: " + state.vabi.toFixed(3) + "i + " + state.vabj.toFixed(3) + "j";
+	document.getElementById("time-closest-value").innerHTML 
+	= "Time of closest distance: " + state.endTime.toFixed(3) + "s";
+	document.getElementById("distance-closest-value").innerHTML
+	= "Closest distance: " + state.closest.toFixed(3) + "m";
+	
+	document.getElementById("scale").innerHTML
+	= "Scale: 1 metre : 1" + state.scale.toFixed(3) + " pixels";
+	
 	
 }
 
@@ -601,6 +627,9 @@ function simulateStepClosest(){
 		
 	}
 	
+	document.getElementById("time").innerHTML 
+	= "Time: " + state.time.toFixed(3) + "s";
+	
 	state.time += (1 / fps);
 	
 }
@@ -615,6 +644,7 @@ function runRiver(){
 	
 	getValuesRiver();
 	getScaleRiver();
+	setDataRiver();
 		
 	waterBackground = paper.rect(0, (size - (state.width * state.scale)), size, size);
 	waterBackground.attr("fill", "#66FFFF");
@@ -682,6 +712,22 @@ function getValuesRiver(){
 
 function setDataRiver(){
 	
+	document.getElementById("vab-info").style.display = "none";
+	document.getElementById("closest-info").style.display = "none";
+	document.getElementById("river-info").style.display = "block";
+	
+	document.getElementById("current-value").innerHTML 
+	= "Speed of current: " + state.riverSpeed.toFixed(3) + "m/s";
+	document.getElementById("angle-value").innerHTML 
+	= "Angle: " + state.riverAngle.toFixed(3);
+	document.getElementById("landing-value").innerHTML 
+	= "Landing location: " + state.across.toFixed(3) + "m";
+	document.getElementById("ij-value").innerHTML 
+	= "Vab: " + state.vabi.toFixed(3) + "i + " + state.vabj.toFixed(3) + "j";
+	
+	document.getElementById("scale").innerHTML
+	= "Scale: 1 metre : 1" + state.scale.toFixed(3) + " pixels";
+	
 }
 
 function getScaleRiver(){
@@ -716,6 +762,9 @@ function simulateStepRiver(){
 	);
 		
 	vabLine.attr("stroke", "#FF0000");
+	
+	document.getElementById("time").innerHTML
+	= "Time: " + state.time.toFixed(3) + "s";
 	
 	state.time += (1 / fps);
 	
