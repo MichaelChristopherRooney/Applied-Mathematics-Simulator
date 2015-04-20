@@ -75,8 +75,7 @@ a:hover, a:active {
 		
 		<select id="typeSelect" onchange="typeChange()" autocomplete="off">
 			<option id="circle-h">Horizontal circle</option>
-			<option id="shm-pendulum">Pendulum</option>
-			<option id="shm-spring">Spring</option>
+			<option id="basic">Basic SHM</option>
 		</select>
 		<div style="height:5px;"></div>
 		<hr style = "float:left; width:85%;">
@@ -120,19 +119,13 @@ a:hover, a:active {
 			</br>
 		</div>
 			
-		<!-- SHOWN WHEN "SPRING" IS SELECTED -->
-		<div id = "shm-spring-div" style="display:none;">
+		<!-- SHOWN WHEN "BASIC SHM" IS SELECTED -->
+		<div id = "basic-div" style="display:none;">
 			
-			<input id="river-vp" type="text" placeholder="Person's speed (>0)" style = "float:left;width:87.5%;" autocomplete="off"> </br>
+			<input id="basic-vr" type="text" placeholder="Angular velocity ω (>0)" style = "float:left;width:87.5%;" autocomplete="off"> </br>
 			<div style="height:5px;"></div>
 			
-			<input id="river-angle" type="text" placeholder="Starting angle  (90≥Θ>0)" style = "float:left;width:87.5%;" autocomplete="off"> </br>
-			<div style="height:5px;"></div>
-			
-			<input id="river-vr" type="text" placeholder="Speed of the current (>0)" style = "float:left;width:87.5%;" autocomplete="off"> </br>
-			<div style="height:5px;"></div>
-			
-			<input id="river-w" type="text" placeholder="Width of the river (>0)" style = "float:left;width:87.5%;" autocomplete="off"> </br>
+			<input id="basic-a" type="text" placeholder="Amplitude A (>0)" style = "float:left;width:87.5%;" autocomplete="off"> </br>
 			<div style="height:5px;"></div>
 			
 			<hr style = "float:left; width:85%;">
@@ -171,19 +164,18 @@ a:hover, a:active {
 			<div id="vr-value"></div>
 		</div>
 		
-		<div id="closest-info" style="display:none;">
-			<div id="vai-value"></div>
-			<div id="vbj-value"></div>
-			<div id="vab-closest-value"></div>
-			<div id="time-closest-value"></div>
-			<div id="distance-closest-value"></div>
-		</div>
-		
-		<div id="river-info" style="display:none;">
-		
+		<div id="basic-info" style="display:none;">
+			<div id="basic-amplitude-value"></div>
+			<div id="basic-vr-value"></div>
+			<div id="basic-maxa-value"></div>
+			<div id="basic-maxv-value"></div>
+			<div id="basic-cura-value"></div>
+			<div id="basic-curv-value"></div>
+			<div id="basic-curx-value"></div>
 		</div>
 		
 		<div id="scale"></div>
+		<div id="time"></div>
 		
 	</div>	
 	

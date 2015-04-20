@@ -63,6 +63,8 @@ function getNewSize(){
 	
 	if(state){
 		
+		console.log("hi?");
+		
 		if(state.scale){
 			oldScale = state.scale;
 			x = oldSize / state.scale;
@@ -73,10 +75,8 @@ function getNewSize(){
 		
 		if(state.type == "circle-h"){
 			rescaleHorizontal();
-		}else if(state.type == "closest"){
-			rescaleClosest();
-		}else if(state.type == "river"){
-			rescaleRiver();
+		}else if(state.type == "basic"){
+			rescaleBasic();
 		}
 		
 	}
@@ -123,147 +123,10 @@ function rescaleHorizontal(){
 	
 }
 
-function rescaleClosest(){
+function rescaleBasic(){
 	
-	if(circle1){
-		circle1.attr("cx", (circle1.attr("cx") / oldScale) * state.scale);
-		circle1.attr("cy", (circle1.attr("cy") / oldScale) * state.scale);
-	}
-
-	if(circle2){
-		circle2.attr("cx", (circle2.attr("cx") / oldScale) * state.scale);
-		circle2.attr("cy", (circle2.attr("cy") / oldScale) * state.scale);
-	}
-	
-	if(vLine){
-
-		vLine.remove();
-		vLine = null;
-		
-		vLine = paper.path("M" + (size/2) + " " + 0 + 
-		"L" + (size/2)
-		+ " " + size
-		);
-		
-	}
-	
-	if(hLine){
-		
-		hLine.remove();
-		hLine = null;
-		
-		hLine = paper.path("M" + 0 + " " + (size / 2) + 
-		"L" + size
-		+ " " + (size / 2)
-		);
-	}
-	
-	
-	var x = -state.startA;
-	var y = -state.startB;
-	
-	if(aCircle){
-		
-		aCircle.remove();
-		aCircle = null;
-		
-		aCircle = paper.circle((size / 2) + (x * state.scale), (size / 2), 3);
-		aCircle.attr("fill", "#000");
-		aCircle.attr("stroke", "#000");
-		
-	}
-	
-	if(bCircle){
-		
-		bCircle.remove();
-		bCircle = null;
-		
-		bCircle = paper.circle((size / 2), (size / 2) - (y * state.scale), 3);
-		bCircle.attr("fill", "#000");
-		bCircle.attr("stroke", "#000");
-		
-	}
-	
-	if(cLine){
-		
-		cLine.remove();
-		cLine = null;
-		
-		cLine = paper.path("M" + circle1.attr("cx") + " " + circle1.attr("cy") + 
-		"L" + circle2.attr("cx")
-		+ " " + circle2.attr("cy")
-		);
-	}
-	
-	if(vabLine){
-		
-		vabLine.remove();
-		vabLine = null;
-		
-		x = (state.vabi * state.time);
-		y = (state.vabj * state.time) - state.startB;
-
-		vabLine = paper.path("M" + (size / 2) + " " + ((size / 2) + (state.startB * state.scale)) + 
-		"L" + ((size / 2) + (x * state.scale))
-		+ " " + ((size / 2) - (y * state.scale))
-		);
-	}
-	
-	if(pLine){
-		
-		pLine.remove();
-		pLine = null;
-		
-		pLine = paper.path("M" + aCircle.attr("cx") + " " +  aCircle.attr("cy") + 
-		"L" + ((size / 2) + (x * state.scale))
-		+ " " + ((size / 2) - (y * state.scale)));
-		
-	}
-	
-}
-
-function rescaleRiver(){
-	
-	if(waterBackground){
-		
-		waterBackground.remove();
-		waterBackground = null;
-		
-		waterBackground = paper.rect(0, (size - (state.width * state.scale)), size, size);
-		waterBackground.attr("fill", "#66FFFF");
-		waterBackground.attr("stroke", "#000");
-		
-	}
-	
-	if(riverLine){
-		
-		riverLine.remove();
-		riverLine = null;
-		
-		riverLine = paper.path("M" + (size/2) + " " + size + 
-		"L" + (size/2)
-		+ " " + (size - (state.width * state.scale))
-		);
-	}
-	
-	
-	if(vabLine){
-		
-		vabLine.remove();
-		vabLine = null;
-		
-		var centre = size / 2;
-		var x = state.vabi * state.time;
-		var y = state.vabj * state.time;
-	
-		vabLine = paper.path("M" + centre + " " + size + 
-		"L" + (centre - (x * state.scale))
-		+ " " + (size - (y * state.scale))
-		);
-		
-		vabLine.attr("stroke", "#FF0000");
-		
-	}
+	circle1.attr("cx", (state.x * state.scale) + (size / 2))
+	circle1.attr("cy", (size / 2))
 	
 }
 
@@ -278,8 +141,14 @@ function stateObject(){
 	this.vm = 0;
 	this.angleR = 0;
 	this.angleD = 0;
+	this.amplitude = 0;
 	this.type = 0;
 	this.time = 0;
+	this.maxA = 0;
+	this.maxV = 0;
+	this.a = 0;
+	this.v = 0;
+	this.x = 0;
 }
 
 /*
@@ -296,8 +165,8 @@ function run(){
 	
 	if(type == "circle-h"){
 		runHorizontal();
-	}else if(type == "closest"){
-	}else if(type == "river"){
+	}else if(type == "basic"){
+		runBasic();
 	}
 		
 
@@ -368,6 +237,7 @@ function getScaleHorizontal(){
 function setDataHorizontal(){
 	
 	document.getElementById("circle-h-info").style.display = "block";
+	document.getElementById("basic-info").style.display = "none";
 	//hide others
 	
 	document.getElementById("force-value").innerHTML 
@@ -418,149 +288,13 @@ function simulateStepHorizontal(){
 	state.angleR = state.angleR + (state.vr * (1/fps));
 	state.angleD = state.angleR * (180 / Math.PI);
 	
+	document.getElementById("time").innerHTML = "Time: " + state.time + "s";
+	
 	state.time = state.time + (1/fps);
 	
 }
 
-function runClosest(){
-	
-	state.type = "closest";
-		
-	if(!parseInputClosest()){
-		return false;
-	}
-		
-	getValuesClosest();
-		
-	getScaleClosest();
-	setDataClosest();
-	
-	circle1 = paper.circle(-10, -10, 10);
-	circle1.attr("fill", "#f00");
-	circle1.attr("stroke", "#000");
-	
-	circle2 = paper.circle(-10, -10, 10);
-	circle2.attr("fill", "#f00");
-	circle2.attr("stroke", "#000");
-	
-	vLine = paper.path("M" + (size/2) + " " + 0 + 
-		"L" + (size/2)
-		+ " " + size);
-		
-	hLine = paper.path("M" + 0 + " " + (size / 2) + 
-		"L" + size
-		+ " " + (size / 2));
-	
-	var x = -state.startA;
-	var y = -state.startB;
-	
-	aCircle = paper.circle((size / 2) + (x * state.scale), (size / 2), 3);
-	aCircle.attr("fill", "#000");
-	aCircle.attr("stroke", "#000");
-	
-	bCircle = paper.circle((size / 2), (size / 2) - (y * state.scale), 3);
-	bCircle.attr("fill", "#000");
-	bCircle.attr("stroke", "#000");
-	
-	
-	//circle2.attr("cx", size / 2);
-	//circle2.attr("cy", (size / 2) - (y * state.scale));
-	
-	
-	//state.endTime = state.endTime * 3;
-	clearID = setInterval(simulateStepClosest, (1/fps) * 1000);
-	
-		
-}
-
-function parseInputClosest(){
-
-	state.vai = parseFloat(document.getElementById("closest-ai").value);
-	state.vbj = parseFloat(document.getElementById("closest-bj").value);
-	state.startA  = parseFloat(document.getElementById("closest-as").value);
-	state.startB  = parseFloat(document.getElementById("closest-bs").value);
-	
-	var alertMessage = "";
-	
-	if(isNaN(state.vai) || state.vai <= 0 || (state.vai == "" && state.vai != 0)){
-		alertMessage += "A's i velocity must be a number > 0\n";
-	}
-	
-	if(isNaN(state.startA) || state.startA <= 0 || (state.startA == "" && state.startA != 0)){
-		alertMessage += "A's distance west must be a number > 0\n";
-	}
-	
-	if(isNaN(state.vbj) || state.vbj <= 0 || (state.vbj == "" && state.vbh != 0)){
-		alertMessage += "B's j velocity must be a number > 0\n";
-	}
-	
-	if(isNaN(state.startB) || state.startB <= 0 || (state.startB == "" && state.startB != 0)){
-		alertMessage += "B's distance south must be a number > 0\n";
-	}
-	
-	if(alertMessage != ""){
-		alert(alertMessage);
-		return false;
-	}
-	
-	return true;
-}
-
-function getValuesClosest(){
-
-	state.vabi = -state.vai;
-	state.vabj = state.vbj;
-	
-	// get slope of line L = Vabj / Vabi
-	var slope =  Math.abs(state.vabi) / Math.abs(state.vabj);
-	
-	var pq, tq, rt;
-	pq = slope * state.startB;
-	tq = state.startA - pq;
-	
-	var theta = Math.atan(slope);
-	rt = Math.cos(theta) * tq;
-	
-	var qr = rt * Math.tan(theta);
-	var sq = state.startB / Math.cos(theta)
-	
-	state.distance = qr + sq;
-	state.endTime = state.distance / Math.sqrt((Math.pow(state.vabj, 2) + Math.pow(state.vabi, 2)));
-	
-	state.endA = (state.vai * state.endTime) - state.startA;
-	state.endB = (state.vbj * state.endTime) - state.startB;
-
-}
-
-function setDataClosest(){
-	
-}
-
-function getScaleClosest(){
-	
-	var a, b;
-	
-	if(state.endA > state.startA){
-		a = state.endA;
-	}else{
-		a = state.startA;
-	}
-	
-	if(state.endB > state.startB){
-		b = state.endB;
-	}else{
-		b = state.startB;
-	}
-	
-	if(a > b){
-		state.scale = size / a / 2;
-	}else{
-		state.scale = size / b / 2;
-	}
-	
-}
-
-function simulateStepClosest(){
+function simulateStepPendulum(){
 	
 	if(state.time > state.endTime){
 		clearInterval(clearID);
@@ -611,63 +345,44 @@ function simulateStepClosest(){
 	
 }
 
-function runRiver(){
+function runBasic(){
 	
-	state.type = "river";
+	state.type = "basic";
 		
-	if(!parseInputRiver()){
-		return fasle;
+	if(!parseInputBasic()){
+		return false;
 	}
 	
-	getValuesRiver();
-	getScaleRiver();
-		
-	waterBackground = paper.rect(0, (size - (state.width * state.scale)), size, size);
-	waterBackground.attr("fill", "#66FFFF");
-	waterBackground.attr("stroke", "#000");
-		
-	riverLine = paper.path("M" + (size/2) + " " + size + 
-		"L" + (size/2)
-		+ " " + (size - (state.width * state.scale)));
-		
-	clearID = setInterval(simulateStepRiver, (1/fps) * 1000);
+	getValuesBasic();
+	getScaleBasic();
+	setDataBasic();
+
+	circle1 = paper.circle(-10, -10, 10);
+	circle1.attr("fill", "#f00");
+	circle1.attr("stroke", "#000");
+	
+	clearID = setInterval(simulateStepBasic, (1/fps) * 1000);
 	
 }
 
-function parseInputRiver(){
+function parseInputBasic(){
 	
 	alertMessage = "";
 	
-	state.vp = parseFloat(document.getElementById("river-vp").value);
+	state.vr = parseFloat(document.getElementById("basic-vr").value);
+	state.amplitude = parseFloat(document.getElementById("basic-a").value);
 	
-	if(isNaN(state.vp) || state.vp <= 0 || state.vp == ""){
+	if(isNaN(state.vr) || state.vr <= 0 || state.vr == ""){
 		alertMessage +=
-		"Person's speed must be a number > 0\n";
+		"Angular velocity must be a number > 0\n";
 	}
 	
-	state.riverAngle = parseFloat(document.getElementById("river-angle").value);
-	
-	if(isNaN(state.riverAngle) || state.riverAngle <= 0 
-	|| state.riverAngle > 90 || state.riverAngle == ""){
-		alertMessage += 
-		"Starting angle must be ≤ 90 and > 0\n";
+	if(isNaN(state.amplitude) || state.amplitude <= 0 || state.amplitude == ""){
+		alertMessage +=
+		"Amplitude must be a number > 0\n";
 	}
-	
-	state.riverSpeed = parseFloat(document.getElementById("river-vr").value);
-	
-	if(isNaN(state.riverSpeed) || state.riverSpeed <= 0 || state.riverSpeed == ""){
-		alertMessage += 
-		"River speed must be a number > 0\n";
-	}
-	
-	state.width = parseFloat(document.getElementById("river-w").value);
-	
-	if(isNaN(state.width) || state.width <= 0 || state.width == ""){
-		alertMessage += 
-		"River width must be a number > 0\n";
-	}
-	
-	if(alertMessage != ""){
+
+	if(alertMessage){
 		alert(alertMessage);
 		return false;
 	}
@@ -676,52 +391,75 @@ function parseInputRiver(){
 	
 }
 
-function getValuesRiver(){
+function getValuesBasic(){
 	
-	state.vabj = state.vp * Math.sin(state.riverAngle * (Math.PI / 180));
-	state.vabi = state.vp * Math.cos(state.riverAngle * (Math.PI / 180));
-	state.vabi = state.vabi - state.riverSpeed;
-	state.endTime = state.width / state.vabj;
-	state.across = state.endTime * state.vabi;
+	state.maxV = state.vr * state.amplitude;
+	state.maxA = state.vr * state.vr * state.amplitude;
 
 }
 
-function setDataRiver(){
+function getScaleBasic(){
+	
+	state.scale = size / state.amplitude / 2;
 	
 }
 
-function getScaleRiver(){
+function setDataBasic(){
 	
-	if(state.width > (Math.abs(state.across * 2))){
-		state.scale = size / state.width;
-	}else{
-		state.scale = (size / 2) / Math.abs(state.across);
-	}
+	document.getElementById("circle-h-info").style.display = "none";
+	document.getElementById("basic-info").style.display = "block";
+	//hide others
 	
-}
-
-function simulateStepRiver(){
-	
-	if(state.time > state.endTime){
-		clearInterval(clearID);
-		state.time = state.endTime;
-	}
-	
-	var x = state.vabi * state.time;
-	var y = state.vabj * state.time;
-	
-	if(vabLine){
-		vabLine.remove();
-		vabLine = null;
-	}
-	
-	var centre = size / 2;
-	vabLine = paper.path("M" + centre + " " + size + 
-		"L" + (centre - (x * state.scale))
-		+ " " + (size - (y * state.scale))
-	);
+	document.getElementById("basic-amplitude-value").innerHTML 
+		= "Amplitude: " + state.amplitude.toFixed(3) + "m";
 		
-	vabLine.attr("stroke", "#FF0000");
+	document.getElementById("basic-vr-value").innerHTML 
+		= "Angular velocity: " + state.vr.toFixed(3) + "rad/s";
+		
+	document.getElementById("basic-maxa-value").innerHTML 
+		= "Max acceleration: " + state.maxA.toFixed(3) + "m/s/s";
+		
+	document.getElementById("basic-maxv-value").innerHTML 
+		= "Max velocity: " + state.maxV.toFixed(3) + "m/s";
+		
+	document.getElementById("basic-cura-value").innerHTML 
+		= "Acceleration: " + state.a.toFixed(3) + "m/s/s";
+		
+	document.getElementById("basic-curv-value").innerHTML 
+		= "Velocity: " + state.v.toFixed(3) + "m/s";
+		
+	document.getElementById("basic-curx-value").innerHTML 
+		= "Displacement: " + state.x.toFixed(3) + "m";
+		
+	document.getElementById("scale").innerHTML = 
+		"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+	
+	
+}
+
+function simulateStepBasic(){
+	
+	state.x = state.amplitude * Math.sin(state.vr * state.time);
+	
+	state.a = (-1) * state.vr * state.vr * state.x;
+	state.v = Math.sqrt(
+		state.vr * state.vr * (
+			(state.amplitude * state.amplitude)
+			- (state.x * state.x)
+		)
+	);
+	
+	document.getElementById("basic-cura-value").innerHTML 
+		= "Acceleration: " + state.a.toFixed(3) + "m/s/s";
+		
+	document.getElementById("basic-curv-value").innerHTML 
+		= "Velocity: " + state.v.toFixed(3) + "m/s";
+		
+	document.getElementById("basic-curx-value").innerHTML 
+		= "Displacement: " + state.x.toFixed(3) + "m";
+	
+	circle1.attr("cx", (state.x * state.scale) + (size / 2))
+	circle1.attr("cy", (size / 2))
 	
 	state.time += (1 / fps);
 	
@@ -757,16 +495,10 @@ function typeChange(){
 	
 	if(type == "circle-h"){
 		document.getElementById("circle-h-div").style.display = "block";
-		document.getElementById("shm-pendulum-div").style.display = "none";
-		document.getElementById("shm-spring-div").style.display = "none";
-	}else if(type == "shm-pendulum"){
+		document.getElementById("basic-div").style.display = "none";
+	}else if(type == "basic"){
 		document.getElementById("circle-h-div").style.display = "none";
-		document.getElementById("shm-pendulum-div").style.display = "block";
-		document.getElementById("shm-spring-div").style.display = "none";
-	}else if(type == "shm-spring"){
-		document.getElementById("circle-h-div").style.display = "none";
-		document.getElementById("shm-pendulum-div").style.display = "none";
-		document.getElementById("shm-spring-div").style.display = "block";
+		document.getElementById("basic-div").style.display = "block";
 	}
 	
 }
