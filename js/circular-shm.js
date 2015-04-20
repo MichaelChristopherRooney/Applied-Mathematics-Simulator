@@ -73,7 +73,7 @@ function getNewSize(){
 			= "Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
 		}
 		
-		if(state.type == "circle-h"){
+		if(state.type == "horizontal"){
 			rescaleHorizontal();
 		}else if(state.type == "basic"){
 			rescaleBasic();
@@ -149,6 +149,8 @@ function stateObject(){
 	this.a = 0;
 	this.v = 0;
 	this.x = 0;
+	this.tension = 0;
+	this.initialV = 0;
 }
 
 /*
@@ -163,18 +165,17 @@ function run(){
 	var select = document.getElementById("typeSelect");
 	var type = select[select.selectedIndex].id;
 	
-	if(type == "circle-h"){
+	if(type == "horizontal"){
 		runHorizontal();
 	}else if(type == "basic"){
 		runBasic();
 	}
-		
 
 }
 
 function runHorizontal(){
 	
-	state.type = "circle-h";
+	state.type = "horizontal";
 		
 	if(!parseInputHorizontal()){
 		return false;
@@ -194,9 +195,9 @@ function runHorizontal(){
 
 function parseInputHorizontal(){
 
-	state.radius = parseFloat(document.getElementById("circle-h-r").value);
-	state.mass = parseFloat(document.getElementById("circle-h-m").value);
-	state.vr = parseFloat(document.getElementById("circle-h-vr").value);
+	state.radius = parseFloat(document.getElementById("horizontal-r").value);
+	state.mass = parseFloat(document.getElementById("horizontal-m").value);
+	state.vr = parseFloat(document.getElementById("horizontal-vr").value);
 	
 	var alertMessage = "";
 	
@@ -236,23 +237,23 @@ function getScaleHorizontal(){
 
 function setDataHorizontal(){
 	
-	document.getElementById("circle-h-info").style.display = "block";
+	document.getElementById("horizontal-info").style.display = "block";
 	document.getElementById("basic-info").style.display = "none";
 	//hide others
 	
-	document.getElementById("force-value").innerHTML 
+	document.getElementById("horizontal-force-value").innerHTML 
 		= "Force: " + state.force.toFixed(3) + "N";
 		
-	document.getElementById("radius-value").innerHTML 
+	document.getElementById("horizontal-radius-value").innerHTML 
 		= "Radius: " + state.radius.toFixed(3) + "m";
 		
-	document.getElementById("mass-value").innerHTML 
+	document.getElementById("horizontal-mass-value").innerHTML 
 		= "Mass: " + state.mass.toFixed(3) + "kg";
 		
-	document.getElementById("vr-value").innerHTML 
+	document.getElementById("horizontal-vr-value").innerHTML 
 		= "Angular velocity: " + state.vr.toFixed(3) + "rad/s";
 		
-	document.getElementById("vm-value").innerHTML 
+	document.getElementById("horizontal-vm-value").innerHTML 
 		= "Velocity: " + state.vm.toFixed(3) + "m/s";
 		
 	document.getElementById("scale").innerHTML = 
@@ -271,9 +272,17 @@ function simulateStepHorizontal(){
 	var x = state.radius * Math.cos(state.angleR);
 	var y = state.radius * Math.sin(state.angleR);
 	
+	var x1 = 
+	(x * Math.cos(90 * (Math.PI / 180))) 
+	- (y * Math.sin(90 * (Math.PI / 180)));
+			
+	var y1 = 
+	(x * Math.sin(90 * (Math.PI / 180))) 
+	+ (y * Math.cos(90 * (Math.PI / 180)));
+	
 	var centre = size / 2;
-	circle1.attr("cx", (x * state.scale) + centre);
-	circle1.attr("cy", (y * state.scale) + centre);
+	circle1.attr("cx", (x1 * state.scale) + centre);
+	circle1.attr("cy", (y1 * state.scale) + centre);
 	
 	if(rLine){
 		rLine.remove();
@@ -288,60 +297,9 @@ function simulateStepHorizontal(){
 	state.angleR = state.angleR + (state.vr * (1/fps));
 	state.angleD = state.angleR * (180 / Math.PI);
 	
-	document.getElementById("time").innerHTML = "Time: " + state.time + "s";
+	document.getElementById("time").innerHTML = "Time: " + state.time.toFixed(3) + "s";
 	
 	state.time = state.time + (1/fps);
-	
-}
-
-function simulateStepPendulum(){
-	
-	if(state.time > state.endTime){
-		clearInterval(clearID);
-		state.time = state.endTime;
-	}
-	
-	var x = (state.vai * state.time) - state.startA;
-	var y = (state.vbj * state.time) - state.startB;
-	
-	circle1.attr("cx", (size / 2) + (x * state.scale));
-	circle1.attr("cy", size / 2);
-	
-	circle2.attr("cx", size / 2);
-	circle2.attr("cy", (size / 2) - (y * state.scale));
-	
-	if(cLine){
-		cLine.remove();
-		cLine = null;
-	}
-	
-	cLine = paper.path("M" + circle1.attr("cx") + " " + circle1.attr("cy") + 
-		"L" + circle2.attr("cx")
-		+ " " + circle2.attr("cy"));
-	
-	if(vabLine){
-		vabLine.remove();
-		vabLine = null;
-	}
-	
-	var x = (state.vabi * state.time);
-	var y = (state.vabj * state.time) - state.startB;
-
-	vabLine = paper.path("M" + (size / 2) + " " + ((size / 2) + (state.startB * state.scale)) + 
-		"L" + ((size / 2) + (x * state.scale))
-		+ " " + ((size / 2) - (y * state.scale))
-	);
-		
-	
-	if(state.time == state.endTime){
-		
-		pLine = paper.path("M" + aCircle.attr("cx") + " " +  aCircle.attr("cy") + 
-		"L" + ((size / 2) + (x * state.scale))
-		+ " " + ((size / 2) - (y * state.scale)));
-		
-	}
-	
-	state.time += (1 / fps);
 	
 }
 
@@ -406,7 +364,7 @@ function getScaleBasic(){
 
 function setDataBasic(){
 	
-	document.getElementById("circle-h-info").style.display = "none";
+	document.getElementById("horizontal-info").style.display = "none";
 	document.getElementById("basic-info").style.display = "block";
 	//hide others
 	
@@ -461,6 +419,16 @@ function simulateStepBasic(){
 	circle1.attr("cx", (state.x * state.scale) + (size / 2))
 	circle1.attr("cy", (size / 2))
 	
+	if(rLine){
+		rLine.remove();
+		rLine = null;
+	}
+	
+	rLine = paper.path("M" + (size / 2) + " " + 0 + 
+		"L" + (size / 2)
+		+ " " + size
+	);
+	
 	state.time += (1 / fps);
 	
 }
@@ -493,11 +461,11 @@ function typeChange(){
 	var select = document.getElementById("typeSelect");
 	var type = select[select.selectedIndex].id;
 	
-	if(type == "circle-h"){
-		document.getElementById("circle-h-div").style.display = "block";
+	if(type == "horizontal"){
+		document.getElementById("horizontal-div").style.display = "block";
 		document.getElementById("basic-div").style.display = "none";
 	}else if(type == "basic"){
-		document.getElementById("circle-h-div").style.display = "none";
+		document.getElementById("horizontal-div").style.display = "none";
 		document.getElementById("basic-div").style.display = "block";
 	}
 	
@@ -505,9 +473,9 @@ function typeChange(){
 
 function clearInput(){
 	
-	document.getElementById("circle-h-r").value = "";
-	document.getElementById("circle-h-m").value = "";
-	document.getElementById("circle-h-vr").value = "";
+	document.getElementById("horizontal-r").value = "";
+	document.getElementById("horizontal-m").value = "";
+	document.getElementById("horizontal-vr").value = "";
 	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();

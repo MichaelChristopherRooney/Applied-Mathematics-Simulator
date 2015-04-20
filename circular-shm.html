@@ -74,7 +74,7 @@ a:hover, a:active {
 		<div style="height:10px;"></div>
 		
 		<select id="typeSelect" onchange="typeChange()" autocomplete="off">
-			<option id="circle-h">Horizontal circle</option>
+			<option id="horizontal">Horizontal circle</option>
 			<option id="basic">Basic SHM</option>
 		</select>
 		<div style="height:5px;"></div>
@@ -82,41 +82,21 @@ a:hover, a:active {
 		</br>
 			
 		<!-- SHOWN WHEN "HORIZONTAL CIRCLE" IS SELECTED -->
-		<div id = "circle-h-div">
+		<div id = "horizontal-div">
 		
-			<input id="circle-h-r" type="text" placeholder="Radius (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+			<input id="horizontal-r" type="text" placeholder="Length (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 			
-			<input id="circle-h-m" type="text" placeholder="Mass (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+			<input id="horizontal-m" type="text" placeholder="Mass (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 			
-			<input id="circle-h-vr" type="text" placeholder="Angular velocity (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+			<input id="horizontal-vr" type="text" placeholder="Angular velocity (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 
 			
 			<hr style = "float:left; width:85%;">
 			</br>
-		</div>
-		
-		<!-- SHOW WHEN "PENDULUM" IS SELECTED -->
-		<div id = "shm-pendulum-div" style="display:none;">
-			<input id="closest-ai" type="text" placeholder="A's i velocity (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>	
 			
-			<input id="closest-as" type="text" placeholder="A's distance west (>0)" style = "float:left;width:87.5%; height:auto;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
-			
-			<div style="height:5px;"></div>
-			
-			<input id="closest-bj" type="text" placeholder="B's j velocity (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
-			
-			<input id="closest-bs" type="text" placeholder="B's distance south (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
-			
-
-			<hr style = "float:left; width:85%;">
-			</br>
 		</div>
 			
 		<!-- SHOWN WHEN "BASIC SHM" IS SELECTED -->
@@ -130,6 +110,7 @@ a:hover, a:active {
 			
 			<hr style = "float:left; width:85%;">
 			</br>
+			
 		</div>
 		
 		<!-- RUN BUTTON -->
@@ -156,14 +137,14 @@ a:hover, a:active {
 	<!-- real time info relevant to the simulation -->
 	<div id ="info_pane" style="position:absolute;left:770px;width:250px;top:65px;height:345px;">
 		
-		<div id="circle-h-info" style="display:none;">
-			<div id="force-value"></div>
-			<div id="radius-value"></div>
-			<div id="mass-value"></div>
-			<div id="vm-value"></div>
-			<div id="vr-value"></div>
+		<div id="horizontal-info" style="display:none;">
+			<div id="horizontal-force-value"></div>
+			<div id="horizontal-radius-value"></div>
+			<div id="horizontal-mass-value"></div>
+			<div id="horizontal-vm-value"></div>
+			<div id="horizontal-vr-value"></div>
 		</div>
-		
+
 		<div id="basic-info" style="display:none;">
 			<div id="basic-amplitude-value"></div>
 			<div id="basic-vr-value"></div>
