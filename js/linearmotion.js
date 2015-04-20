@@ -120,6 +120,7 @@ function getNewSize(){
 	document.getElementById("info_pane").style.left = (size + 10 + 165) + "px";
 	document.getElementById("graph_panel").style.left = (size + 10 + 165) + "px";
 	document.getElementById("graphText").style.left = (size + 10 + 165) + "px";
+	document.getElementById("navbar").style.width = (w - 16) + "px";
 			
 }
 

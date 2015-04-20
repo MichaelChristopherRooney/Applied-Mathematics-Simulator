@@ -114,6 +114,7 @@ function getNewSize(){
 	document.getElementById("graphics_panel").style.height = size + "px";
 	document.getElementById("graphics_panel").style.left = "165px";
 	document.getElementById("info_pane").style.left = (size + 10 + 165) + "px";
+	document.getElementById("navbar").style.width = (w - 16) + "px";
 	
 }
 
@@ -543,7 +544,9 @@ function getScaleClosest(){
 		b = state.startB;
 	}
 	
-	if(a > b){
+	if(state.distance > a && state.distance > b){
+		state.scale = size / state.distance / 2;
+	}else if(a > b){
 		state.scale = size / a / 2;
 	}else{
 		state.scale = size / b / 2;

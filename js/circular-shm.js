@@ -97,13 +97,24 @@ function getNewSize(){
 		
 	}
 	
+	if(w < 1024){
+		document.getElementById("navbar").style.display = "none";
+		document.getElementById("navselect").style.display = "block";
+		document.getElementById("navselect").style.width = (w - 20) + "px";
+	}else{
+		document.getElementById("navbar").style.display = "block";
+		document.getElementById("navselect").style.display = "none";
+	}
+	
 	paper.setSize(size, size);
 	backgroundRectangle.attr("height", size);
 	backgroundRectangle.attr("width", size);
 	
-	document.getElementById("graphics_panel").style.width = size;
-	document.getElementById("graphics_panel").style.height = size;
-	document.getElementById("info_pane").style.left = size + 10 + 165;
+	document.getElementById("graphics_panel").style.width = size + "px";
+	document.getElementById("graphics_panel").style.height = size + "px";
+	document.getElementById("graphics_panel").style.left = "165px";
+	document.getElementById("info_pane").style.left = (size + 10 + 165) + "px";
+	document.getElementById("navbar").style.width = (w - 16) + "px";
 	
 }
 
@@ -673,10 +684,10 @@ function setDataRiver(){
 
 function getScaleRiver(){
 	
-	if(state.width > (state.across * 2)){
+	if(state.width > (Math.abs(state.across * 2))){
 		state.scale = size / state.width;
 	}else{
-		state.scale = (size / 2) / state.across;
+		state.scale = (size / 2) / Math.abs(state.across);
 	}
 	
 }
@@ -798,18 +809,18 @@ function typeChange(){
 	var select = document.getElementById("typeSelect");
 	var type = select[select.selectedIndex].id;
 	
-	if(type == "vab"){
-		document.getElementById("vabdiv").style.display = "block";
-		document.getElementById("closestdiv").style.display = "none";
-		document.getElementById("riverdiv").style.display = "none";
-	}else if(type == "closest"){
-		document.getElementById("vabdiv").style.display = "none";
-		document.getElementById("closestdiv").style.display = "block";
-		document.getElementById("riverdiv").style.display = "none";
-	}else if(type == "river"){
-		document.getElementById("vabdiv").style.display = "none";
-		document.getElementById("closestdiv").style.display = "none";
-		document.getElementById("riverdiv").style.display = "block";
+	if(type == "circle-h"){
+		document.getElementById("circle-h-div").style.display = "block";
+		document.getElementById("shm-pendulum-div").style.display = "none";
+		document.getElementById("shm-spring-div").style.display = "none";
+	}else if(type == "shm-pendulum"){
+		document.getElementById("circle-h-div").style.display = "none";
+		document.getElementById("shm-pendulum-div").style.display = "block";
+		document.getElementById("shm-spring-div").style.display = "none";
+	}else if(type == "shm-spring"){
+		document.getElementById("circle-h-div").style.display = "none";
+		document.getElementById("shm-pendulum-div").style.display = "none";
+		document.getElementById("shm-spring-div").style.display = "block";
 	}
 	
 }
@@ -848,4 +859,16 @@ function stopSimulation(){
 		clearInterval(clearID);
 	}
 	
+}
+
+function showHelp(){
+	var alertMessage =
+	"In simple Vab the result of Vab = Va - Vb is shown.\n\n"
+	+ "In closest distance one object approaches from the west and another from the south.\n"
+	+ "The closest distance between these objects is shown.\n\n"
+	+ "In river crossing a person swims with speed v at an angle Θ.\n"
+	+ "The river has a given width and a current of a given speed.\n"
+	+ "The affect the current has on the swimmer is shown in the path they take.\n";
+	
+	alert(alertMessage);
 }

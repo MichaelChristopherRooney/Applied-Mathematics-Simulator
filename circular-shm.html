@@ -6,7 +6,7 @@
 
 <script src="js/raphael.js"></script>
 <script src="js/jquery-1.11.2.js"></script>
-<script src="js/relative.js"></script>
+<script src="js/circular-shm.js"></script>
 <script src="js/placeholders.min.js"></script>
 
 
@@ -50,9 +50,9 @@ a:hover, a:active {
 		<ul>
 		<li><a href="linearmotion.html">Linear motion</a><li>
 		<li><a href="projectiles.html">Projectiles</a><li>
-		<li><a style="color:black; background-color:#A0A0A0" href="relative.html">Relative velocity</a></li>
+		<li><a href="relative.html">Relative velocity</a></li>
 		<li><a href="connected.html">Connected particles</a></li>
-		<li><a href="circular-shm.html">Circular and SHM</a></li>
+		<li><a style="color:black; background-color:#A0A0A0;" href="circular-shm.html">Circular and SHM</a></li>
 		<li><a href="collisions.html">Collisions</a></li>
 		<li><a href="index.html">Index</a></li>
 		</ul>
@@ -74,36 +74,35 @@ a:hover, a:active {
 		<div style="height:10px;"></div>
 		
 		<select id="typeSelect" onchange="typeChange()" autocomplete="off">
-			<option id="vab">Simple Vab</option>
-			<option id="closest">Closest distance</option>
-			<option id="river">River crossing</option>
+			<option id="circle-h">Horizontal circle</option>
+			<option id="shm-pendulum">Pendulum</option>
+			<option id="shm-spring">Spring</option>
 		</select>
 		<div style="height:5px;"></div>
 		<hr style = "float:left; width:85%;">
 		</br>
 			
-		<!-- SHOWN WHEN "SIMPLE VAB" IS SELECTED -->
-		<div id = "vabdiv">
-			<input id="vab-vai" type="text" placeholder="A i velocity Vai" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+		<!-- SHOWN WHEN "HORIZONTAL CIRCLE" IS SELECTED -->
+		<div id = "circle-h-div">
+		
+			<input id="circle-h-r" type="text" placeholder="Radius of the circle" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 			
-			<input id="vab-vaj" type="text" placeholder="A j velocity Vaj" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+			<input id="circle-h-omega" type="text" placeholder="Velocity in radians/sec" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+			<div style="height:5px;"></div>
+			
+			or
+			<div style="height:5px;"></div>
+			
+			<input id="circle-h-v" type="text" placeholder="Velocity in metres/sec" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>	
-			
-			<div style="height:5px;"></div>
-			
-			<input id="vab-vbi" type="text" placeholder="B i velocity Vbi" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
-			
-			<input id="vab-vbj" type="text" placeholder="B j velocity Vbj" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>
 			
 			<hr style = "float:left; width:85%;">
 			</br>
 		</div>
 		
-		<!-- SHOW WHEN "CLOSEST DISTANCE" IS SELECTED -->
-		<div id = "closestdiv" style="display:none;">
+		<!-- SHOW WHEN "PENDULUM" IS SELECTED -->
+		<div id = "shm-pendulum-div" style="display:none;">
 			<input id="closest-ai" type="text" placeholder="A's i velocity (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>	
 			
@@ -123,8 +122,8 @@ a:hover, a:active {
 			</br>
 		</div>
 			
-		<!-- SHOWN WHEN "RIVER" IS SELECTED -->
-		<div id = "riverdiv" style="display:none;">
+		<!-- SHOWN WHEN "SPRING" IS SELECTED -->
+		<div id = "shm-spring-div" style="display:none;">
 			
 			<input id="river-vp" type="text" placeholder="Person's speed (>0)" style = "float:left;width:87.5%;" autocomplete="off"> </br>
 			<div style="height:5px;"></div>

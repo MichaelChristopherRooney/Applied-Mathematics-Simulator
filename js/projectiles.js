@@ -83,6 +83,7 @@ function getNewSize(){
 	document.getElementById("graphics_panel").style.width = size + "px";
 	document.getElementById("graphics_panel").style.left = "165px";
 	document.getElementById("info_pane").style.left = size + 10 + 165 + "px";
+	document.getElementById("navbar").style.width = (w - 16) + "px";
 		
 }
 
