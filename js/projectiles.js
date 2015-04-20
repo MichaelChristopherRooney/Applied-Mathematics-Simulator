@@ -162,11 +162,6 @@ function run(){
 	
 	cleanUp();
 	
-	/*
-	
-	//parseInt(document.getElementById("u").value),parseInt(document.getElementById("angle").value)
-	*/
-	
 	circle = paper.circle(-10, -10, 10);
 	circle.attr("fill", "#f00");
 	circle.attr("stroke", "#000");
@@ -174,66 +169,31 @@ function run(){
 	state = new stateObject();
 	
 	if(document.getElementById("offGround").checked){
-		
-		state.type = "offGround";
-		
-		if(!parseInputOffGround()){
-			return false;
-		}
-		
-		getOffGroundValues();
-		getScaleOffGround();
-		setData();
-		
-		line = paper.path("M0 " 
-			+ (size - (state.startHeight * state.scale)) + " " + "L"
-			+ size
-			+ " "
-			+ (size - (state.startHeight * state.scale))
-		);
-		
-		clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
-		
+		runOffGround();
 	}else if(document.getElementById("isIncline").checked){
-		
-		state.type = "incline";
-		
-		if(!parseInputIncline()){
-			return false;
-		}
-		
-		getInclineValues();
-		getScaleIncline();
-		setData();
-		
-		line = paper.path("M0 " + size + "L"
-			+ size
-			+ " "
-			+ (size - 
-			(size * Math.tan(state.inclineAngle * (Math.PI / 180)))
-			)
-		);
-		
-		clearID = setInterval(simulateStepIncline, (1/fps) * 1000);
-		
+		runIncline();
 	}else{
-		
-		state.type = "normal";
-		
-		if(!parseInput()){
-			return false;
-		}
-		
-		getValues();
-		getScale();
-		setData();
-		clearID = setInterval(simulateStep, (1/fps) * 1000);
-		
+		runNormal();
 	}
 	
 }
 
-function parseInput(){
+function runNormal(){
+	
+	state.type = "normal";
+		
+	if(!parseInputNormal()){
+		return false;
+	}
+		
+	getValuesNormal();
+	getScaleNormal();
+	setData();
+	clearID = setInterval(simulateStepNormal, (1/fps) * 1000);
+	
+}
+
+function parseInputNormal(){
 	
 	var alertMessage = "";
 	
@@ -263,7 +223,7 @@ function parseInput(){
 /*
 gets constant values for the normal case
 */
-function getValues(){
+function getValuesNormal(){
 	
 	state.ux = state.u * Math.cos(state.projectileAngle * (Math.PI / 180));
 	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
@@ -284,7 +244,7 @@ function getValues(){
 /*
 gets values for the next step in the simulation
 */
-function simulateStep(){
+function simulateStepNormal(){
 	
 	if(state.time > state.tof){
 		clearInterval(clearID);
@@ -309,6 +269,30 @@ function simulateStep(){
 	setData();
 	
 	state.time = state.time + (1/fps);
+	
+}
+
+function runIncline(){
+	
+	state.type = "incline";
+		
+	if(!parseInputIncline()){
+		return false;
+	}
+		
+	getInclineValues();
+	getScaleIncline();
+	setData();
+		
+	line = paper.path("M0 " + size + "L"
+		+ size
+		+ " "
+		+ (size - 
+		(size * Math.tan(state.inclineAngle * (Math.PI / 180)))
+		)
+	);
+		
+	clearID = setInterval(simulateStepIncline, (1/fps) * 1000);
 	
 }
 
@@ -433,6 +417,29 @@ function simulateStepIncline(){
 	setData();
 	
 	state.time = state.time + (1/fps);
+	
+}
+
+function runOffGround(){
+	
+	state.type = "offGround";
+		
+	if(!parseInputOffGround()){
+		return false;
+	}
+		
+	getOffGroundValues();
+	getScaleOffGround();
+	setData();
+		
+	line = paper.path("M0 " 
+		+ (size - (state.startHeight * state.scale)) + " " + "L"
+		+ size
+		+ " "
+		+ (size - (state.startHeight * state.scale))
+	);
+		
+	clearID = setInterval(simulateStepOffGround, (1/fps) * 1000);
 	
 }
 
@@ -566,7 +573,7 @@ function cleanUp(){
 	
 }
 	
-function getScale(){
+function getScaleNormal(){
 	
 	if(state.projectileAngle == 0){
 			state.scale = 1;

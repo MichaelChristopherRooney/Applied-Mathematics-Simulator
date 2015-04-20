@@ -59,11 +59,14 @@ a:hover, a:active {
 	</div>
 	
 	<div id="navselect" style="width:100%; height:55px;display:none;background-color:#585858;border: 1px solid black;">
-		<select id="navselectmenu" style="position:relative;height:35px;top:10px; left:5px;width:98%;">
-			<option>Linear Motion</option>
-			<option>Projectiles</option>
-			<option>Relative Velocity</option>
-			<option>Simple Harmonic</option>
+		<select id="navselectmenu" onchange="location = this.options[this.selectedIndex].value;" style="position:relative;height:35px;top:10px; left:5px;width:98%;">
+			<option value="linearmotion.html">Linear Motion</option>
+			<option value="projectiles.html">Projectiles</option>
+			<option value="relative.html">Relative Velocity</option>
+			<option value="connected.html">Connected Particles</option>
+			<option value="circular-shm.html">Circular and SHM</option>
+			<option value="collisions.html">Collisions</option>
+			<option value="index.html">Index</option>
 		</select>
 	</div>
 	
