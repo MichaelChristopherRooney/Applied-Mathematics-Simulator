@@ -85,17 +85,15 @@ a:hover, a:active {
 		<!-- SHOWN WHEN "HORIZONTAL CIRCLE" IS SELECTED -->
 		<div id = "circle-h-div">
 		
-			<input id="circle-h-r" type="text" placeholder="Radius of the circle" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+			<input id="circle-h-r" type="text" placeholder="Radius (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 			
-			<input id="circle-h-omega" type="text" placeholder="Velocity in radians/sec" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
+			<input id="circle-h-m" type="text" placeholder="Mass (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
 			
-			or
+			<input id="circle-h-vr" type="text" placeholder="Angular velocity (>0)" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
 			<div style="height:5px;"></div>
-			
-			<input id="circle-h-v" type="text" placeholder="Velocity in metres/sec" style = "float:left;width:87.5%;" autocomplete="off"/> </br>
-			<div style="height:5px;"></div>	
+
 			
 			<hr style = "float:left; width:85%;">
 			</br>
@@ -165,10 +163,12 @@ a:hover, a:active {
 	<!-- real time info relevant to the simulation -->
 	<div id ="info_pane" style="position:absolute;left:770px;width:250px;top:65px;height:345px;">
 		
-		<div id="vab-info" style="display:none;">
-			<div id="va-value">Va (red line):</div>
-			<div id="vb-value">Vb (blue line):</div>
-			<div id="vab-value">Vab (purple line):</div>
+		<div id="circle-h-info" style="display:none;">
+			<div id="force-value"></div>
+			<div id="radius-value"></div>
+			<div id="mass-value"></div>
+			<div id="vm-value"></div>
+			<div id="vr-value"></div>
 		</div>
 		
 		<div id="closest-info" style="display:none;">
@@ -182,6 +182,8 @@ a:hover, a:active {
 		<div id="river-info" style="display:none;">
 		
 		</div>
+		
+		<div id="scale"></div>
 		
 	</div>	
 	

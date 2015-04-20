@@ -1,18 +1,8 @@
 var size = 600;
 var oldSize;
-var vaLine;
-var vbLine;
-var vabLine;
-var riverLine;
-var hLine;
-var vLine;
-var cLine;
-var pLine;
+var rLine;
 var waterBackground;
 var circle1;
-var circle2;
-var aCircle;
-var bCircle;
 var paper;
 var clearID;
 var fps = 60;
@@ -77,23 +67,17 @@ function getNewSize(){
 			oldScale = state.scale;
 			x = oldSize / state.scale;
 			state.scale = size / x;
-			
-			//document.getElementById("scale").innerHTML = "Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+			document.getElementById("scale").innerHTML 
+			= "Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
 		}
 		
-		/*
-		if Vab scenario then we can just
-		call runVAB again to recreate the
-		lines with the new size in mind
-		*/
-		if(state.type == "vab"){
-			rescaleVAB();
+		if(state.type == "circle-h"){
+			rescaleHorizontal();
 		}else if(state.type == "closest"){
 			rescaleClosest();
 		}else if(state.type == "river"){
 			rescaleRiver();
 		}
-		
 		
 	}
 	
@@ -118,13 +102,24 @@ function getNewSize(){
 	
 }
 
-function rescaleVAB(){
+function rescaleHorizontal(){
 	
-	vaLine.remove();
-	vbLine.remove();
-	vabLine.remove();
-	vabLine = vbLine = vaLine = null;
-	simulateStepVAB();
+	var x = state.radius * Math.cos(state.angleR);
+	var y = state.radius * Math.sin(state.angleR);
+	
+	var centre = size / 2;
+	circle1.attr("cx", (x * state.scale) + centre);
+	circle1.attr("cy", (y * state.scale) + centre);
+	
+	if(rLine){
+		rLine.remove();
+		rLine = null;
+	}
+	
+	rLine = paper.path("M" + centre + " " + centre + 
+		"L" + circle1.attr("cx")
+		+ " " + circle1.attr("cy")
+	);
 	
 }
 
@@ -276,28 +271,15 @@ function rescaleRiver(){
 this holds the state at the moment the run button is pressed
 */
 function stateObject(){
-	this.vai = 0;
-	this.vaj = 0;
-	this.vbi = 0;
-	this.vbj = 0;
-	this.vabi = 0;
-	this.vabj = 0;
-	this.vp = 0;
-	this.sa = 0;
-	this.sb = 0;
-	this.scale = 0;
-	this.type = "";
-	this.riverAngle = 0;
-	this.riverSpeed = 0;
-	this.width = 0;
-	this.endTime = 0;
-	this.across = 0;
+	this.radius;
+	this.vr = 0;
+	this.mass = 0;
+	this.force = 0;
+	this.vm = 0;
+	this.angleR = 0;
+	this.angleD = 0;
+	this.type = 0;
 	this.time = 0;
-	this.distance = 0;
-	this.startA = 0;
-	this.startB = 0;
-	this.endA = 0;
-	this.endB = 0;
 }
 
 /*
@@ -312,54 +294,53 @@ function run(){
 	var select = document.getElementById("typeSelect");
 	var type = select[select.selectedIndex].id;
 	
-	if(type == "vab"){
-		runVAB();
+	if(type == "circle-h"){
+		runHorizontal();
 	}else if(type == "closest"){
-		runClosest();
 	}else if(type == "river"){
-		runRiver();
 	}
 		
 
 }
 
-function runVAB(){
+function runHorizontal(){
 	
-	state.type = "vab";
+	state.type = "circle-h";
 		
-	if(!parseInputVAB()){
+	if(!parseInputHorizontal()){
 		return false;
 	}
 		
-	getScaleVAB();
-	setDataVAB();
-	simulateStepVAB();
+	getValuesHorizontal();
+	getScaleHorizontal();
+	setDataHorizontal();
+	
+	circle1 = paper.circle(-10, -10, 10);
+	circle1.attr("fill", "#f00");
+	circle1.attr("stroke", "#000");
+	
+	clearID = setInterval(simulateStepHorizontal, (1/fps) * 1000);
 	
 }
 
-function parseInputVAB(){
+function parseInputHorizontal(){
 
-	state.vai = parseFloat(document.getElementById("vab-vai").value);
-	state.vaj = parseFloat(document.getElementById("vab-vaj").value);
-	state.vbi = parseFloat(document.getElementById("vab-vbi").value);
-	state.vbj = parseFloat(document.getElementById("vab-vbj").value);
+	state.radius = parseFloat(document.getElementById("circle-h-r").value);
+	state.mass = parseFloat(document.getElementById("circle-h-m").value);
+	state.vr = parseFloat(document.getElementById("circle-h-vr").value);
 	
 	var alertMessage = "";
 	
-	if(isNaN(state.vai) || (state.vai == "" && state.vai != 0)){
-		alertMessage += "A's i velocity must be a number\n";
+	if(isNaN(state.radius) || state.radius <= 0 || (state.radius == "" && state.radius != 0)){
+		alertMessage += "Radius must be a number > 0\n";
 	}
 	
-	if(isNaN(state.vaj) || (state.vaj == "" && state.vaj != 0)){
-		alertMessage += "A's j velocity must be a number\n";
+	if(isNaN(state.mass) || state.mass <= 0 || (state.mass == "" && state.mass != 0)){
+		alertMessage += "Mass must be a number > 0\n";
 	}
 	
-	if(isNaN(state.vbi) || (state.vbi == "" && state.vbi != 0)){
-		alertMessage += "B's i velocity must be a number\n";
-	}
-	
-	if(isNaN(state.vbj) || (state.vbj == "" && state.vbj != 0)){
-		alertMessage += "B's j velocity must be a number\n";
+	if(isNaN(state.vr) || state.vr <= 0 || (state.vr == "" && state.vr != 0)){
+		alertMessage += "Angular velocity must be a number > 0\n";
 	}
 	
 	if(alertMessage != ""){
@@ -367,50 +348,77 @@ function parseInputVAB(){
 		return false;
 	}
 	
-	state.vabi = state.vai - state.vbi;
-	state.vabj = state.vaj - state.vbj;
-	
 	return true;
 }
 
-function setDataVAB(){
+function getValuesHorizontal(){
 	
-	document.getElementById("vab-info").style.display = "block";
-	document.getElementById("va-value").innerHTML = "Va (red line): " + state.vai + "i + " + state.vaj + "j";
-	document.getElementById("vb-value").innerHTML = "Vb (blue line): " + state.vbi + "i + " + state.vbj + "j";
-	document.getElementById("vab-value").innerHTML = "Vab (purple line): " + state.vabi + "i + " + state.vabj + "j";
+	state.force = state.mass * state.vr * state.vr * state.radius;
+	state.vm = state.vr * state.radius;
 	
 }
 
-function getScaleVAB(){
+function getScaleHorizontal(){
 	
-	var aMax = Math.max(Math.abs(state.vai), Math.abs(state.vaj));
-	var bMax = Math.max(Math.abs(state.vbi), Math.abs(state.vbj));
-	var abMax = Math.max(Math.abs(state.vabi), Math.abs(state.vabj));
-	
-	state.scale = size / Math.max(abMax, Math.max(aMax, bMax));
+	state.scale = (size / (state.radius));
+	state.scale = state.scale / 2.5;
 	
 }
 
-function simulateStepVAB(){
+function setDataHorizontal(){
+	
+	document.getElementById("circle-h-info").style.display = "block";
+	//hide others
+	
+	document.getElementById("force-value").innerHTML 
+		= "Force: " + state.force.toFixed(3) + "N";
+		
+	document.getElementById("radius-value").innerHTML 
+		= "Radius: " + state.radius.toFixed(3) + "m";
+		
+	document.getElementById("mass-value").innerHTML 
+		= "Mass: " + state.mass.toFixed(3) + "kg";
+		
+	document.getElementById("vr-value").innerHTML 
+		= "Angular velocity: " + state.vr.toFixed(3) + "rad/s";
+		
+	document.getElementById("vm-value").innerHTML 
+		= "Velocity: " + state.vm.toFixed(3) + "m/s";
+		
+	document.getElementById("scale").innerHTML = 
+		"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
+	
+}
+
+function simulateStepHorizontal(){
+	
+	
+	if(state.angleD > 360){
+		state.angleD = state.angleD - 360;
+		state.angleR = state.angleD * (Math.PI / 180);
+	}
+	
+	var x = state.radius * Math.cos(state.angleR);
+	var y = state.radius * Math.sin(state.angleR);
 	
 	var centre = size / 2;
+	circle1.attr("cx", (x * state.scale) + centre);
+	circle1.attr("cy", (y * state.scale) + centre);
 	
-	vaLine = paper.path("M" + centre + " " + centre + 
-		"L" + ((state.vai * state.scale / 2) + centre)
-		+ " " + (centre - (state.vaj * state.scale / 2)));
+	if(rLine){
+		rLine.remove();
+		rLine = null;
+	}
 	
-	vbLine = paper.path("M" + centre + " " + centre + 
-		"L" + ((state.vbi * state.scale / 2) + centre)
-		+ " " + (centre - (state.vbj * state.scale / 2)));
+	rLine = paper.path("M" + centre + " " + centre + 
+		"L" + circle1.attr("cx")
+		+ " " + circle1.attr("cy")
+	);
 	
-	vabLine = paper.path("M" + centre + " " + centre + 
-		"L" + ((state.vabi * state.scale / 2) + centre)
-		+ " " + (centre - (state.vabj * state.scale / 2)));
+	state.angleR = state.angleR + (state.vr * (1/fps));
+	state.angleD = state.angleR * (180 / Math.PI);
 	
-	vaLine.attr("stroke", "#FF3300"); // green
-	vbLine.attr("stroke", "#0000FF"); // purple
-	vabLine.attr("stroke", "#CC00CC");
+	state.time = state.time + (1/fps);
 	
 }
 
@@ -735,71 +743,9 @@ function cleanUp(){
 		circle1 = null;
 	}
 	
-	if(circle2){
-		circle2.remove();
-		circle2 = null;
-	}
-	
-	if(pointList){
-		for(var i = 0; i < pointList.length; i++){
-			pointList[i].remove();
-		}
-		pointList = [];
-	}
-	
-	if(vaLine){
-		vaLine.remove();
-		vaLine = null;
-	}
-	
-	if(vbLine){
-		vbLine.remove();
-		vbLine = null;
-	}
-	
-	if(vabLine){
-		vabLine.remove();
-		vabLine = null;
-	}
-	
-	if(riverLine){
-		riverLine.remove();
-		riverLine = null;
-	}
-	
-	if(waterBackground){
-		waterBackground.remove();
-		waterBackground = null;
-	}
-	
-	if(hLine){
-		hLine.remove();
-		hLine = null;
-	}
-	
-	if(vLine){
-		vLine.remove();
-		vLine = null;
-	}
-	
-	if(cLine){
-		cLine.remove();
-		cLine = null;
-	}
-	
-	if(pLine){
-		pLine.remove();
-		pLine = null;
-	}
-	
-	if(aCircle){
-		aCircle.remove();
-		aCircle = null;
-	}
-	
-	if(bCircle){
-		bCircle.remove();
-		bCircle = null;
+	if(rLine){
+		rLine.remove();
+		rLine = null;
 	}
 	
 }
@@ -827,20 +773,9 @@ function typeChange(){
 
 function clearInput(){
 	
-	document.getElementById("vab-vai").value = "";
-	document.getElementById("vab-vaj").value = "";
-	document.getElementById("vab-vbi").value = "";
-	document.getElementById("vab-vbj").value = "";
-	
-	document.getElementById("closest-ai").value = "";
-	document.getElementById("closest-as").value = "";
-	document.getElementById("closest-bj").value = "";
-	document.getElementById("closest-bs").value = "";
-	
-	document.getElementById("river-vp").value = "";
-	document.getElementById("river-angle").value = "";
-	document.getElementById("river-vr").value = "";
-	document.getElementById("river-w").value = "";
+	document.getElementById("circle-h-r").value = "";
+	document.getElementById("circle-h-m").value = "";
+	document.getElementById("circle-h-vr").value = "";
 	
 	document.getElementById("typeSelect").selectedIndex = 0;
 	typeChange();
@@ -863,12 +798,10 @@ function stopSimulation(){
 
 function showHelp(){
 	var alertMessage =
-	"In simple Vab the result of Vab = Va - Vb is shown.\n\n"
-	+ "In closest distance one object approaches from the west and another from the south.\n"
-	+ "The closest distance between these objects is shown.\n\n"
-	+ "In river crossing a person swims with speed v at an angle Θ.\n"
-	+ "The river has a given width and a current of a given speed.\n"
-	+ "The affect the current has on the swimmer is shown in the path they take.\n";
+	"In horizontal circle the user needs to enter:\n"
+	+ "The radius of the circle\n" 
+	+ "The mass of the object\n"
+	+ "The angular velocity (in radians)\n\n";
 	
 	alert(alertMessage);
 }
