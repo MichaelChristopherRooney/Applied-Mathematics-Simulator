@@ -71,7 +71,7 @@ function getNewSize(){
 		size = h - 80;
 	}
 
-	if(h < 480){
+	if(size < 480){
 		size = 400;
 	}	
 	
