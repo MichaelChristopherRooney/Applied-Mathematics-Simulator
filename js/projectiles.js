@@ -123,10 +123,10 @@ function rescale(oldSize, oldScale){
 		
 		if(state.type == "offGround"){
 			line = paper.path("M0 " 
-			+ (size - (state.startHeight * scale)) + " " + "L"
+			+ (size - (state.startHeight * state.scale)) + " " + "L"
 			+ size
 			+ " "
-			+ (size - (state.startHeight * scale))
+			+ (size - (state.startHeight * state.scale))
 			);
 		}else if(state.type == "incline"){
 			line = paper.path("M0 " + size + "L"
