@@ -483,6 +483,8 @@ function simulateStepBasic(){
 		+ " " + size
 	);
 	
+	document.getElementById("time").innerHTML = "Time: " + state.time.toFixed(3) + "s";
+	
 	state.time += (1 / fps);
 	
 }
