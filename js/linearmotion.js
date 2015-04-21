@@ -265,7 +265,6 @@ function runCatchup(){
 function parseInputCatchup(){
 	
 	/* parse all relevant input */
-	//state.u1 = parseFloat(document.getElementById("catch-u1").value);
 	state.a1 = parseFloat(document.getElementById("catch-a1").value);
 	state.u2 = parseFloat(document.getElementById("catch-u2").value);
 	state.a2 = parseFloat(document.getElementById("catch-a2").value);
@@ -274,13 +273,8 @@ function parseInputCatchup(){
 	/* now verify the input */
 	var alertMessage = "";
 	
-	/*
-	if(isNaN(state.u1) || state.u1 <= 0 || (state.u1 == "" && state.u1 != 0)){
-		alertMessage += "Initial velocity (u1) must be a number > 0\n";
-	}
-	*/
-	if(isNaN(state.a1) || state.a1 < 0 || (state.a1 == "" && state.a1 != 0)){
-		alertMessage += "Acceleration (a1) must be a number ≥ 0\n";
+	if(isNaN(state.a1) || state.a1 <= 0 || (state.a1 == "" && state.a1 != 0)){
+		alertMessage += "Acceleration (a1) must be a number > 0\n";
 	}
 	
 	if(isNaN(state.u2) || state.u2 < 0 || (state.u2 == "" && state.u2 != 0)){

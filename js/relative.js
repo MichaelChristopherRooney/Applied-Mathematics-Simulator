@@ -692,7 +692,7 @@ function parseInputRiver(){
 	if(isNaN(state.riverAngle) || state.riverAngle <= 0 
 	|| state.riverAngle > 90 || state.riverAngle == ""){
 		alertMessage += 
-		"Starting angle must be ≤ 90 and > 0\n";
+		"Starting angle must be a number 90 ≥ α > 0\n";
 	}
 	
 	state.riverSpeed = parseFloat(document.getElementById("river-vr").value);

@@ -208,7 +208,7 @@ function parseInputNormal(){
 	if(isNaN(state.projectileAngle) || state.projectileAngle < 0 || state.projectileAngle > 90 
 	|| (state.projectileAngle == "" && state.projectileAngle != 0)){
 		alertMessage += 
-		"Projectile angle must be a number and be >= 0 and <= 90\n";
+		"Angle must be a number 90 ≥ α ≥ 0\n";
 	}
 	
 	if(alertMessage != ""){
@@ -344,7 +344,7 @@ function parseInputIncline(){
 	if(isNaN(state.projectileAngle) || state.projectileAngle < 0 || state.projectileAngle > 90 
 	|| (state.projectileAngle == "" && state.projectileAngle != 0)){
 		alertMessage += 
-		"Projectile angle must be a number and be >= 0 and <= 90\n";
+		"Angle must be a number 90 ≥ α ≥ 0\n";
 	}
 	
 	state.inclineAngle = parseFloat(document.getElementById("inclineAngle").value);
@@ -352,7 +352,7 @@ function parseInputIncline(){
 	if(isNaN(state.inclineAngle) || state.inclineAngle <= 0 || state.inclineAngle > 90
 	|| (state.inclineAngle == "" && state.inclineAngle != 0)){
 		alertMessage +=
-		"Incline plane angle must be a number > 0 and <= 90"
+		"Incline plane angle must be a number 90 > Θ > 0"
 	}
 	
 	if(state.inclineAngle + state.projectileAngle > 90){
@@ -458,7 +458,7 @@ function parseInputOffGround(){
 	if(isNaN(state.projectileAngle) || state.projectileAngle < 0 || state.projectileAngle > 90 
 	|| (state.projectileAngle == "" && state.projectileAngle != 0)){
 		alertMessage += 
-		"Projectile angle must be a number and be >= 0 and <= 90\n";
+		"Projectile angle must be a number 90 ≥ α ≥ 0\n";
 	}
 	
 	state.startHeight = parseFloat(document.getElementById("startHeight").value);

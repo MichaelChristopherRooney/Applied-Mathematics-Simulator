@@ -505,7 +505,10 @@ function showHelp(){
 	"In horizontal circle the user needs to enter:\n"
 	+ "The radius of the circle\n" 
 	+ "The mass of the object\n"
-	+ "The angular velocity (in radians)\n\n";
+	+ "The angular velocity (in radians)\n\n"
+	+ "In basic SHM the user needs to enter:\n"
+	+ "The angular velocity\n"
+	+ "The amplitude\n\n";
 	
 	alert(alertMessage);
 }
