@@ -74,8 +74,6 @@ function getNewSize(){
 	
 	if(state){
 		
-		console.log("hi?");
-		
 		if(state.scale){
 			oldScale = state.scale;
 			x = oldSize / state.scale;
