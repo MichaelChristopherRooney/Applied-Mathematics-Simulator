@@ -34,6 +34,10 @@ $(document).ready(function(){
 
 });
 
+/*
+resize only if it has been 250ms since last resize
+this stops elements jumping while the browser is still resizing
+*/
 var resizeTimer;
 $(window).resize(function (){
 	
@@ -43,6 +47,9 @@ $(window).resize(function (){
 	
 });
 
+/* 
+readjust all elements to suit new display size
+*/
 function getNewSize(){
 	
 	var w = 0, h = 0;
@@ -122,6 +129,9 @@ function getNewSize(){
 	
 }
 
+/*
+rescale all graphical elements in the simple VAB scenario
+*/
 function rescaleVAB(){
 	
 	vaLine.remove();
@@ -132,6 +142,9 @@ function rescaleVAB(){
 	
 }
 
+/*
+rescale all graphical elements in the closest distance scenario
+*/
 function rescaleClosest(){
 	
 	if(circle1){
@@ -231,6 +244,9 @@ function rescaleClosest(){
 	
 }
 
+/*
+rescale all graphical elements in the river crossing scenario
+*/
 function rescaleRiver(){
 	
 	if(waterBackground){
@@ -342,6 +358,9 @@ function run(){
 
 }
 
+/*
+run the simple VAB scenario
+*/
 function runVAB(){
 	
 	state.type = "vab";
@@ -356,6 +375,9 @@ function runVAB(){
 	
 }
 
+/*
+parse input for the simple VAB scenario
+*/
 function parseInputVAB(){
 
 	state.vai = parseFloat(document.getElementById("vab-vai").value);
@@ -392,6 +414,9 @@ function parseInputVAB(){
 	return true;
 }
 
+/*
+set data in the right hand info panel for the simple VAB scenario
+*/
 function setDataVAB(){
 	
 	document.getElementById("vab-info").style.display = "block";
@@ -412,16 +437,25 @@ function setDataVAB(){
 	
 }
 
+/*
+get the display scale for the simple VAB scenario
+*/
 function getScaleVAB(){
 	
+	// largest components of Va, Vb and Vab
 	var aMax = Math.max(Math.abs(state.vai), Math.abs(state.vaj));
 	var bMax = Math.max(Math.abs(state.vbi), Math.abs(state.vbj));
 	var abMax = Math.max(Math.abs(state.vabi), Math.abs(state.vabj));
 	
+	// select largest out of the above three
 	state.scale = size / Math.max(abMax, Math.max(aMax, bMax));
 	
 }
 
+/*
+simulate the simple VAB scenario
+note that this only runs once
+*/
 function simulateStepVAB(){
 	
 	var centre = size / 2;
@@ -444,6 +478,9 @@ function simulateStepVAB(){
 	
 }
 
+/*
+run the closest distance scenario
+*/
 function runClosest(){
 	
 	state.type = "closest";
@@ -489,6 +526,9 @@ function runClosest(){
 		
 }
 
+/*
+parse input for the closest distance scenario
+*/
 function parseInputClosest(){
 
 	state.vai = parseFloat(document.getElementById("closest-ai").value);
@@ -522,6 +562,9 @@ function parseInputClosest(){
 	return true;
 }
 
+/*
+calculate needed values for the closest distance scenario
+*/
 function getValuesClosest(){
 
 	state.vabi = -state.vai;
@@ -549,6 +592,9 @@ function getValuesClosest(){
 
 }
 
+/*
+set data in the right hand info panel for the closest distance scenario
+*/
 function setDataClosest(){
 	
 	document.getElementById("vab-info").style.display = "none";
@@ -572,6 +618,9 @@ function setDataClosest(){
 	
 }
 
+/*
+get the display scale for the closest distance scenario
+*/
 function getScaleClosest(){
 	
 	var a, b;
@@ -598,6 +647,9 @@ function getScaleClosest(){
 	
 }
 
+/*
+simulate the closest distance scenario
+*/
 function simulateStepClosest(){
 	
 	if(state.time > state.endTime){
@@ -652,6 +704,9 @@ function simulateStepClosest(){
 	
 }
 
+/*
+run the river crossing scenario
+*/
 function runRiver(){
 	
 	state.type = "river";
@@ -676,6 +731,9 @@ function runRiver(){
 	
 }
 
+/*
+parse input for the river crossing scenario
+*/
 function parseInputRiver(){
 	
 	alertMessage = "";
@@ -718,6 +776,9 @@ function parseInputRiver(){
 	
 }
 
+/*
+calculate needed values for the river crossing scenario
+*/
 function getValuesRiver(){
 	
 	state.vabj = state.vp * Math.sin(state.riverAngle * (Math.PI / 180));
@@ -728,6 +789,9 @@ function getValuesRiver(){
 
 }
 
+/*
+set data in the right hand info panel for the river crossing scenario
+*/
 function setDataRiver(){
 	
 	document.getElementById("vab-info").style.display = "none";
@@ -748,6 +812,9 @@ function setDataRiver(){
 	
 }
 
+/*
+get the display scale for the river crossing scenario
+*/
 function getScaleRiver(){
 	
 	if(state.width > (Math.abs(state.across * 2))){
@@ -758,6 +825,9 @@ function getScaleRiver(){
 	
 }
 
+/*
+simulate the river crossing scenario
+*/
 function simulateStepRiver(){
 	
 	if(state.time > state.endTime){
@@ -798,6 +868,9 @@ function simulateStepRiver(){
 	
 }
 
+/*
+remove graphical elements from previous simulations
+*/
 function cleanUp(){
 	
 	if(clearID){
@@ -883,6 +956,9 @@ function cleanUp(){
 	
 }
 
+/*
+handle the selected scenario being changed
+*/
 function typeChange(){
 	
 	var select = document.getElementById("typeSelect");
@@ -904,6 +980,9 @@ function typeChange(){
 	
 }
 
+/*
+clear all input
+*/
 function clearInput(){
 	
 	document.getElementById("vab-vai").value = "";

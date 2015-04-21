@@ -23,6 +23,7 @@ $(document).ready(function(){
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
 	
+	// velocity vs time graph
 	graph = Raphael(document.getElementById("graph_panel"), graphSize, graphSize);
 	graphBackground = graph.rect(0, 0, graphSize, graphSize);
 	graphBackground.attr("fill", "#bdbdbd");
@@ -32,6 +33,10 @@ $(document).ready(function(){
 
 });
 
+/*
+resize only if it has been 250ms since last resize
+this stops elements jumping while the browser is still resizing
+*/
 var resizeTimer;
 $(window).resize(function (){
 	
@@ -41,6 +46,9 @@ $(window).resize(function (){
 	
 });
 
+/* 
+readjust all elements to suit new display size
+*/
 function getNewSize(){
 	
 	var w = 0, h = 0;
@@ -159,72 +167,30 @@ when the "Run simulation" button is pressed
 */
 function run(){
 
-	if(clearID){
-		clearInterval(clearID);
-		clearID = null;
-	}
-	
-	if(graphLine){
-		graphLine.remove();
-	}
-	
-	if(graphLine2){
-		graphLine2.remove();
-		
-	}
-	
-	if(baseLine){
-		baseLine.remove();
-		baseLine = false;
-	}
-	
-	if(circle1){
-		circle1.remove();
-		circle1 = null;
-	}
-	
-	if(circle2){
-		circle2.remove();
-		circle2 = null;
-	}
-	
-	if(pointList){
-		for(var i = 0; i < pointList.length; i++){
-			pointList[i].remove();
-		}
-		pointList = [];
-	}
+	cleanUp();
 	
 	state = new stateObject();
 		
 	var select = document.getElementById("typeSelect");
 	state.type = select[select.selectedIndex].id;
 	
+	circle1 = paper.circle(-10, -10, 10);
+	circle1.attr("fill", "#f00");
+	circle1.attr("stroke", "#000");
+	
 	if(state.type == "reachSpeed"){
 		
-		circle1 = paper.circle(-10, -10, 10);
-		circle1.attr("fill", "#f00");
-		circle1.attr("stroke", "#000");
-	
 		if(!runReach()){
 			return false;
 		}
 		
 	}else if(state.type == "slowToZero"){
 		
-		circle1 = paper.circle(-10, -10, 10);
-		circle1.attr("fill", "#f00");
-		circle1.attr("stroke", "#000");
-	
 		if(!runSlow()){
 			return false;
 		}
 		
 	}else if(state.type == "catchup"){
-		
-		circle1 = paper.circle(-10, -10, 10);
-		circle1.attr("fill", "#f00");
-		circle1.attr("stroke", "#000");
 		
 		circle2 = paper.circle(-10, -10, 10);
 		circle2.attr("fill", "#f00");
@@ -238,6 +204,9 @@ function run(){
 
 }
 
+/*
+run the catchup scenario
+*/
 function runCatchup(){
 	
 	if(!parseInputCatchup()){
@@ -262,6 +231,9 @@ function runCatchup(){
 	
 }
 
+/*
+parse input for catchup scenario
+*/
 function parseInputCatchup(){
 	
 	/* parse all relevant input */
@@ -298,6 +270,9 @@ function parseInputCatchup(){
 	
 }
 
+/*
+calculate all needed values for catchup scenario
+*/
 function getCatchupValues(){
 
 	var a = (0.5 * state.a2) - (0.5 * state.a1);
@@ -305,8 +280,13 @@ function getCatchupValues(){
 	var c = (0.5 * state.a2 * state.delay * state.delay) 
 		- (state.u2 * state.delay);
 
+	// quadratic formula
 	state.endTime = (-b + Math.sqrt((b * b) - (4 * a * c))) / (2 * a);
 	
+	/*
+	happens when the square root of a negative occurs above
+	means the objects will never catchup
+	*/
 	if(isNaN(state.endTime)){
 		alert("Car two will never overtake car one");
 		return false;
@@ -319,6 +299,7 @@ function getCatchupValues(){
 	var tV1 = graphSize / (state.u1 + (state.a1 * (state.endTime)));
 	var tV2 = graphSize / (state.u2 + (state.a2 * (state.endTime - state.delay)));
 	
+	// determine graph scale
 	if(tT < tV1 && tT < tV2){
 		state.graphScale = tT;
 	}else if(tV1 < tV2){
@@ -331,6 +312,9 @@ function getCatchupValues(){
 	
 }
 
+/*
+simulate the catchup scenario
+*/
 function simulateStepCatchup(){
 	
 	if(state.currentTime > state.endTime){
@@ -342,6 +326,7 @@ function simulateStepCatchup(){
 	state.s1 = (state.u1 * state.currentTime)
 		+ (0.5 * state.a1 * state.currentTime * state.currentTime);
 	
+	// if the delay has passed then simulate second object
 	if(state.currentTime > state.delay){
 		
 		state.v2 = state.u2 + (state.a2 * (state.currentTime - state.delay));
@@ -361,6 +346,7 @@ function simulateStepCatchup(){
 		
 	}
 	
+	// leave a mark every 10 ticks
 	if(state.ticks % 10 == 0){
 		tCircle2 = paper.circle(0, 0, 2);
 		tCircle2.attr("cx", state.s1 * state.scale);
@@ -381,6 +367,8 @@ function simulateStepCatchup(){
 	
 	state.currentTime += (1 / fps);
 	state.ticks++;
+	
+	// graph velocity vs time
 	
 	if(graphLine){
 		graphLine.remove();
@@ -428,6 +416,9 @@ function simulateStepCatchup(){
 	
 }
 
+/*
+run the slow down scenario
+*/
 function runSlow(){
 	
 	if(!parseInputSlow()){
@@ -453,13 +444,14 @@ function runSlow(){
 	
 }
 
+/*
+parse input for slow down scenario
+*/
 function parseInputSlow(){
 	
-	/* parse all relevant input */
 	state.u1 = parseFloat(document.getElementById("slow-u1").value);
 	state.a1 = parseFloat(document.getElementById("slow-a1").value);
 	
-	/* now verify the input */
 	var alertMessage = "";
 	
 	if(isNaN(state.u1) || state.u1 <= 0 || (state.u1 == "" && state.u1 != 0)){
@@ -479,6 +471,9 @@ function parseInputSlow(){
 	
 }
 
+/*
+calculate needed values for the slow down scenario
+*/
 function getSlowValues(){
 	
 	/*
@@ -495,7 +490,7 @@ function getSlowValues(){
 		return false;
 	}
 	
-	/* s = u*t + 0.5*a*t*t */
+	/* s = u*t + 0.5*a*t*t see appendix*/
 	state.s1 = (state.u1 * state.endTime)
 		+ (0.5 * state.a1 * state.endTime * state.endTime);
 		
@@ -517,6 +512,9 @@ function getSlowValues(){
 	
 }
 
+/*
+simulate the slow scenario
+*/
 function simulateStepSlow(){
 	
 	if(state.currentTime > state.endTime){
@@ -536,7 +534,7 @@ function simulateStepSlow(){
 	
 	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3) + "s";
 	
-	
+	// leave a mark every ten ticks
 	if(state.ticks % 10 == 0){
 		var tCircle = paper.circle(0, 0, 2);
 		tCircle.attr("cx", state.s1 * state.scale);
@@ -548,6 +546,7 @@ function simulateStepSlow(){
 	state.currentTime += (1 / fps);
 	state.ticks++;
 	
+	// graph velocity vs time graph
 	if(graphLine){
 		graphLine.remove();
 		graphLine = false;
@@ -564,6 +563,9 @@ function simulateStepSlow(){
 	
 }
 
+/*
+run the reach given speed scenario
+*/
 function runReach(){
 	
 	if(!parseInputReach()){
@@ -589,6 +591,9 @@ function runReach(){
 	
 }
 
+/*
+parse input for the reach given speed scenario
+*/
 function parseInputReach(){
 	
 	/* parse all relevant input */
@@ -620,6 +625,9 @@ function parseInputReach(){
 	
 }
 
+/*
+calculate needed values for the reach given speed scenario
+*/
 function getReachValues(){
 	
 	//v = u + at
@@ -655,6 +663,9 @@ function getReachValues(){
 	
 }
 
+/*
+simulate the reach given speed scenario
+*/
 function simulateStepReach(){
 	
 	if(state.currentTime > state.endTime){
@@ -673,6 +684,7 @@ function simulateStepReach(){
 	document.getElementById("cs1").innerHTML = "Current position: " + state.s1.toFixed(3) + "m";
 	document.getElementById("time").innerHTML = "Current time: " + state.currentTime.toFixed(3) + "s";
 	
+	// leave a mark every ten ticks
 	if(state.ticks % 10 == 0){
 		var tCircle = paper.circle(0, 0, 2);
 		tCircle.attr("cx", state.s1 * state.scale);
@@ -684,6 +696,7 @@ function simulateStepReach(){
 	state.currentTime += (1 / fps);
 	state.ticks++;
 	
+	// graph velocity vs time
 	if(graphLine){
 		graphLine.remove();
 		graphLine = false;
@@ -700,6 +713,9 @@ function simulateStepReach(){
 	
 }
 
+/*
+set info in the right hand info panel
+*/
 function setInfo(){
 	
 	document.getElementById("iu1").innerHTML = 
@@ -733,7 +749,52 @@ function setInfo(){
 	
 }
 
+/*
+remove any graphical elements from prior simulations
+*/
+function cleanUp(){
+	
+	if(clearID){
+		clearInterval(clearID);
+		clearID = null;
+	}
+	
+	if(graphLine){
+		graphLine.remove();
+	}
+	
+	if(graphLine2){
+		graphLine2.remove();
+		
+	}
+	
+	if(baseLine){
+		baseLine.remove();
+		baseLine = false;
+	}
+	
+	if(circle1){
+		circle1.remove();
+		circle1 = null;
+	}
+	
+	if(circle2){
+		circle2.remove();
+		circle2 = null;
+	}
+	
+	if(pointList){
+		for(var i = 0; i < pointList.length; i++){
+			pointList[i].remove();
+		}
+		pointList = [];
+	}
+	
+}
 
+/*
+deal with the scenario selection changing
+*/
 function typeChange(){
 	
 	var select = document.getElementById("typeSelect");
@@ -754,6 +815,9 @@ function typeChange(){
 	}
 }
 
+/*
+clean all input
+*/
 function clearInput(){
 	
 	document.getElementById("reach-u1").value = "";

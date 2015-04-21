@@ -1,10 +1,8 @@
 var size = 600;
 var circle;
 var line;
-var paper;
 var state;
 var clearID;
-var offGround;
 var fps = 60;
 var pointList = [];
 var paper;
@@ -23,6 +21,10 @@ $(document).ready(function(){
 	
 });
 
+/*
+resize only if it has been 250ms since last resize
+this stops elements jumping while the browser is still resizing
+*/
 var resizeTimer;
 $(window).resize(function (){
 	
@@ -32,6 +34,9 @@ $(window).resize(function (){
 	
 });
 
+/* 
+readjust all elements to suit new display size
+*/
 function getNewSize(){
 	
 	var w = 0, h = 0;
@@ -91,6 +96,9 @@ function getNewSize(){
 		
 }
 
+/*
+rescale the graphical elements to fit the new size
+*/
 function rescale(oldSize, oldScale){
 	
 	document.getElementById("scale").innerHTML = 
@@ -133,8 +141,8 @@ function rescale(oldSize, oldScale){
 }
 
 /*
-see appendix for detailed explanations of
-values and formulae used in projectiles
+holds state information when the 
+"Run simulation" button is pressed
 */
 function stateObject(){
 		this.u = 0;
@@ -178,6 +186,9 @@ function run(){
 	
 }
 
+/*
+run the basic projectile scenario
+*/
 function runNormal(){
 	
 	state.type = "normal";
@@ -193,6 +204,9 @@ function runNormal(){
 	
 }
 
+/*
+parse input for the basic projectile scenario
+*/
 function parseInputNormal(){
 	
 	var alertMessage = "";
@@ -221,7 +235,7 @@ function parseInputNormal(){
 }
 
 /*
-gets constant values for the normal case
+calculate needed values for the basic projectile scenario
 */
 function getValuesNormal(){
 	
@@ -241,8 +255,24 @@ function getValuesNormal(){
 		
 }
 
+
 /*
-gets values for the next step in the simulation
+get the scale for the basic projectile scenario
+*/	
+function getScaleNormal(){
+	
+	if(state.projectileAngle == 0){
+			state.scale = 1;
+	}else if(state.range > state.maxHeight){
+			state.scale = size / state.range;
+	}else{
+			state.scale = size / state.maxHeight;
+	}
+
+}
+
+/*
+simulate the basic projectile scenario
 */
 function simulateStepNormal(){
 	
@@ -272,6 +302,9 @@ function simulateStepNormal(){
 	
 }
 
+/*
+run the incline scenario
+*/
 function runIncline(){
 	
 	state.type = "incline";
@@ -297,38 +330,8 @@ function runIncline(){
 }
 
 /*
-gets constant values for when the specific case where the projectile is
-fired up an inclined plane
+parse input for the incline scenario
 */
-function getInclineValues(){
-	
-	state.ux = state.u * Math.cos(state.projectileAngle * (Math.PI / 180));
-	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
-	state.vx = state.ux;
-	state.vy = 0;
-	state.sx = 0;
-	state.sy = 0; 
-	state.time = 0;
-
-	state.tof = (2 * state.uy) 
-		/ (9.8 * Math.cos(state.inclineAngle * (Math.PI / 180))
-	);
-		
-	state.range = (state.ux * state.tof) 
-		+ (-4.9 
-		* Math.sin(state.inclineAngle * (Math.PI / 180)) 
-		* state.tof * state.tof
-	);
-	
-	state.maxHeight = (state.uy * (state.tof / 2)) 
-		+ (-4.9 
-		* Math.cos(state.inclineAngle * (Math.PI / 180)) 
-		* (state.tof / 2) * (state.tof / 2)
-	);
-
-	
-}
-
 function parseInputIncline(){
 	
 	var alertMessage = "";
@@ -369,6 +372,71 @@ function parseInputIncline(){
 	
 }
 
+/*
+calculate needed values for the incline scenario
+*/
+function getInclineValues(){
+	
+	state.ux = state.u * Math.cos(state.projectileAngle * (Math.PI / 180));
+	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
+	state.vx = state.ux;
+	state.vy = 0;
+	state.sx = 0;
+	state.sy = 0; 
+	state.time = 0;
+
+	state.tof = (2 * state.uy) 
+		/ (9.8 * Math.cos(state.inclineAngle * (Math.PI / 180))
+	);
+		
+	state.range = (state.ux * state.tof) 
+		+ (-4.9 
+		* Math.sin(state.inclineAngle * (Math.PI / 180)) 
+		* state.tof * state.tof
+	);
+	
+	state.maxHeight = (state.uy * (state.tof / 2)) 
+		+ (-4.9 
+		* Math.cos(state.inclineAngle * (Math.PI / 180)) 
+		* (state.tof / 2) * (state.tof / 2)
+	);
+
+	
+}
+
+/*
+get the scale for the incline scenario
+*/
+function getScaleIncline(){
+	
+	if(state.projectileAngle == 0){
+		state.scale = 1;
+	}else if(state.maxHeight > state.range){
+			
+		var tempRange = (state.ux * (state.tof / 2)) 
+			+ (-4.9 
+			* Math.sin(state.inclineAngle * (Math.PI / 180)) 
+			* ((state.tof / 2) * (state.tof / 2))
+		);
+		
+		var y = 
+			((tempRange) 
+			* Math.sin(state.inclineAngle * (Math.PI / 180))) 
+			+ (state.maxHeight 
+			* Math.cos(state.inclineAngle * (Math.PI / 180))
+		);
+		
+		state.scale = size / y;
+		
+	}else{
+		state.scale = size / state.range;
+	}
+	
+}
+
+/*
+simulate the incline scenario
+*/
 function simulateStepIncline(){
 	
 	if(state.time > state.tof){
@@ -420,6 +488,9 @@ function simulateStepIncline(){
 	
 }
 
+/*
+run the off ground scenario
+*/
 function runOffGround(){
 	
 	state.type = "offGround";
@@ -443,6 +514,9 @@ function runOffGround(){
 	
 }
 
+/*
+parse input for the off ground scenario
+*/
 function parseInputOffGround(){
 	
 	var alertMessage = "";
@@ -478,8 +552,7 @@ function parseInputOffGround(){
 }
 
 /*
-gets constant values for when the specific case where the projectile starts
-off the ground
+calculate needed values for the off ground scenario
 */
 function getOffGroundValues(){
 	
@@ -487,7 +560,6 @@ function getOffGroundValues(){
 	state.uy = state.u * Math.sin(state.projectileAngle * (Math.PI / 180));
 	state.vx = state.ux;
 	state.vy = 0;
-	state.tof = (2 * state.uy) / 9.8;
 	state.sx = 0;
 	state.sy = 0; 
 	state.time = 0;
@@ -504,8 +576,27 @@ function getOffGroundValues(){
 }
 
 /*
-gets values for the next step in the simulation
-specific for when the projectile starts off the ground
+get the scale for the off ground scenario
+*/
+function getScaleOffGround(){
+	
+	if(state.projectileAngle == 0){
+		if(state.range > state.startHeight){
+			state.scale = size / state.range;
+		}else{
+			state.scale = size / state.startHeight;
+		}
+	}else if(state.range > (state.maxHeight + state.startHeight)){
+		state.scale = size / state.range;
+	}else if(state.maxHeight > state.startHeight){
+		state.scale = size / state.maxHeight;
+	}else{
+		state.scale = size / (state.startHeight + state.maxHeight);
+	}
+}
+
+/*
+simulate the off ground scenario
 */
 function simulateStepOffGround(){
 	
@@ -543,6 +634,9 @@ function stopSimulation(){
 	
 }
 
+/*
+remove graphical elements from previous scenarios
+*/
 function cleanUp(){
 	
 	if(state){
@@ -572,71 +666,24 @@ function cleanUp(){
 	}
 	
 }
-	
-function getScaleNormal(){
-	
-	if(state.projectileAngle == 0){
-			state.scale = 1;
-	}else if(state.range > state.maxHeight){
-			state.scale = size / state.range;
-	}else{
-			state.scale = size / state.maxHeight;
-	}
 
-}
-
-function getScaleOffGround(){
-	
-	if(state.projectileAngle == 0){
-		if(state.range > state.startHeight){
-			state.scale = size / state.range;
-		}else{
-			state.scale = size / state.startHeight;
-		}
-	}else if(state.range > (state.maxHeight + state.startHeight)){
-		state.scale = size / state.range;
-	}else if(state.maxHeight > state.startHeight){
-		state.scale = size / state.maxHeight;
-	}else{
-		state.scale = size / (state.startHeight + state.maxHeight);
-	}
-}
-
-function getScaleIncline(){
-	
-	if(state.projectileAngle == 0){
-		state.scale = 1;
-	}else if(state.maxHeight > state.range){
-			
-		var tempRange = (state.ux * (state.tof / 2)) 
-			+ (-4.9 
-			* Math.sin(state.inclineAngle * (Math.PI / 180)) 
-			* ((state.tof / 2) * (state.tof / 2))
-		);
-		
-		var y = 
-			((tempRange) 
-			* Math.sin(state.inclineAngle * (Math.PI / 180))) 
-			+ (state.maxHeight 
-			* Math.cos(state.inclineAngle * (Math.PI / 180))
-		);
-		
-		state.scale = size / y;
-		
-	}else{
-		state.scale = size / state.range;
-	}
-	
-}
-
+/*
+when incline check box is checked
+*/
 function inclineChecked(){
 	document.getElementById("offGround").checked = false;
 }
 
+/*
+when off ground check box is checked
+*/
 function offgroundChecked(){
 	document.getElementById("isIncline").checked = false;
 }
 
+/*
+set info in the right hand info panel
+*/
 function setData(){
 	
 	document.getElementById("ux").innerHTML = "Initial x velocity: " + state.ux.toFixed(3) + "m/s";

@@ -24,6 +24,10 @@ $(document).ready(function(){
 
 });
 
+/*
+resize only if it has been 250ms since last resize
+this stops elements jumping while the browser is still resizing
+*/
 var resizeTimer;
 $(window).resize(function (){
 	
@@ -33,6 +37,9 @@ $(window).resize(function (){
 	
 });
 
+/* 
+readjust all elements to suit new display size
+*/
 function getNewSize(){
 	
 	var w = 0, h = 0;
@@ -106,6 +113,9 @@ function getNewSize(){
 	
 }
 
+/*
+rescale the graphical elements in the horizontal circle scenario
+*/
 function rescaleHorizontal(){
 	
 	var x = state.radius * Math.cos(state.angleR);
@@ -127,6 +137,9 @@ function rescaleHorizontal(){
 	
 }
 
+/*
+rescale the graphical elements in the basic SHM scenario
+*/
 function rescaleBasic(){
 	
 	circle1.attr("cx", (state.x * state.scale) + (size / 2))
@@ -177,6 +190,9 @@ function run(){
 
 }
 
+/*
+run the horizontal circle scenario
+*/
 function runHorizontal(){
 	
 	state.type = "horizontal";
@@ -197,6 +213,9 @@ function runHorizontal(){
 	
 }
 
+/*
+parse input for the horizontal circle scenario
+*/
 function parseInputHorizontal(){
 
 	state.radius = parseFloat(document.getElementById("horizontal-r").value);
@@ -225,6 +244,9 @@ function parseInputHorizontal(){
 	return true;
 }
 
+/*
+calculate needed values for the horizontal circle scenario
+*/
 function getValuesHorizontal(){
 	
 	state.force = state.mass * state.vr * state.vr * state.radius;
@@ -232,6 +254,9 @@ function getValuesHorizontal(){
 	
 }
 
+/*
+get the display scale for the horizontal circle scenario
+*/
 function getScaleHorizontal(){
 	
 	state.scale = (size / (state.radius));
@@ -239,6 +264,9 @@ function getScaleHorizontal(){
 	
 }
 
+/*
+set info in the right hand info panel for the horizontal circle scenario
+*/
 function setDataHorizontal(){
 	
 	document.getElementById("horizontal-info").style.display = "block";
@@ -265,6 +293,9 @@ function setDataHorizontal(){
 	
 }
 
+/* 
+simulate the horizontal circle scenario
+*/
 function simulateStepHorizontal(){
 	
 	
@@ -276,6 +307,7 @@ function simulateStepHorizontal(){
 	var x = state.radius * Math.cos(state.angleR);
 	var y = state.radius * Math.sin(state.angleR);
 	
+	// transform so its orientated correctly
 	var x1 = 
 	(x * Math.cos(90 * (Math.PI / 180))) 
 	- (y * Math.sin(90 * (Math.PI / 180)));
@@ -307,6 +339,9 @@ function simulateStepHorizontal(){
 	
 }
 
+/*
+run the basic SHM scenario
+*/
 function runBasic(){
 	
 	state.type = "basic";
@@ -327,6 +362,9 @@ function runBasic(){
 	
 }
 
+/*
+parse input for the basic SHM scenario
+*/
 function parseInputBasic(){
 	
 	alertMessage = "";
@@ -353,6 +391,9 @@ function parseInputBasic(){
 	
 }
 
+/*
+calculate needed values for the basic SHM scenario
+*/
 function getValuesBasic(){
 	
 	state.maxV = state.vr * state.amplitude;
@@ -360,12 +401,18 @@ function getValuesBasic(){
 
 }
 
+/*
+get the display scale for the basic SHM scenario
+*/
 function getScaleBasic(){
 	
 	state.scale = size / state.amplitude / 2;
 	
 }
 
+/*
+set the info in the right hand info panel for the basic SHM scenario
+*/
 function setDataBasic(){
 	
 	document.getElementById("horizontal-info").style.display = "none";
@@ -399,6 +446,9 @@ function setDataBasic(){
 	
 }
 
+/*
+simulate the basic SHM scenario
+*/
 function simulateStepBasic(){
 	
 	state.x = state.amplitude * Math.sin(state.vr * state.time);
@@ -437,6 +487,9 @@ function simulateStepBasic(){
 	
 }
 
+/*
+remove graphical elements from previous simulations
+*/
 function cleanUp(){
 	
 	if(clearID){
@@ -460,6 +513,9 @@ function cleanUp(){
 	
 }
 
+/*
+handle the selected scenario changing
+*/
 function typeChange(){
 	
 	var select = document.getElementById("typeSelect");
@@ -475,6 +531,9 @@ function typeChange(){
 	
 }
 
+/*
+clear all input
+*/
 function clearInput(){
 	
 	document.getElementById("horizontal-r").value = "";
@@ -501,12 +560,15 @@ function stopSimulation(){
 }
 
 function showHelp(){
-	var alertMessage =
-	"In horizontal circle the user needs to enter:\n"
+	var alertMessage = 
+	"Horizontal circle deals with a object performing circular motion in a horizontal plane\n"
+	+ "The user needs to enter:\n"
 	+ "The radius of the circle\n" 
 	+ "The mass of the object\n"
 	+ "The angular velocity (in radians)\n\n"
-	+ "In basic SHM the user needs to enter:\n"
+	
+	+ "Basic SHM shows a simple scenario of a particle performing harmonic motion"
+	+ "The user needs to enter:\n"
 	+ "The angular velocity\n"
 	+ "The amplitude\n\n";
 	
