@@ -255,15 +255,16 @@ function rescaleRiver(){
 		);
 	}
 	
+	var centre = size / 2;
+	var x = state.vabi * state.time;
+	var y = state.vabj * state.time;
 	
 	if(vabLine){
 		
 		vabLine.remove();
 		vabLine = null;
 		
-		var centre = size / 2;
-		var x = state.vabi * state.time;
-		var y = state.vabj * state.time;
+		
 	
 		vabLine = paper.path("M" + centre + " " + size + 
 		"L" + (centre - (x * state.scale))
@@ -273,6 +274,19 @@ function rescaleRiver(){
 		vabLine.attr("stroke", "#FF0000");
 		
 	}
+	
+	if(pLine){
+		
+		pLine.remove();
+		pLine = null;
+		
+		pLine = paper.path("M" + (centre - (x * state.scale)) + " " + (size - (y * state.scale)) + 
+			"L" + (centre - ((x + (state.vbi/4)) * state.scale))
+			+ " " + (size - ((y + (state.vabj/4)) * state.scale))
+		);
+	}
+	
+	
 	
 }
 
@@ -707,8 +721,8 @@ function parseInputRiver(){
 function getValuesRiver(){
 	
 	state.vabj = state.vp * Math.sin(state.riverAngle * (Math.PI / 180));
-	state.vabi = state.vp * Math.cos(state.riverAngle * (Math.PI / 180));
-	state.vabi = state.vabi - state.riverSpeed;
+	state.vbi = state.vp * Math.cos(state.riverAngle * (Math.PI / 180));
+	state.vabi = state.vbi - state.riverSpeed;
 	state.endTime = state.width / state.vabj;
 	state.across = state.endTime * state.vabi;
 
@@ -766,6 +780,16 @@ function simulateStepRiver(){
 	);
 		
 	vabLine.attr("stroke", "#FF0000");
+	
+	if(pLine){
+		pLine.remove();
+		pLine = null;
+	}
+	
+	pLine = paper.path("M" + (centre - (x * state.scale)) + " " + (size - (y * state.scale)) + 
+		"L" + (centre - ((x + (state.vbi/4)) * state.scale))
+		+ " " + (size - ((y + (state.vabj/4)) * state.scale))
+	);
 	
 	document.getElementById("time").innerHTML
 	= "Time: " + state.time.toFixed(3) + "s";
