@@ -47,13 +47,21 @@ function resizeNavBar(){
 	
 	navbar = document.getElementById("navbar");
 	navselect = document.getElementById("navselect");
+	navselectmenu = document.getElementById("navselectmenu");
 	
 	// once below a certain width change the navbar to a dropdown menu
 	if(w < 1024){
 		
 		navbar.style.display = "none";
 		navselect.style.display = "block";
-		navselect.style.width = (w - 20) + "px";
+		
+		if(w < 800){
+			navselect.style.width = (800 - 20) + "px";
+			navselectmenu.style.width = (800 - 40) + "px";
+		}else{
+			navselect.style.width = (w - 20) + "px";
+			navselectmenu.style.width = (w - 40) + "px";
+		}
 	}else{
 		navbar.style.display = "block";
 		navbar.style.width = (w - 16) + "px";

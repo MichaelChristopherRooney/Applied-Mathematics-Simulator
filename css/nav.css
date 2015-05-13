@@ -1,47 +1,51 @@
 #navbar ul {
 
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    width:100%;
+	
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	width:100%;
     
-    border-right: 2px solid black;
-    border-top: 2px solid black;
-    border-bottom: 2px solid black;
-  
-    
+	border-right: 2px solid black;
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
+
 }
 
 #navbar ul li {
 
-    float: left;
-    width: 14.285%;
+	
+	float: left;
+	width: 14.285%;
     
-    text-align: center;
-    font-weight: medium;
+	text-align: center;
+	font-weight: normal;
     
-    text-transform: uppercase;
+	text-transform: uppercase;
     
 }
 
 #navbar ul li a:link, #navbar  ul li a:visited {
-    display: block;
-    width: 100%;
-    height:50px;
+
+	line-height:25px;
+	vertical-align: middle;
+	display: block;
+	
+	width: 100%;
+	height:50px;
     
-    color: #FFFFFF;
-    background-color: #585858;
+	color: #FFFFFF;
+	background-color: #585858;
     
-    text-decoration: none;
+	text-decoration: none;
     
-    border-left: 2px solid black;
-    
-    
+	border-left: 2px solid black;
+
 }
 
 #navbar  ul li a:hover {
-    background-color: #b2b2b2;
+	background-color: #b2b2b2;
 }
 
 #navselect {
@@ -50,6 +54,15 @@
 	height: 55px;
 	display: none;
 	background-color: #585858;
-	border 1px solid black;
+	border: 1px solid black;
+	
+}
+
+#navselectmenu {
+
+	position: relative;
+	height: 35px;
+	top: 10px;
+	left: 10px;
 	
 }
