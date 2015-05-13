@@ -1,52 +1,23 @@
 <!DOCTYPE html>
 
 <html>
+
 <head>
 
-<meta charset="UTF-8"> 
+	<meta charset="UTF-8"> 
 
-<script src="js/raphael.js"></script>
-<script src="js/jquery-1.11.2.js"></script>
-<script src="js/collisions.js"></script>
-<script src="js/placeholders.min.js"></script>
+	<script src="js/raphael.js"></script>
+	<script src="js/jquery-1.11.2.js"></script>
+	<script src="js/scale.js"></script>
+	<script src="js/collisions.js"></script>
+	<script src="js/placeholders.min.js"></script>
 
-<style>
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    width:100%;
-}
-
-li {
-    float: left;
-    width: 14.285%;
- 
-}
-
-a:link, a:visited {
-    top:0px;
-    display: block;
-    width: 100%;
-    height:50px;
-    font-weight: medium;
-    color: #FFFFFF;
-    background-color: #585858;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    border: 1px solid black;
-}
-
-a:hover, a:active {
-    background-color: #b2b2b2;
-}
-</style>
+	<link rel="stylesheet" type="text/css" href="css/nav.css">
 
 </head>	
+
 <body>
-	<div id="navbar" style="height:60px;width:1024px;">
+	<div id="navbar">
 		<ul>
 		<li><a href="linearmotion.html">Linear motion</a><li>
 		<li><a href="projectiles.html">Projectiles</a><li>
@@ -58,7 +29,7 @@ a:hover, a:active {
 		</ul>
 	</div>
 	
-	<div id="navselect" style="width:100%; height:55px;display:none;background-color:#585858;border: 1px solid black;">
+	<div id="navselect">
 		<select id="navselectmenu" onchange="location = this.options[this.selectedIndex].value;" style="position:relative;height:35px;top:10px; left:5px;width:98%;">
 			<option value="collisions.html">Collisions</option>
 			<option value="projectiles.html">Projectiles</option>

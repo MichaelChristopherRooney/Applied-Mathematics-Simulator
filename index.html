@@ -1,27 +1,45 @@
+<!DOCTYPE html>
+
 <html>
 
-<meta charset="UTF-8"> 
+<head>
+
+	<meta charset="UTF-8"> 
+
+	<script src="js/jquery-1.11.2.js"></script>
+	<script src="js/scale.js"></script>
+	<script src="js/index.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="css/nav.css">
+
+</head>
 
 <body>
 
-	<p style="text-decoration: underline; font-weight: bold;">
-	Links to simulators for each topic
-	</p>
+	<div id="navbar">
+		<ul>
+		<li><a href="linearmotion.html">Linear motion</a><li>
+		<li><a href="projectiles.html">Projectiles</a><li>
+		<li><a href="relative.html">Relative velocity</a></li>
+		<li><a href="connected.html">Connected particles</a></li>
+		<li><a href="circular-shm.html">Circular and SHM</a></li>
+		<li><a href="collisions.html">Collisions</a></li>
+		<li><a style="color:black; background-color:#A0A0A0;" href="index.html">Index</a></li>
+		</ul>
+	</div>
 	
-	<ul>
-		<li><a href="linearmotion.html">Linear Motion</a></li>
-		<li><a href="projectiles.html">Projectiles</a></li>
-		<li><a href="relative.html">Relative Velocity</a></li>
-		<li><a href="circular-shm.html">Circular and Simple Harmonic Motion</a></li>
-		<!--
-		<li><a href="vectors.html">Vectors (NOT DONE)</a></li>
-		<li><a href="connected.html">Connected particles (NOT DONE)</a></li>
-		
-		
-		
-		<li><a href="collisions.html">Collisions (NOT DONE)</a></li>
-		-->
-	</ul>
+	<div id="navselect">
+		<select id="navselectmenu" onchange="location = this.options[this.selectedIndex].value;" style="position:relative;height:35px;top:10px; left:5px;width:98%;">
+			<option value="index.html">Index</option>
+			<option value="projectiles.html">Projectiles</option>
+			<option value="linearmotion.html">Linear Motion</option>
+			<option value="relative.html">Relative Velocity</option>
+			<option value="connected.html">Connected Particles</option>
+			<option value="circular-shm.html">Circular and SHM</option>
+			<option value="collisions.html">Collisions</option>
+			
+		</select>
+	</div>
 	
 	<p>
 	The aim of this project is to provide simulators to aid students 

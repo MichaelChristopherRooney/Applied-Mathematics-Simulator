@@ -1,5 +1,6 @@
 var size = 600;
 var oldSize;
+var oldScale;
 var graphSize = 225;
 var graphLine;
 var graphLine2;
@@ -29,7 +30,7 @@ $(document).ready(function(){
 	graphBackground.attr("fill", "#bdbdbd");
 	graphBackground.attr("stroke", "#000");
 	
-	getNewSize();
+	resize();
 
 });
 
@@ -41,56 +42,21 @@ var resizeTimer;
 $(window).resize(function (){
 	
 	clearTimeout(resizeTimer);
-	resizeTimer = setTimeout(getNewSize, 250);
-	
+	resizeTimer = setTimeout(resize, 250);
 	
 });
 
 /* 
 readjust all elements to suit new display size
 */
-function getNewSize(){
+function resize(){
 	
-	var w = 0, h = 0;
-	if( typeof( window.innerWidth ) == 'number' ) {
-		//Non-IE
-		w = window.innerWidth;
-		h = window.innerHeight;
-	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-		//IE 6+ in 'standards compliant mode'
-		w = document.documentElement.clientWidth;
-		h = document.documentElement.clientHeight;
-	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-		//IE 4 compatible
-		w = document.body.clientWidth;
-		h = document.body.clientHeight;
-	}
-	
-		
-	var x;
-	var oldSize = size;
-	var oldScale;
-		
-	size = w - 250 - 10 - 165;
+	var w = getNewDimensions();
+	resizeNavBar();
 	
 	
-	if(size + 80 > h){
-		size = h - 80;
-	}
-	
-	if(size < 480){
-		size = 400;
-	}
-	
-	if(w < 1024){
-		document.getElementById("navbar").style.display = "none";
-		document.getElementById("navselect").style.display = "block";
-		document.getElementById("navselect").style.width = w - 20;
-	}else{
-		document.getElementById("navbar").style.display = "block";
-		document.getElementById("navselect").style.display = "none";
-	}
-	
+	oldSize = size;
+	size = getNewSize();
 		
 	if(state){
 		
@@ -103,9 +69,7 @@ function getNewSize(){
 			"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
 		}
 		
-		
 	}
-
 	
 	if(circle1){
 		circle1.attr("cx", (circle1.attr("cx") / oldScale) * state.scale);
@@ -132,7 +96,6 @@ function getNewSize(){
 	document.getElementById("info_pane").style.left = (size + 10 + 165) + "px";
 	document.getElementById("graph_panel").style.left = (size + 10 + 165) + "px";
 	document.getElementById("graphText").style.left = (size + 10 + 165) + "px";
-	document.getElementById("navbar").style.width = (w - 16) + "px";
 			
 }
 

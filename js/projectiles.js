@@ -7,6 +7,8 @@ var fps = 60;
 var pointList = [];
 var paper;
 var backgroundRectangle;
+var oldScale;
+var oldSize; 
 
 $(document).ready(function(){
 	
@@ -16,8 +18,7 @@ $(document).ready(function(){
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
 	
-	getNewSize();
-
+	resize();
 	
 });
 
@@ -29,61 +30,22 @@ var resizeTimer;
 $(window).resize(function (){
 	
 	clearTimeout(resizeTimer);
-	resizeTimer = setTimeout(getNewSize, 250);
-	
+	resizeTimer = setTimeout(resize, 250);
 	
 });
 
 /* 
 readjust all elements to suit new display size
 */
-function getNewSize(){
+function resize(){
 	
-	var w = 0, h = 0;
-	if( typeof( window.innerWidth ) == 'number' ) {
-		//Non-IE
-		w = window.innerWidth;
-		h = window.innerHeight;
-	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-		//IE 6+ in 'standards compliant mode'
-		w = document.documentElement.clientWidth;
-		h = document.documentElement.clientHeight;
-	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-		//IE 4 compatible
-		w = document.body.clientWidth;
-		h = document.body.clientHeight;
-	}
+	var w = getNewDimensions();
+	resizeNavBar();
 	
-		
-	var oldSize = size;
-	var oldScale;
-		
+	oldSize = size;
+	size = getNewSize();
 	
-	size = w - 250 - 10 - 165;
-	
-	if(size + 80 > h){
-		size = h - 80;
-	}
-	
-	if(size < 480){
-		size = 400;
-	}
-	
-	if(w < 1024){
-		document.getElementById("navbar").style.display = "none";
-		document.getElementById("navselect").style.display = "block";
-		document.getElementById("navselect").style.width = (w - 20) + "px";
-	}else{
-		document.getElementById("navbar").style.display = "block";
-		document.getElementById("navselect").style.display = "none";
-	}
-	
-	if(state){
-		oldScale = state.scale;
-		var x = oldSize / state.scale;
-		state.scale = size / x;
-		rescale(oldSize, oldScale);
-	}
+	rescaleGraphics();
 	
 	paper.setSize(size, size);
 	backgroundRectangle.attr("height", size);
@@ -92,15 +54,22 @@ function getNewSize(){
 	document.getElementById("graphics_panel").style.width = size + "px";
 	document.getElementById("graphics_panel").style.left = "165px";
 	document.getElementById("info_pane").style.left = size + 10 + 165 + "px";
-	document.getElementById("navbar").style.width = (w - 16) + "px";
 		
 }
 
 /*
 rescale the graphical elements to fit the new size
 */
-function rescale(oldSize, oldScale){
+function rescaleGraphics(){
 	
+	if(!state){
+		return;
+	}
+	
+	oldScale = state.scale;
+	x = oldSize / state.scale;
+	state.scale = size / x;
+
 	document.getElementById("scale").innerHTML = 
 	"Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";	
 			

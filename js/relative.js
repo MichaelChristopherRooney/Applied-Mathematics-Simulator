@@ -1,5 +1,4 @@
 var size = 600;
-var oldSize;
 var vaLine;
 var vbLine;
 var vabLine;
@@ -30,7 +29,7 @@ $(document).ready(function(){
 	backgroundRectangle.attr("fill", "#bdbdbd");
 	backgroundRectangle.attr("stroke", "#000");
 	
-	getNewSize();
+	resize();
 
 });
 
@@ -42,45 +41,20 @@ var resizeTimer;
 $(window).resize(function (){
 	
 	clearTimeout(resizeTimer);
-	resizeTimer = setTimeout(getNewSize, 250);
-	
+	resizeTimer = setTimeout(resize, 250);
 	
 });
 
 /* 
 readjust all elements to suit new display size
 */
-function getNewSize(){
+function resize(){
 	
-	var w = 0, h = 0;
-	if( typeof( window.innerWidth ) == 'number' ) {
-		//Non-IE
-		w = window.innerWidth;
-		h = window.innerHeight;
-	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-		//IE 6+ in 'standards compliant mode'
-		w = document.documentElement.clientWidth;
-		h = document.documentElement.clientHeight;
-	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-		//IE 4 compatible
-		w = document.body.clientWidth;
-		h = document.body.clientHeight;
-	}
+	var w = getNewDimensions();
+	resizeNavBar();
 	
-		
-	var x;
 	oldSize = size;
-	oldScale;
-		
-	size = w - 250 - 10 - 165;
-	
-	if(size + 80 > h){
-		size = h - 80;
-	}
-
-	if(size < 480){
-		size = 400;
-	}	
+	size = getNewSize();	
 	
 	if(state){
 		
@@ -88,15 +62,8 @@ function getNewSize(){
 			oldScale = state.scale;
 			x = oldSize / state.scale;
 			state.scale = size / x;
-			
-			//document.getElementById("scale").innerHTML = "Scale: 1 metre = " + state.scale.toFixed(3) + " pixels";
 		}
 		
-		/*
-		if Vab scenario then we can just
-		call runVAB again to recreate the
-		lines with the new size in mind
-		*/
 		if(state.type == "vab"){
 			rescaleVAB();
 		}else if(state.type == "closest"){
@@ -108,15 +75,6 @@ function getNewSize(){
 		
 	}
 	
-	if(w < 1024){
-		document.getElementById("navbar").style.display = "none";
-		document.getElementById("navselect").style.display = "block";
-		document.getElementById("navselect").style.width = (w - 20) + "px";
-	}else{
-		document.getElementById("navbar").style.display = "block";
-		document.getElementById("navselect").style.display = "none";
-	}
-	
 	paper.setSize(size, size);
 	backgroundRectangle.attr("height", size);
 	backgroundRectangle.attr("width", size);
@@ -125,7 +83,6 @@ function getNewSize(){
 	document.getElementById("graphics_panel").style.height = size + "px";
 	document.getElementById("graphics_panel").style.left = "165px";
 	document.getElementById("info_pane").style.left = (size + 10 + 165) + "px";
-	document.getElementById("navbar").style.width = (w - 16) + "px";
 	
 }
 
@@ -579,7 +536,12 @@ function getValuesClosest(){
 	
 	var theta = Math.atan(slope);
 	rt = Math.cos(theta) * tq;
-	state.closest = rt;
+	
+	/*
+	rt can be negative which is fine in the simulation
+	make it always positive for the info pane to avoid confusion
+	*/
+	state.closest = Math.abs(rt);
 	
 	var qr = rt * Math.tan(theta);
 	var sq = state.startB / Math.cos(theta)
@@ -589,6 +551,8 @@ function getValuesClosest(){
 	
 	state.endA = (state.vai * state.endTime) - state.startA;
 	state.endB = (state.vbj * state.endTime) - state.startB;
+	
+	
 
 }
 
@@ -615,7 +579,6 @@ function setDataClosest(){
 	document.getElementById("scale").innerHTML
 	= "Scale: 1 metre : 1" + state.scale.toFixed(3) + " pixels";
 	
-	
 }
 
 /*
@@ -638,7 +601,8 @@ function getScaleClosest(){
 	}
 	
 	if(state.distance > a && state.distance > b){
-		state.scale = size / state.distance / 2;
+		// *.95 to stop the vab line lying on the edge of the display
+		state.scale = (size / state.distance / 2) * 0.95;
 	}else if(a > b){
 		state.scale = size / a / 2;
 	}else{
