@@ -1,3 +1,9 @@
+/*
+this is scaling code that every simulator uses
+it provides the width of the window, and the size that the simulator display shoudld be
+it also handles resizing the navbar
+*/
+
 var w;
 var h;
 
@@ -42,6 +48,7 @@ function resizeNavBar(){
 	navbar = document.getElementById("navbar");
 	navselect = document.getElementById("navselect");
 	
+	// once below a certain width change the navbar to a dropdown menu
 	if(w < 1024){
 		
 		navbar.style.display = "none";
